@@ -1,0 +1,41 @@
+server:
+  port: 8080
+#  servlet:
+#    context-path: /identity
+
+#Swagger
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    path: /index.html
+
+#Security
+security:
+  jwt:
+    header: "Authorization"
+    prefix: "Bearer "
+    secret: "demo_oracle_db"
+    expiration: "#{30*60}"
+    refresh-expiration: "#{7*24*60*60}"
+
+spring:
+  datasource:
+    driver-class-name: oracle.jdbc.OracleDriver
+    url: "jdbc:oracle:thin:@10.10.0.202:1521:ORCL"
+    username: demo
+    password: demo
+    name: DEMO
+    hikari:
+      auto-commit: false
+  jpa:
+    database-platform: org.hibernate.dialect.OracleDialect
+    database: oracle
+    show-sql: true
+    properties:
+      hibernate.id.new_generator_mappings: true
+      hibernate.connection.provider_disables_autocommit: true
+      hibernate.cache.use_second_level_cache: false
+      hibernate.cache.use_query_cache: false
+      hibernate.generate_statistics: false

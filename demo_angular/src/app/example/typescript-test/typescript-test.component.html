@@ -1,0 +1,19 @@
+<style>
+  label{
+    width: 50px;
+  }
+</style>
+
+<p>typescript-test works!</p>
+<div>
+  <label for="text-input">Text</label><input #textInput type="text">
+  <button (click)="listen(textInput.value)">Click</button>
+</div>
+<div>
+  <label for="number-input">Number</label><input #numberInput type="number">
+  <button (click)="listen(numberInput.value)">Click</button>
+</div>
+<!-- <div>
+  <label for="boolean-input">Check</label><input #booleanInput type="checkbox">
+  <button (click)="listen(booleanInput.checked)">Click</button>
+</div> -->

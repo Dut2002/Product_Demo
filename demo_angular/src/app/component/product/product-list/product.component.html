@@ -1,0 +1,126 @@
+<div class="container">
+  <h1 class="title center">Product Management</h1>
+  <div class="table-actions">
+    <button class="btn add-btn btn-medium" *ngIf="authService.hasAuthority(authority.ADD_PRODUCT.name)" (click)="openAddModal()">Add Product</button>
+    <button class="btn import-btn btn-medium" (click)="importProducts()">Import Product</button>
+    <button class="btn export-btn btn-medium" (click)="exportProducts()">Export Product</button>
+  </div>
+
+  <app-product-filter
+  [filter]="productFilter"
+  (applyEvent)="applyFilter($event)"
+  (resetEvent)="resetFilter()"
+  >
+
+  </app-product-filter>
+
+  <ng-container *ngIf="products.length > 0; else noData">
+    <div class="table-container">
+      <table class="table product-table">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th (click)="sortTable('name')">Product Name
+              <i class="fa-solid fa-angle-up"
+                *ngIf="productFilter.orderCol === 'name' && productFilter.sortDesc === false"></i>
+              <i class="fa-solid fa-angle-down"
+                *ngIf="productFilter.orderCol === 'name' && productFilter.sortDesc === true"></i>
+            </th>
+            <th (click)="sortTable('yearMaking')">Year Making
+              <i class="fa-solid fa-angle-up"
+                *ngIf="productFilter.orderCol === 'yearMaking' && productFilter.sortDesc === false"></i>
+              <i class="fa-solid fa-angle-down"
+                *ngIf="productFilter.orderCol === 'yearMaking' && productFilter.sortDesc === true"></i>
+            </th>
+            <th (click)="sortTable('price')">Price
+              <i class="fa-solid fa-angle-up"
+                *ngIf="productFilter.orderCol === 'price' && productFilter.sortDesc === false"></i>
+              <i class="fa-solid fa-angle-down"
+                *ngIf="productFilter.orderCol === 'price' && productFilter.sortDesc === true"></i>
+            </th>
+            <th (click)="sortTable('quantity')">Quality
+              <i class="fa-solid fa-angle-up"
+                *ngIf="productFilter.orderCol === 'quantity' && productFilter.sortDesc === false"></i>
+              <i class="fa-solid fa-angle-down"
+                *ngIf="productFilter.orderCol === 'quantity' && productFilter.sortDesc === true"></i>
+            </th>
+            <th (click)="sortTable('expireDate')">Expire Date
+              <i class="fa-solid fa-angle-up"
+                *ngIf="productFilter.orderCol === 'expireDate' && productFilter.sortDesc === false"></i>
+              <i class="fa-solid fa-angle-down"
+                *ngIf="productFilter.orderCol === 'expireDate' && productFilter.sortDesc === true"></i>
+            </th>
+
+            <th (click)="sortTable('categoryId')">Category
+              <i class="fa-solid fa-angle-up"
+                *ngIf="productFilter.orderCol === 'categoryId' && productFilter.sortDesc === false"></i>
+              <i class="fa-solid fa-angle-down"
+                *ngIf="productFilter.orderCol === 'categoryId' && productFilter.sortDesc === true"></i>
+            </th>
+
+            <th (click)="sortTable('supplier')">Supplier
+              <i class="fa-solid fa-angle-up"
+                *ngIf="productFilter.orderCol === 'supplier' && productFilter.sortDesc === false"></i>
+              <i class="fa-solid fa-angle-down"
+                *ngIf="productFilter.orderCol === 'supplier' && productFilter.sortDesc === true"></i>
+            </th>
+
+            <th >Voucher
+            </th>
+
+            <th *ngIf="authService.hasAuthority(authority.UPDATE_PRODUCT.name)&&authService.hasAuthority(authority.DELETE_PRODUCT.name)">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of products; let i = index">
+            <td class="col-50">{{ i + 1 }}</td>
+            <td class="col-150">{{ product.name }}</td>
+            <td class="col-75">{{ product.yearMaking }}</td>
+            <td class="col-100">{{ product.price | currency }}</td>
+            <td class="col-50">{{ product.quantity }}</td>
+            <td class="col-100">{{ product.expireDate| date }}</td>
+            <td class="col-75">{{ product.categoryName }}</td>
+            <td class="col-150">{{ product.supplierName }}</td>
+            <td class="col-150">{{ product.vouchers }}</td>
+            <td class="col-75" *ngIf="authService.hasAuthority(authority.UPDATE_PRODUCT.name)&&authService.hasAuthority(authority.DELETE_PRODUCT.name)">
+              <button class="btn update-btn btn-small" *ngIf="authService.hasAuthority(authority.UPDATE_PRODUCT.name)" (click)="openUpdateModal(product)">Update</button>
+              <button class="btn delete-btn btn-small" *ngIf="authService.hasAuthority(authority.DELETE_PRODUCT.name)" (click)="confirmDelete(product)">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class=" e-pagerContainer">
+        <div class="e-navigationStyle">
+          <a (click)="onPageChange(productFilter.pageNum-1)" class="btn"
+            [class.btn-disable]="productFilter.pageNum <= 1">Previous</a>
+        </div>
+        <div>
+          <span>Page </span>
+          <input type="number" [(ngModel)]="productFilter.pageNum" min="1" [max]="totalPages"
+            [ngModel]="productFilter.pageNum" (ngModelChange)="loadProducts()" class="page-input"
+            style="width: 40px; text-align: center;">
+          <span> of <b>{{totalPages}}</b></span>
+        </div>
+        <div class="e-navigationStyle">
+          <a (click)="onPageChange(productFilter.pageNum+1)" class="btn"
+            [class.btn-disable]="productFilter.pageNum >= totalPages">Next</a>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+  <ng-template #noData>
+    <h1 class="title center">No data available</h1>
+  </ng-template>
+
+  <app-product-modal *ngIf="showModal"
+  [modalTitle]="modalTitle"
+  [product]="currentProduct"
+  (successEvent)="saveSuccess()" (cancelEvent)="closeModal()"
+  >
+  </app-product-modal>
+
+  <app-confirm-modal [title]="'Do you want to delete this product?'" [showConfirmation]="showConfirmation"
+    (confirmEvent)="deleteProduct()" (cancelEvent)="cancleConfirm()">
+  </app-confirm-modal>
+
+</div>

@@ -1,0 +1,19 @@
+<div class="modal">
+  <div class="modal-content">
+    <h2>{{ modalTitle }}</h2>
+    <form (ngSubmit)="saveProduct()">
+      <input type="text" [(ngModel)]="product.name" name="name" placeholder="Product Name" required>
+      <input type="number" [(ngModel)]="product.yearMaking" name="yearmaking" placeholder="Year Making"
+        required>
+      <input type="number" [(ngModel)]="product.price" name="price" placeholder="Price" required>
+      <input type="number" [(ngModel)]="product.quantity" name="quality" placeholder="Quality" required>
+      <input type="date" [(ngModel)]="product.expireDate" name="expridate" placeholder="Expired Date" required>
+
+      <div class="center">
+        <button type="submit" class="btn btn-small btn-green">Save</button>
+        <button type="button" class="btn btn-small btn-orange" (click)="onReset()">Refresh</button>
+        <button type="button" class="btn btn-small btn-gray" (click)="onCancel()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>

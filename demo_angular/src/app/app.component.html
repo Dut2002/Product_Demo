@@ -1,0 +1,6 @@
+<app-header (scrollEvent)="onScroll($event)" [title]="'APP MANAGEMENT'" [isNavVisible]="isNavVisible"
+*ngIf="authService.isLoggedIn()"
+></app-header>
+<div class="content-wrapper">
+  <router-outlet></router-outlet>
+</div>

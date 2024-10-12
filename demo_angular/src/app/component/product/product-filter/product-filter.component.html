@@ -1,0 +1,74 @@
+<div class="table-filters">
+  <form class="form">
+    <div class="form-input flex-third">
+      <label class="form-label" for="Product Name">Search</label>
+      <div class="form-input-enter">
+        <input type="text" [(ngModel)]="filter.name" name="name" placeholder="Search products...">
+      </div>
+    </div>
+    <div class="form-input flex-third">
+      <label class="form-label" for="yearMaking">Year Making</label>
+      <div class="form-input-enter">
+        <input type="number" min="1900" [(ngModel)]="filter.yearMaking" name="yearMaking"
+          placeholder="Search products...">
+      </div>
+    </div>
+    <div class="form-input flex-third">
+      <label class="form-label" for="quality-range">Quantity</label>
+      <div class="form-input-enter">
+        <input [min]="0" type="number" [(ngModel)]="filter.minQuantity" name="minQuality"
+          placeholder="Min Quality" (change)="changeQuality(false)">
+        <input [min]="0" type="number" [(ngModel)]="filter.maxQuantity" name="maxQuality"
+          placeholder="Max Quality" (change)="changeQuality(true)">
+      </div>
+    </div>
+    <div class="form-input flex-third">
+      <label class="form-label" for="price-range">Price</label>
+      <div class="form-input-enter">
+        <input [min]="0" placeholder="Min Price" name="minPrice" [(ngModel)]="filter.minPrice" type="number"
+          (change)="changePrice(false)">
+        <input [min]="0" placeholder="Max Price" name="maxPrice" [(ngModel)]="filter.maxPrice" type="number"
+          (change)="changePrice(true)">
+      </div>
+    </div>
+    <div class="form-input flex-third">
+      <label class="form-label" for="date-range">Expired Date</label>
+      <div class="form-input-enter">
+        <input [(ngModel)]="filter.startExpireDate" name="startExpiredDate" type="date">
+        <input [(ngModel)]="filter.endExpireDate" name="endExpiredDate" type="date">
+      </div>
+    </div>
+
+    <div class="form-input flex-third">
+      <label class="form-label" for="producer">Voucher</label>
+      <div class="form-input-enter">
+        <input type="text" [(ngModel)]="filter.voucherCode" name="voucherCode" placeholder="Search products...">
+      </div>
+    </div>
+
+
+
+    <div class="form-input flex-third">
+      <label class="form-label" for="producer">Category</label>
+      <div class="form-input-enter">
+        <input type="number" [(ngModel)]="filter.categoryId" name="categoryId" placeholder="Search products...">
+      </div>
+    </div>
+    <div class="form-input flex-third">
+      <label class="form-label" for="producer">Supplier</label>
+        <app-search-drop-down >
+        </app-search-drop-down>
+    </div>
+    <div class="form-input flex-third">
+      <label class="form-label" for="producer">Customer</label>
+      <div class="form-input-enter">
+        <input type="number" [(ngModel)]="filter.customerId" name="customerId" placeholder="Search products...">
+      </div>
+    </div>
+
+    <div class="form-input flex-full center">
+      <button class="btn submit-btn btn-small" (click)="onApply()">Apply</button>
+      <input type="reset" class="btn reset-btn btn-small" value="Reset" (click)="onReset()">
+    </div>
+  </form>
+</div>

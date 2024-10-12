@@ -1,0 +1,14 @@
+<div [ngClass]="snackType" class="snack-bar">
+  <span class="snack-bar-label"  matSnackBarLabel>
+    <div class="snack-bar-title text-bold">
+      {{snackTitle}}
+    </div>
+    <div class="snack-bar-content" [innerHTML]="snackMessage">
+
+    </div>
+  </span>
+  <span  class="snack-bar-action" matSnackBarActions>
+    <a mat-button matSnackBarAction (click)="snackBarRef.dismissWithAction()"><i class="fa-regular fa-circle-xmark"></i></a>
+  </span>
+</div>
+

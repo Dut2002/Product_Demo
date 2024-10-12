@@ -1,0 +1,33 @@
+.form-input-enter {
+  position: relative;
+}
+
+.form-input-enter input{
+  margin: 0;
+}
+
+.dropdown {
+  position: absolute;
+  border: 0.5px solid #404040;
+  background-color: white;
+  z-index: 1000;
+  top: 100%;
+  width: 100%;
+  border-radius: 5px;
+  overflow: hidden;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.dropdown div {
+  padding: 8px;
+  cursor: pointer;
+
+}
+
+
+
+.dropdown div:hover {
+  background-color: #f0f0f0;
+}
+

@@ -1,0 +1,18 @@
+<div class="form-input-enter">
+  <input
+    type="text"
+    placeholder="Select Category"
+    [ngModel] = "search"
+    (focus)="showDropdown = true"
+    (blur)="hideDropdown()"
+    (input)="filterCategories(search)"
+  />
+
+  <div *ngIf="showDropdown" class="dropdown">
+    <div *ngFor="let category of filteredCategories" (click)="selectCategory(category)">
+      {{ category }}
+    </div>
+  </div>
+</div>
+
+

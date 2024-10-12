@@ -1,0 +1,28 @@
+<style>
+
+    .progress-bar-container,
+    .progress {
+      height: 20px;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+    }
+
+</style>
+
+<p>progress-bar works!</p>
+<button (mousedown)="startDecreasing()" (mouseup)="stopChanging()">←</button>
+<button (mousedown)="startIncreasing()" (mouseup)="stopChanging()">→</button>
+<div
+  class="progress-bar-container"
+  [style.backgroundColor]="backgroundColor"
+>
+  <div
+    class="progress"
+    [style]="{
+      backgroundColor: progressColor,
+      width: progress + '%'
+    }"
+  >{{progress}}</div>
+</div>

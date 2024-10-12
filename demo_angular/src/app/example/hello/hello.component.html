@@ -1,0 +1,87 @@
+<style>
+  label{
+    width: 30px;
+  }
+  .input{
+    margin-top: 10px;
+  }
+
+  .tab-container div {
+  padding: 10px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  }
+
+  .tab-active {
+    background-color: lightblue;
+    font-weight: bold;
+    color: red;
+  }
+
+  .extra-class {
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;;
+  }
+
+</style>
+
+<h2>Hello my app!</h2>
+<h3> Name: {{user.name}}</h3>
+<h3> Age: {{user.age}}</h3>
+
+<div class="input">
+  <label for="name">Name: </label><input type="text" [ngModel]="user.name" (ngModelChange) = "user.name = $event"/>
+</div>
+<div class="input">
+  <label for="age">Age: </label><input type="number" [(ngModel)]="user.age"/>
+</div>
+<div class="input">
+  <label for="Active">Tab Active: </label><input type="checkbox" [(ngModel)]="isTabActive"/>
+</div>
+
+<ng-template [ngIf]="user.age >= 13" [ngIfElse]="noP13">
+  <div>You can see content PG-13</div>
+</ng-template>
+<ng-template #noP13>
+  <div>You can not see content PG-13</div>
+</ng-template>
+
+<div><button (click)="showArlet()">No click</button>
+</div>
+
+<h2>List of Authors</h2>
+<!-- <div *ngFor="let author of authors, index as idx, count as total">
+  {{idx+1}}/{{total}}: {{author.id}} - {{author.firstName}} {{author.lastName}}
+</div> -->
+<ng-template
+  ngFor
+  [ngForOf]="authors"
+  let-author
+  let-idx="index"
+  let-total = "count"
+>
+  <div>{{idx+1}}/{{total}}: {{author.id}} - {{author.firstName}} {{author.lastName}}</div>
+</ng-template>
+<!--
+<h2>List of Authors</h2>
+<div *ngFor="let item of authors, first as first">
+  <ng-container *ngIf="first"> More code </ng-container>
+</div>
+
+<h2>List of Authors</h2>
+<div *ngFor="let item of authors, first as first">
+  <ng-template [ngIf]="first"> More code </ng-template>
+</div> -->
+
+
+<!-- <h1 style="color:red;" [class.tab-inactive]="!isTabActive">My new Content</h1> -->
+
+<h2  [class]="{'tab-active': isSelectedTab(1), 'extra-class': true}" (click)="selectTab(1)">Tab 1</h2>
+<h2  [class]="{'tab-active': isSelectedTab(2), 'extra-class': true}" (click)="selectTab(2)">Tab 2</h2>
+<h2  [class]="{'tab-active': isSelectedTab(3), 'extra-class': true}" (click)="selectTab(3)">Tab 3</h2>
+
+<app-progress-bar
+  [backgroundColor]="'#9e9e9e'"
+  [progressColor]="'#2e8b57'"
+  [progress]="user.age"
+>
+</app-progress-bar>

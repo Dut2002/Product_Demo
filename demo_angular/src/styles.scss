@@ -1,0 +1,430 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+
+/* You can add global styles to this file, and also import other style files */
+.container {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  background-color: #e6e6e6;
+}
+
+.align-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.center {
+  text-align: center;
+}
+
+.text-bold {
+  font-weight: bold;
+}
+
+.title {
+  padding: 0;
+  margin: 10px;
+}
+
+.flex-box{
+  display: flex;
+}
+
+.flex-align-end{
+  // align-self: flex-end;
+  margin-top: auto;
+}
+
+//FORM
+
+.form {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 10px 16px;
+  height: auto;
+  box-sizing: border-box;
+  align-content: flex-start;
+}
+
+.form-title{
+  display: inline;
+  font-weight: bold;
+  font-size: large;
+  padding-bottom: 8px;
+  height: fit-content;
+}
+
+.form-input {
+  margin: 5px;
+  /* Tạo khoảng cách giữa các dòng */
+}
+
+.form-input-enter {
+  display: flex;
+}
+
+.flex-full {
+  flex: 1 1 100%
+}
+
+.flex-half {
+  /* Chia 2 phần tử mỗi dòng */
+  flex: 1 1 45%;
+  /* Mỗi phần tử chiếm 45% chiều rộng */
+}
+
+.flex-third {
+  /* Chia 3 phần tử mỗi dòng */
+  flex: 1 1 28%;
+  /* Mỗi phần tử chiếm 30% chiều rộng */
+}
+
+.flex-quarter {
+  /* Chia 4 phần tử mỗi dòng */
+  flex: 1 1 22%;
+  /* Mỗi phần tử chiếm 22% chiều rộng */
+}
+
+.form-input-enter input {
+  flex: 1;
+  /* Mỗi input chiếm đều không gian */
+  margin-right: 8px;
+  /* Tạo khoảng cách giữa các input */
+  width: fit-content;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.form-input-enter input[type='text']{
+  border: 1px solid black;
+}
+
+.form-input-enter input:last-child {
+  margin-right: 0;
+  /* Xóa khoảng cách bên phải của input cuối cùng */
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+//Button
+
+.btn {
+  display: inline-block;
+  /* Để thẻ có thể sử dụng padding và chiều rộng */
+  margin: 2px 5px 2px 5px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 120px;
+  text-align: center;
+  /* Để căn giữa nội dung */
+  background-color: #007BFF;
+  /* Màu nền mặc định */
+  color: white;
+  /* Màu chữ mặc định */
+  font-size: 14px;
+  /* Kích thước chữ */
+}
+
+.btn-disable {
+  pointer-events: none;
+  /* Ngăn không cho nhấn vào nút */
+  color: gray;
+  /* Thay đổi màu sắc */
+  text-decoration: none;
+  /* Xóa gạch chân nếu có */
+  opacity: 0.6;
+  /* Giảm độ sáng */
+}
+
+/* Button sizes */
+.btn-small {
+  padding: 4px 8px;
+  font-size: 12px;
+  width: 80px;
+}
+
+.btn-medium {
+  padding: 8px 12px;
+  font-size: 14px;
+  width: 120px;
+}
+
+.btn-large {
+  padding: 12px 20px;
+  font-size: 16px;
+  width: 160px;
+}
+
+.btn:hover {
+  opacity: 0.9;
+  // background-color: #0056b3;
+}
+
+.add-btn {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.import-btn {
+  background-color: #2196F3;
+  color: white;
+}
+
+.export-btn {
+  background-color: #FF9800;
+  color: white;
+}
+
+.update-btn {
+  background-color: #FFC107;
+  color: black;
+}
+
+.delete-btn {
+  background-color: #f44336;
+  color: white;
+}
+
+/* Màu xanh lá cây */
+.btn-green {
+  background-color: #4CAF50;
+  color: white;
+}
+
+/* Màu xanh dương */
+.btn-blue {
+  background-color: #2196F3;
+  color: white;
+}
+
+/* Màu cam */
+.btn-orange {
+  background-color: #FF9800;
+  color: white;
+}
+
+/* Màu vàng */
+.btn-yellow {
+  background-color: #FFC107;
+  color: black;
+}
+
+/* Màu đỏ */
+.btn-red {
+  background-color: #f44336;
+  color: white;
+}
+
+/* Màu tím */
+.btn-purple {
+  background-color: #9C27B0;
+  color: white;
+}
+
+/* Màu xám */
+.btn-gray {
+  background-color: #9E9E9E;
+  color: white;
+}
+
+/* Màu đen */
+.btn-black {
+  background-color: #000000;
+  color: white;
+}
+
+/* Màu xanh nhạt */
+.btn-light-blue {
+  background-color: #03A9F4;
+  color: white;
+}
+
+/* Màu xanh lá nhạt */
+.btn-light-green {
+  background-color: #8BC34A;
+  color: white;
+}
+
+
+.update-btn,
+.delete-btn {
+  padding: 6px 12px;
+  margin-right: 5px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+
+
+//Modal
+
+.modal,
+.confirmation-modal {
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content,
+.confirmation-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  width: 80%;
+  max-width: 500px;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+}
+
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content input {
+  margin-bottom: 10px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.modal-content button,
+.confirmation-content button {
+  margin-top: 10px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.confirmation-title{
+  font-size: 20px;
+}
+
+.confirm-group   {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.table-container {
+  overflow-x: auto;
+  /* Thêm thanh cuộn ngang nếu nội dung quá rộng */
+  margin: 20px 0;
+  /* Tùy chọn: Thêm khoảng cách phía trên và dưới */
+}
+
+.table-container th{
+  position: relative;
+  padding-right: 20px; // Tạo khoảng trống cho icon ở phía phải
+  cursor: pointer;
+}
+
+[class^="col-"] {
+  /* Tìm class bắt đầu bằng col- */
+  min-width: attr(data-width px); /* Áp dụng width từ giá trị data-width */
+  max-width: attr(data-width px);
+  width: attr(data-width px);
+}
+
+@for $i from 50 through 500 {
+  .col-#{$i} {
+    min-width: #{$i}px;
+    max-width: #{$i}px;
+    width: #{$i}px;
+  }
+}
+
+.table-container th i{
+  position: absolute;
+  right: 0; // Căn lề phải cho icon
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.table {
+  width: 100%;
+  /* Đảm bảo bảng chiếm hết chiều rộng có sẵn */
+  min-width: 600px;
+  /* Đặt chiều rộng tối thiểu cho bảng (có thể điều chỉnh tùy ý) */
+  border-collapse: collapse;
+  /* Để loại bỏ khoảng cách giữa các ô */
+}
+
+.table th,
+.product-table td {
+  padding: 8px;
+  /* Thêm khoảng cách cho các ô */
+  text-align: left;
+  /* Canh lề cho nội dung bên trái */
+  border: 0.5px solid #000000;
+  /* Thêm đường viền cho các ô */
+  overflow-wrap: break-word;
+}
+
+.table th {
+  background-color: #c2c2c2;
+  /* Màu nền cho tiêu đề */
+  cursor: pointer;
+  /* Thêm con trỏ chuột khi di chuột qua tiêu đề */
+}
+
+.table tr:hover {
+  background-color: #efefef;
+  /* Thêm hiệu ứng hover cho hàng */
+}
+
+table tbody {
+  background-color: #ffffff;
+}
+
+mat-form-field{
+  width: 100%;
+  // position: absolute;
+  // bottom: -100%;
+  // padding: 0;
+  // margin: 0;
+}
+
+//Paging
+.e-pagerContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 5px 0;
+}
+
+.e-pagerContainer .btn {
+  background: #aaabae;
+  width: 70px;
+  padding: 8px 8px;
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
