@@ -1,16 +1,13 @@
 <div class="container">
   <h1 class="title center">Product Management</h1>
   <div class="table-actions">
-    <button class="btn add-btn btn-medium" *ngIf="authService.hasAuthority(authority.ADD_PRODUCT.name)" (click)="openAddModal()">Add Product</button>
+    <button class="btn add-btn btn-medium" *ngIf="authService.hasAuthority(authority.ADD_PRODUCT.name)"
+      (click)="openAddModal()">Add Product</button>
     <button class="btn import-btn btn-medium" (click)="importProducts()">Import Product</button>
     <button class="btn export-btn btn-medium" (click)="exportProducts()">Export Product</button>
   </div>
 
-  <app-product-filter
-  [filter]="productFilter"
-  (applyEvent)="applyFilter($event)"
-  (resetEvent)="resetFilter()"
-  >
+  <app-product-filter [filter]="productFilter" (applyEvent)="applyFilter($event)" (resetEvent)="resetFilter()">
 
   </app-product-filter>
 
@@ -65,26 +62,36 @@
                 *ngIf="productFilter.orderCol === 'supplier' && productFilter.sortDesc === true"></i>
             </th>
 
-            <th >Voucher
-            </th>
+            <th>Voucher
 
-            <th *ngIf="authService.hasAuthority(authority.UPDATE_PRODUCT.name)&&authService.hasAuthority(authority.DELETE_PRODUCT.name)">Actions</th>
+            </th>
+            <th
+              *ngIf="authService.hasAuthority(authority.UPDATE_PRODUCT.name)&&authService.hasAuthority(authority.DELETE_PRODUCT.name)">
+              Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let product of products; let i = index">
-            <td class="col-50">{{ i + 1 }}</td>
-            <td class="col-150">{{ product.name }}</td>
-            <td class="col-75">{{ product.yearMaking }}</td>
-            <td class="col-100">{{ product.price | currency }}</td>
+            <td class="col-20">{{ i + 1 }}</td>
+            <td class="col-120">{{ product.name }}</td>
+            <td class="col-70">{{ product.yearMaking }}</td>
+            <td class="col-80">{{ product.price | currency }}</td>
             <td class="col-50">{{ product.quantity }}</td>
             <td class="col-100">{{ product.expireDate| date }}</td>
             <td class="col-75">{{ product.categoryName }}</td>
-            <td class="col-150">{{ product.supplierName }}</td>
-            <td class="col-150">{{ product.vouchers }}</td>
-            <td class="col-75" *ngIf="authService.hasAuthority(authority.UPDATE_PRODUCT.name)&&authService.hasAuthority(authority.DELETE_PRODUCT.name)">
-              <button class="btn update-btn btn-small" *ngIf="authService.hasAuthority(authority.UPDATE_PRODUCT.name)" (click)="openUpdateModal(product)">Update</button>
-              <button class="btn delete-btn btn-small" *ngIf="authService.hasAuthority(authority.DELETE_PRODUCT.name)" (click)="confirmDelete(product)">Delete</button>
+            <td class="col-120">{{ product.supplierName }}</td>
+            <td class="col-250" style="height: auto;">
+              <app-product-voucher [vouchers]="product.vouchers" [productId]="product.id"
+                (loadProductEvent)="loadProducts()">
+
+              </app-product-voucher>
+            </td>
+            <td class="col-75"
+              *ngIf="authService.hasAuthority(authority.UPDATE_PRODUCT.name)&&authService.hasAuthority(authority.DELETE_PRODUCT.name)">
+              <button class="btn update-btn btn-icon" *ngIf="authService.hasAuthority(authority.UPDATE_PRODUCT.name)"
+                (click)="openUpdateModal(product)"><i class="fa-solid fa-pen-to-square"></i></button>
+              <button class="btn delete-btn btn-icon" *ngIf="authService.hasAuthority(authority.DELETE_PRODUCT.name)"
+                (click)="confirmDelete(product)"><i class="fa-solid fa-trash"></i></button>
             </td>
           </tr>
         </tbody>
@@ -112,15 +119,13 @@
     <h1 class="title center">No data available</h1>
   </ng-template>
 
-  <app-product-modal *ngIf="showModal"
-  [modalTitle]="modalTitle"
-  [product]="currentProduct"
-  (successEvent)="saveSuccess()" (cancelEvent)="closeModal()"
-  >
+  <app-product-modal *ngIf="showModal" [modalTitle]="modalTitle" [product]="currentProduct"
+    (successEvent)="saveSuccess()" (cancelEvent)="closeModal()">
   </app-product-modal>
 
-  <app-confirm-modal [title]="'Do you want to delete this product?'" [showConfirmation]="showConfirmation"
-    (confirmEvent)="deleteProduct()" (cancelEvent)="cancleConfirm()">
+  <app-confirm-modal *ngIf="showConfirmation" [title]="'Do you want to delete this product?'"
+  (confirmEvent)="deleteProduct()"
+  (closeEvent)="cancleConfirm()">
   </app-confirm-modal>
 
 </div>

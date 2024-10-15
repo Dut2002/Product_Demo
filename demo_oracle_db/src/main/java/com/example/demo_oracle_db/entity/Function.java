@@ -16,10 +16,10 @@ public class Function {
     @Column(name = "ID", nullable = false, precision = 0)
     private Long id;
     @Basic
-    @Column(name = "NAME", nullable = false, length = 20)
+    @Column(name = "NAME", nullable = false, length = 255)
     private String name;
     @Basic
-    @Column(name = "END_POINT", nullable = true, length = 100)
+    @Column(name = "END_POINT", nullable = true, length = 255)
     private String endPoint;
 
 }

@@ -1,9 +1,8 @@
 package com.example.demo_oracle_db.service.product;
 
-import com.example.demo_oracle_db.entity.Category;
 import com.example.demo_oracle_db.entity.Product;
-import com.example.demo_oracle_db.entity.Supplier;
 import com.example.demo_oracle_db.exception.DodException;
+import com.example.demo_oracle_db.service.product.request.AddVoucherRequest;
 import com.example.demo_oracle_db.service.product.request.ProductFilter;
 import com.example.demo_oracle_db.service.product.request.ProductRequest;
 import com.example.demo_oracle_db.service.product.response.ProductDto;
@@ -35,4 +34,8 @@ public interface ProductService {
     List<SearchBox> getSupplierBox(String name);
 
     List<SearchBox> getCustomerBox(String name);
+
+    void addVoucherToProduct(AddVoucherRequest request) throws DodException;
+
+    void deleteVoucherFromProduct(Long productId, Long voucherId) throws DodException;
 }

@@ -4,13 +4,14 @@ import { inject } from '@angular/core';
 import { RouterUrl } from '../constant/app.const.router';
 import { ApiHeaders } from '../constant/api.const.urls';
 
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = async (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
   const authority = route.data[ApiHeaders.AUTHORITY];
   if(authService.isTokenExpired(authService.getToken())){
 
-    if(!authService.sendRefreshToken()){
+    if( !await authService.sendRefreshToken()){
+      alert(authService.getToken);
       router.navigate([RouterUrl.LOG_IN.path]);
       return false;
     }

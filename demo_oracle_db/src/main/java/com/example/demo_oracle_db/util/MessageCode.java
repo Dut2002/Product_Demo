@@ -24,7 +24,7 @@ public enum MessageCode{
     TOKEN_FAILED("Token generates failed!"),
     REFRESH_FAILED("Refresh failed!"),
     USER_UNAUTHORIZED("User is unauthorized to access this resource!"),
-    PRODUCT_NOT_EXIST("Product with id [%s] does not exist!"),
+    PRODUCT_NOT_EXIST("Product does not exist!"),
     ADD_PRODUCT_FAILED("Add new product failed!"),
     UPDATE_PRODUCT_FAILED("Update product with [%id] failed!"),
     DELETE_PRODUCT_FAILED("Delete product with [%id] failed!"),
@@ -32,8 +32,15 @@ public enum MessageCode{
     ROLE_NAME_EXIST("Role with name [%s] already exist!"),
     ADD_ROLE_FAILED("Add new role failed!"),
     UPDATE_ROLE_FAILED("Update role with [%id] failed!"),
-    DELETE_ROLE_FAILED("Delete role with [%id] failed!")
-    ;
+    DELETE_ROLE_FAILED("Delete role with [%id] failed!"),
+    VOUCHER_CODE_NOT_EXIST("Voucher with code [%s] does not exist!"),
+    VOUCHER_EXPIRED("Voucher already expired in date [%s]!"),
+    VOUCHER_ALREADY_ADD("Voucher already added to product!"),
+    ADD_VOUCHER_FAILED("Add voucher to product failed!"),
+    DELETE_VOUCHER_FAILED("Delete voucher from product failed!"),
+    VOUCHER_PRODUCT_NOT_FOUND("Voucher not found in product")
+
+            ;
 
     private final String code;
 

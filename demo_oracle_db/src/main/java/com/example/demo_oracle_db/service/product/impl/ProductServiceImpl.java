@@ -4,11 +4,9 @@ import com.example.demo_oracle_db.config.ValidatorHandler;
 import com.example.demo_oracle_db.entity.*;
 import com.example.demo_oracle_db.entity.Order;
 import com.example.demo_oracle_db.exception.DodException;
-import com.example.demo_oracle_db.repository.AccountRepository;
-import com.example.demo_oracle_db.repository.CategoryRepository;
-import com.example.demo_oracle_db.repository.ProductRepository;
-import com.example.demo_oracle_db.repository.SupplierRepository;
+import com.example.demo_oracle_db.repository.*;
 import com.example.demo_oracle_db.service.product.ProductService;
+import com.example.demo_oracle_db.service.product.request.AddVoucherRequest;
 import com.example.demo_oracle_db.service.product.request.ProductFilter;
 import com.example.demo_oracle_db.service.product.request.ProductRequest;
 import com.example.demo_oracle_db.service.product.response.ProductDto;
@@ -30,6 +28,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +44,10 @@ public class ProductServiceImpl implements ProductService {
     private SupplierRepository supplierRepository;
     @Autowired
     private AccountRepository accountRepository;
+    @Autowired
+    private VoucherRepository voucherRepository;
+    @Autowired
+    private ProductVoucherRepository productVoucherRepository;
 
     @Autowired
     private Validator validator;
@@ -59,81 +62,77 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<ProductDto> getProducts(ProductFilter productFilter) {
-        int page = productFilter.getPageNum()!=null?productFilter.getPageNum():1;
-        int size = productFilter.getSizePage()!=null?productFilter.getSizePage():8;
+        int page = productFilter.getPageNum() != null ? productFilter.getPageNum() : 1;
+        int size = productFilter.getSizePage() != null ? productFilter.getSizePage() : 8;
 
         Page<Product> products = productRepository.findAll((Specification<Product>) (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            // Always join category and supplier without fetching
-            Join<Product, Category> categoryJoin = root.join("category", JoinType.LEFT);
-            Join<Product, Supplier> supplierJoin = root.join("supplier", JoinType.LEFT);
-
-            // Join productVoucher and voucher
-            Join<Product, ProductVoucher> productVoucherJoin = root.join("productVouchers", JoinType.LEFT);
-            Join<ProductVoucher, Voucher> voucherJoin = productVoucherJoin.join("voucher", JoinType.LEFT);
-
-            Join<Product, OrderDetail> orderDetailJoin = root.join("orderDetails", JoinType.LEFT);
-            Join<OrderDetail, Order> orderJoin = orderDetailJoin.join("order", JoinType.LEFT);
-            Join<Order, Account> customerJoin = orderJoin.join("customer", JoinType.LEFT);
-
-            if(productFilter.getName() != null && !productFilter.getName().isBlank()){
+            if (productFilter.getName() != null && !productFilter.getName().isBlank()) {
                 String keyword = productFilter.getName().toLowerCase();
                 predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + keyword + "%"));
             }
-            if(productFilter.getYearMaking() != null){
+            if (productFilter.getYearMaking() != null) {
                 predicates.add(criteriaBuilder.equal(root.get("yearMaking"), productFilter.getYearMaking()));
             }
-            if(productFilter.getStartExpireDate() != null){
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("expireDate"), LocalDate.parse(productFilter.getStartExpireDate(),dateTimeFormat)));
+            if (productFilter.getStartExpireDate() != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("expireDate"), LocalDate.parse(productFilter.getStartExpireDate(), dateTimeFormat)));
             }
-            if(productFilter.getEndExpireDate() != null){
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("expireDate"), LocalDate.parse(productFilter.getEndExpireDate(),dateTimeFormat)));
+            if (productFilter.getEndExpireDate() != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("expireDate"), LocalDate.parse(productFilter.getEndExpireDate(), dateTimeFormat)));
             }
-            if(productFilter.getMinQuantity() != null){
+            if (productFilter.getMinQuantity() != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("quantity"), productFilter.getMinQuantity()));
             }
-            if(productFilter.getMaxQuantity() != null){
+            if (productFilter.getMaxQuantity() != null) {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("quantity"), productFilter.getMaxQuantity()));
             }
-            if(productFilter.getMinPrice() != null){
+            if (productFilter.getMinPrice() != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("price"), productFilter.getMinPrice()));
             }
-            if(productFilter.getMaxPrice() != null){
+            if (productFilter.getMaxPrice() != null) {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("price"), productFilter.getMaxPrice()));
             }
 
-            if(productFilter.getCategoryId() != null ){
+            if (productFilter.getCategoryId() != null) {
                 predicates.add(criteriaBuilder.equal(root.join("category").get("id"), productFilter.getCategoryId()));
             }
-            if(productFilter.getSupplierId() != null){
-                predicates.add(criteriaBuilder.equal(root.join("supplier").get("id"),productFilter.getSupplierId()));
+            if (productFilter.getSupplierId() != null) {
+                predicates.add(criteriaBuilder.equal(root.join("supplier").get("id"), productFilter.getSupplierId()));
             }
             // Voucher code filtering
             if (productFilter.getVoucherCode() != null && !productFilter.getVoucherCode().isBlank()) {
                 String keyword = productFilter.getVoucherCode().toLowerCase();
-                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.join("productVouchers").join("voucher").get("code")), "%" + keyword + "%"));
+                predicates.add(criteriaBuilder.like(criteriaBuilder
+                        .lower(root.join("productVouchers", JoinType.LEFT)
+                        .join("voucher", JoinType.LEFT)
+                        .get("code")), "%" + keyword + "%"));
             }
 
             if (productFilter.getCustomerId() != null) {
-                predicates.add(criteriaBuilder.equal(customerJoin.get("id"), productFilter.getCustomerId()));
+                predicates.add(criteriaBuilder.
+                        equal(root.join("orderDetails", JoinType.LEFT)
+                                .join("order", JoinType.LEFT)
+                                .join("customer", JoinType.LEFT)
+                                .get("id"), productFilter.getCustomerId()));
             }
 
-            if(productFilter.getOrderCol() != null && !productFilter.getOrderCol().isBlank()){
-                if(productFilter.getSortDesc()!=null?productFilter.getSortDesc():false) query.orderBy(criteriaBuilder.desc(root.get(productFilter.getOrderCol())));
+            if (productFilter.getOrderCol() != null && !productFilter.getOrderCol().isBlank()) {
+                if (productFilter.getSortDesc() != null ? productFilter.getSortDesc() : false)
+                    query.orderBy(criteriaBuilder.desc(root.get(productFilter.getOrderCol())));
                 else query.orderBy(criteriaBuilder.asc(root.get(productFilter.getOrderCol())));
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
-        }, PageRequest.of(page-1,size));
+        }, PageRequest.of(page - 1, size));
         return ProductDto.convertToProductDtoPage(products);
     }
 
     @Override
     public Product getProduct(Long id) throws DodException {
         Product product = productRepository.findById(id).orElse(null);
-        if(product == null){
-            throw new DodException(MessageCode.PRODUCT_NOT_EXIST, id);
+        if (product == null) {
+            throw new DodException(MessageCode.PRODUCT_NOT_EXIST);
         }
         return product;
     }
@@ -144,11 +143,11 @@ public class ProductServiceImpl implements ProductService {
         try {
             saveProduct(product, request);
             productRepository.save(product);
-        }catch (Exception e){
-            if(option == 0){
+        } catch (Exception e) {
+            if (option == 0) {
                 request.setStatus(Constants.ApiStatus.FAILED);
                 request.setErrorMessage(MessageCode.ADD_PRODUCT_FAILED.getCode());
-            }else {
+            } else {
                 throw new DodException(MessageCode.ADD_PRODUCT_FAILED);
             }
         }
@@ -158,13 +157,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductRequest updateProduct(ProductRequest request, int option) throws DodException {
         Product product = productRepository.findById(request.getId()).orElse(null);
-        if(product == null){
-            if(option == 0){
+        if (product == null) {
+            if (option == 0) {
                 request.setStatus(Constants.ApiStatus.FAILED);
-                request.setErrorMessage(MessageCode.PRODUCT_NOT_EXIST.format(request.getId()));
+                request.setErrorMessage(MessageCode.PRODUCT_NOT_EXIST.getCode());
                 return request;
-            }else {
-                throw new DodException(MessageCode.PRODUCT_NOT_EXIST, request.getId());
+            } else {
+                throw new DodException(MessageCode.PRODUCT_NOT_EXIST);
             }
         }
 
@@ -172,11 +171,11 @@ public class ProductServiceImpl implements ProductService {
             saveProduct(product, request);
             productRepository.save(product);
             request.setStatus(Constants.ApiStatus.SUCCESS);
-        }catch (Exception e){
-            if(option == 0){
+        } catch (Exception e) {
+            if (option == 0) {
                 request.setStatus(Constants.ApiStatus.FAILED);
                 request.setErrorMessage(MessageCode.UPDATE_PRODUCT_FAILED.getCode());
-            }else {
+            } else {
                 throw new DodException(MessageCode.UPDATE_PRODUCT_FAILED, request.getId());
             }
         }
@@ -186,7 +185,7 @@ public class ProductServiceImpl implements ProductService {
     private void saveProduct(Product product, ProductRequest request) {
         product.setName(request.getName());
         product.setYearMaking(request.getYearMaking());
-        product.setExpireDate(LocalDate.parse(request.getExpireDate(),dateTimeFormat));
+        product.setExpireDate(LocalDate.parse(request.getExpireDate(), dateTimeFormat));
         product.setQuantity(request.getQuantity());
         product.setPrice(request.getPrice());
         product.setCategoryId(request.getCategoryId());
@@ -195,31 +194,31 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void deleteProduct(Long id) throws DodException {
-        if(productRepository.findById(id).isPresent()){
+        if (productRepository.findById(id).isPresent()) {
             try {
                 productRepository.deleteById(id);
-            }catch (Exception e){
+            } catch (Exception e) {
                 throw new DodException(MessageCode.DELETE_PRODUCT_FAILED);
             }
-        }else {
-            throw new DodException(MessageCode.PRODUCT_NOT_EXIST, id);
+        } else {
+            throw new DodException(MessageCode.PRODUCT_NOT_EXIST);
         }
     }
 
     @Override
     public List<ProductRequest> importProducts(List<ProductRequest> requests) throws DodException {
         for (ProductRequest request : requests) {
-            Map<String,String> errors = validatorHandler.validateRequest(request);
+            Map<String, String> errors = validatorHandler.validateRequest(request);
             if (!errors.isEmpty()) {
                 request.setStatus(Constants.ApiStatus.FAILED);
                 request.setErrorMessage(errors);
                 continue;
             }
 
-            if(request.getId()!=null){
-                updateProduct(request,0);
-            }else {
-                addProduct(request,0);
+            if (request.getId() != null) {
+                updateProduct(request, 0);
+            } else {
+                addProduct(request, 0);
             }
         }
         return requests;
@@ -229,28 +228,28 @@ public class ProductServiceImpl implements ProductService {
     public List<Product> exportProduct(String search, Long yearMaking, LocalDate startExpireDate, LocalDate endExpireDate, Long startQuality, Long endQuality, Double startPrice, Double endPrice) {
         List<Product> products = productRepository.findAll((Specification<Product>) (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if(search != null && !search.isBlank()){
+            if (search != null && !search.isBlank()) {
                 predicates.add(criteriaBuilder.like(root.get("PRONAME"), "%" + search + "%"));
             }
-            if(yearMaking != null){
+            if (yearMaking != null) {
                 predicates.add(criteriaBuilder.equal(root.get("YEARMAKING"), yearMaking));
             }
-            if(startExpireDate != null){
+            if (startExpireDate != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("EXPRIDATE"), startExpireDate));
             }
-            if(endExpireDate != null){
+            if (endExpireDate != null) {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("EXPRIDATE"), endExpireDate));
             }
-            if(startQuality != null){
+            if (startQuality != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("QUALITY"), startQuality));
             }
-            if(endQuality != null){
+            if (endQuality != null) {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("QUALITY"), endQuality));
             }
-            if(startPrice != null){
+            if (startPrice != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("PRICE"), startPrice));
             }
-            if(endPrice != null){
+            if (endPrice != null) {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("PRICE"), endPrice));
             }
             return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
@@ -282,7 +281,7 @@ public class ProductServiceImpl implements ProductService {
                 .setParameter("min_price", filter.getMinPrice())
                 .setParameter("max_price", filter.getMaxPrice())
                 .setParameter("order_col", filter.getOrderCol())
-                .setParameter("sort_desc", (filter.getSortDesc()!=null&&filter.getSortDesc())?1:0);//KHông nhận kiểu Boolean
+                .setParameter("sort_desc", (filter.getSortDesc() != null && filter.getSortDesc()) ? 1 : 0);//KHông nhận kiểu Boolean
 
         query.execute();
 
@@ -290,14 +289,14 @@ public class ProductServiceImpl implements ProductService {
 
         // Tính toán tổng số trang
         long totalElements = result.size();// Lấy tổng số sản phẩm từ cơ sở dữ liệu (có thể viết một query riêng cho việc này)
-        int page = filter.getPageNum()!=null? filter.getPageNum() : 1;
-        int size = filter.getSizePage()!=null? filter.getSizePage() : 8;
+        int page = filter.getPageNum() != null ? filter.getPageNum() : 1;
+        int size = filter.getSizePage() != null ? filter.getSizePage() : 8;
         int start = Math.toIntExact((page - 1) * size);
         int end = Math.min(start + size, result.size());
 
         List<Product> paginatedProducts = result.subList(start, end);
 
-        return new PageImpl<>(paginatedProducts, PageRequest.of(page-1, size), totalElements);
+        return new PageImpl<>(paginatedProducts, PageRequest.of(page - 1, size), totalElements);
     }
 
     @Override
@@ -338,5 +337,39 @@ public class ProductServiceImpl implements ProductService {
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         });
         return accounts.stream().map(SearchBox::new).toList();
+    }
+
+    @Override
+    public void addVoucherToProduct(AddVoucherRequest request) throws DodException {
+        if (!productRepository.existsById(request.getProductId())) {
+            throw new DodException(MessageCode.PRODUCT_NOT_EXIST);
+        }
+        Voucher voucher = voucherRepository.findByCode(request.getVoucherCode()).orElseThrow(() -> new DodException(MessageCode.VOUCHER_CODE_NOT_EXIST, request.getVoucherCode()));
+
+        if (voucher.getEndDate().before(new Date())) {
+            throw new DodException(MessageCode.VOUCHER_EXPIRED, voucher.getEndDate());
+        }
+        if (productVoucherRepository.existsByProductIdAndVoucherId(request.getProductId(), voucher.getId())) {
+            throw new DodException(MessageCode.VOUCHER_ALREADY_ADD);
+        }
+        try {
+            ProductVoucher productVoucher = new ProductVoucher();
+            productVoucher.setProductId(request.getProductId());
+            productVoucher.setVoucherId(voucher.getId());
+            productVoucherRepository.save(productVoucher);
+        } catch (Exception ex) {
+            throw new DodException(MessageCode.ADD_VOUCHER_FAILED);
+        }
+
+    }
+
+    @Override
+    public void deleteVoucherFromProduct(Long productId, Long voucherId) throws DodException {
+        ProductVoucher productVoucher = productVoucherRepository.findByProductIdAndVoucherId(productId, voucherId).orElseThrow(()-> new DodException(MessageCode.VOUCHER_PRODUCT_NOT_FOUND));
+        try {
+            productVoucherRepository.deleteById(productVoucher.getId());
+        } catch (Exception ex) {
+            throw new DodException(MessageCode.DELETE_VOUCHER_FAILED);
+        }
     }
 }

@@ -10,7 +10,7 @@ export class AuthService {
 
   constructor(private loginService: LoginService) { }
 
-  isLoggedIn(){
+  isLoggedIn() {
     return !this.isTokenExpired(this.getRefresh());
   }
 
@@ -59,35 +59,41 @@ export class AuthService {
     if (!token) return true;
 
     const decoded = this.decodeToken(token);
-    const expirationDate = decoded.exp*1000; // Chuyển sang milliseconds
+    const expirationDate = decoded.exp * 1000; // Chuyển sang milliseconds
     return Date.now() >= expirationDate;
   }
 
-  public sendRefreshToken(): boolean {
-
-    const refresh = this.getRefresh();
-    if(!refresh) return false;
-    if(this.isTokenExpired(refresh)) return false;
-    this.loginService.sendRefreshToken(refresh).subscribe({
-      next: (response) => {
-        alert("token " + response.token);
-        alert("refresh " + response.refresh);
-        alert("role" + response.role[0]);
-        localStorage.setItem(ApiHeaders.TOKEN_KEY, response.token);
-        localStorage.setItem(ApiHeaders.REFRESH_KEY, response.refreshToken)
-        localStorage.setItem(ApiHeaders.ROLE_KEY, response.role[0])
-
-        return true;
-      },
-      error: (error) => {
-        console.log(error);
-        alert(error.content);
-        return false;
-      },
+  public sendRefreshToken():Promise<boolean> {
+    return new Promise((resolve) => {
+      const refresh = this.getRefresh();
+      if (!refresh) {
+        localStorage.clear();
+        resolve(false);
+        return;
+      }
+      if (this.isTokenExpired(refresh)){
+        resolve(false)
+        return;
+        }
+      this.loginService.sendRefreshToken(refresh).subscribe({
+        next: (response) => {
+          localStorage.setItem(ApiHeaders.TOKEN_KEY, response.token);
+          localStorage.setItem(ApiHeaders.REFRESH_KEY, response.refreshToken)
+          localStorage.setItem(ApiHeaders.ROLE_KEY, response.role[0])
+          resolve(true);
+          return;
+        },
+        error: () => {
+          localStorage.clear();
+          resolve(false)
+          return;
+        },
+      });
     });
-    localStorage.clear();
-    return false;
   }
+
+
+
 
   clearLocalStorage() {
     localStorage.clear();

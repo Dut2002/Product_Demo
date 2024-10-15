@@ -16,27 +16,21 @@ export class ProductFilterComponent implements OnInit{
   @Output() applyEvent = new EventEmitter<ProductFilter>();
   @Output() resetEvent = new EventEmitter<void>();
 
-  selectedCategoryName = '';
-
   categorySearchBox: SearchBoxDto[] = []
   supplierSearchBox: SearchBoxDto[] = []
   customerSearchBox: SearchBoxDto[] = []
 
   ngOnInit(): void {
-
-
+    this.loadCategory(null)
+    this.loadCustomer(null)
+    this.loadSupplier(null)
   }
 
   constructor(private productService: ProductService,
-    private snackBarService: SnackBarService,
     private errorHandle: ErrorHandleService,
   ) { }
 
-  changeCategory(change: SimpleChange){
-
-  }
-
-  loadCategory(name: string){
+  loadCategory(name: string|null){
     this.productService.getCategoryBox(name).subscribe({
       next: (response) =>{
         this.categorySearchBox = response;
@@ -48,13 +42,45 @@ export class ProductFilterComponent implements OnInit{
     )
   }
 
+  loadCustomer(name: string|null){
+    this.productService.getCustomerBox(name).subscribe({
+      next: (response) =>{
+        this.customerSearchBox = response;
+      },
+      error: (err) => {
+        console.error(err)
+        this.errorHandle.handle(err);
+      }
+    }
+    )
+  }
 
-  onCategorySelected(option: any)
+  loadSupplier(name: string|null){
+    this.productService.getSupplierBox(name).subscribe({
+      next: (response) =>{
+        this.supplierSearchBox = response;
+      },
+      error: (err) => {
+        this.errorHandle.handle(err);
+      }
+    }
+    )
+  }
+
+
+  onCategorySelected(id: number|null)
   {
-    console.log(option);
+    this.filter.categoryId = id;
+  }
 
-    this.filter.categoryId = option.id;
-    this.selectedCategoryName = option.name;
+  onSupplierSelected(id: number|null)
+  {
+    this.filter.supplierId = id;
+  }
+
+  onCustomerSelected(id: number|null)
+  {
+    this.filter.customerId = id;
   }
 
 

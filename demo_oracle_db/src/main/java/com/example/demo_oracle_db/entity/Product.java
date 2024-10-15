@@ -1,5 +1,6 @@
 package com.example.demo_oracle_db.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -50,6 +51,7 @@ public class Product {
     @JoinColumn(name = "SUPPLIER_ID", insertable=false, updatable=false)
     private Supplier supplier;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ProductVoucher> productVouchers;
 

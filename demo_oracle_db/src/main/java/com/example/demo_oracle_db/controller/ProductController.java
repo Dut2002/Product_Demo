@@ -1,26 +1,22 @@
 package com.example.demo_oracle_db.controller;
 
-import com.example.demo_oracle_db.entity.Category;
 import com.example.demo_oracle_db.entity.Product;
-import com.example.demo_oracle_db.entity.Supplier;
 import com.example.demo_oracle_db.exception.DodException;
 import com.example.demo_oracle_db.service.login.response.Res;
 import com.example.demo_oracle_db.service.product.ProductService;
+import com.example.demo_oracle_db.service.product.request.AddVoucherRequest;
 import com.example.demo_oracle_db.service.product.request.ProductFilter;
 import com.example.demo_oracle_db.service.product.request.ProductRequest;
 import com.example.demo_oracle_db.service.product.response.SearchBox;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("api/product")
@@ -103,5 +99,18 @@ public class ProductController {
     {
         List<SearchBox> suppliers = productService.getCustomerBox(name);
         return  ResponseEntity.ok(suppliers);
+    }
+
+    @PostMapping("add-voucher")
+    private  ResponseEntity<?> addVoucherToProduct(@RequestBody @Valid AddVoucherRequest request) throws DodException {
+        productService.addVoucherToProduct(request);
+        return ResponseEntity.ok(new Res().resOk("Add voucher to product success"));
+    }
+
+    @DeleteMapping("delete-voucher")
+    private ResponseEntity<?> deleteVoucherFromProduct(@RequestParam Long productId, @RequestParam Long voucherId) throws DodException {
+        productService.deleteVoucherFromProduct(productId, voucherId);
+        return ResponseEntity.ok(new Res().resOk("Delete voucher from product success"));
+
     }
 }

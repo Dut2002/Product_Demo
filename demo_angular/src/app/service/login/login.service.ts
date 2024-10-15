@@ -20,6 +20,4 @@ export class LoginService {
   logout(){
     return this.baseService.post(ApiUrls.Authentication.LOG_OUT, null)
   }
-
-
 }

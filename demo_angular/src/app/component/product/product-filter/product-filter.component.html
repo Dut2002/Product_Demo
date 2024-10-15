@@ -16,10 +16,10 @@
     <div class="form-input flex-third">
       <label class="form-label" for="quality-range">Quantity</label>
       <div class="form-input-enter">
-        <input [min]="0" type="number" [(ngModel)]="filter.minQuantity" name="minQuality"
-          placeholder="Min Quality" (change)="changeQuality(false)">
-        <input [min]="0" type="number" [(ngModel)]="filter.maxQuantity" name="maxQuality"
-          placeholder="Max Quality" (change)="changeQuality(true)">
+        <input [min]="0" type="number" [(ngModel)]="filter.minQuantity" name="minQuality" placeholder="Min Quality"
+          (change)="changeQuality(false)">
+        <input [min]="0" type="number" [(ngModel)]="filter.maxQuantity" name="maxQuality" placeholder="Max Quality"
+          (change)="changeQuality(true)">
       </div>
     </div>
     <div class="form-input flex-third">
@@ -46,25 +46,36 @@
       </div>
     </div>
 
+    <div class="form-input flex-third">
+      <label class="form-label" for="customer">Category</label>
+      <div class="form-input-enter">
+        <ng-select class="form-select" [items]="categorySearchBox" bindLabel="name" bindValue="id"
+          [(ngModel)]="filter.categoryId" [ngModelOptions]="{ standalone: true }" [searchable]="true">
+        </ng-select>
+      </div>
 
 
+    </div>
     <div class="form-input flex-third">
-      <label class="form-label" for="producer">Category</label>
+      <label class="form-label" for="customer">Supplier</label>
       <div class="form-input-enter">
-        <input type="number" [(ngModel)]="filter.categoryId" name="categoryId" placeholder="Search products...">
+        <ng-select class="form-select" [items]="supplierSearchBox" bindLabel="name" bindValue="id"
+          [(ngModel)]="filter.supplierId" [ngModelOptions]="{ standalone: true }" [searchable]="true">
+        </ng-select>
       </div>
+
     </div>
+
     <div class="form-input flex-third">
-      <label class="form-label" for="producer">Supplier</label>
-        <app-search-drop-down >
-        </app-search-drop-down>
-    </div>
-    <div class="form-input flex-third">
-      <label class="form-label" for="producer">Customer</label>
+      <label class="form-label" for="customer">Customer</label>
       <div class="form-input-enter">
-        <input type="number" [(ngModel)]="filter.customerId" name="customerId" placeholder="Search products...">
+        <ng-select class="form-select" [items]="customerSearchBox" bindLabel="name" bindValue="id"
+          [(ngModel)]="filter.customerId" [ngModelOptions]="{ standalone: true }" [searchable]="true">
+        </ng-select>
       </div>
+
     </div>
+
 
     <div class="form-input flex-full center">
       <button class="btn submit-btn btn-small" (click)="onApply()">Apply</button>

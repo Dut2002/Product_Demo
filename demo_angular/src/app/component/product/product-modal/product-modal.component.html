@@ -1,13 +1,86 @@
 <div class="modal">
   <div class="modal-content">
-    <h2>{{ modalTitle }}</h2>
-    <form (ngSubmit)="saveProduct()">
-      <input type="text" [(ngModel)]="product.name" name="name" placeholder="Product Name" required>
-      <input type="number" [(ngModel)]="product.yearMaking" name="yearmaking" placeholder="Year Making"
-        required>
-      <input type="number" [(ngModel)]="product.price" name="price" placeholder="Price" required>
-      <input type="number" [(ngModel)]="product.quantity" name="quality" placeholder="Quality" required>
-      <input type="date" [(ngModel)]="product.expireDate" name="expridate" placeholder="Expired Date" required>
+    <h2 class="modal-title">{{ modalTitle }}</h2>
+    <form class="flex" #productForm="ngForm" (ngSubmit)="saveProduct()">
+      <input type="hidden" [(ngModel)]="product.id" name="id">
+      <div class="form-input flex-half">
+        <label class="form-label" for="category">Product Name</label>
+        <div class="form-input-enter">
+          <input type="text" [(ngModel)]="product.name" #name="ngModel" name="name" placeholder="Product Name"
+            [minlength]="2" [maxlength]="100" [required]="true">
+        </div>
+        <div *ngIf="name.touched && !name.valid" class="validate-input">
+          <span *ngIf="name.errors?.['required']">Name is required</span>
+          <span *ngIf="name.errors?.['minlength'] || name.errors?.['maxlength']">Length from 2 to 100 characters</span>
+        </div>
+      </div>
+      <div class="form-input flex-half">
+        <label class="form-label" for="category">Year Making</label>
+        <div class="form-input-enter">
+          <input type="number" [(ngModel)]="product.yearMaking" #yearMaking="ngModel" name="yearMaking"
+            placeholder="Year Making" [min]="1900" [required]="true">
+        </div>
+        <div *ngIf="yearMaking.touched && !yearMaking.valid" class="validate-input">
+          <span *ngIf="yearMaking.errors?.['required']">Year making is required</span>
+          <span *ngIf="yearMaking.errors?.['min']">Must be 1900 or later</span>
+        </div>
+      </div>
+      <div class="form-input flex-half">
+        <label class="form-label" for="category">Price</label>
+        <div class="form-input-enter">
+          <input type="number" [(ngModel)]="product.price" #price="ngModel" name="price" placeholder="Price" [min]="0"
+            [required]="true">
+        </div>
+        <div *ngIf="price.touched && !price.valid" class="validate-input">
+          <span *ngIf="price.errors?.['required']">Price is required</span>
+          <span *ngIf="price.errors?.['min']">Must be greater 0</span>
+        </div>
+      </div>
+      <div class="form-input flex-half">
+        <label class="form-label" for="category">Quantity</label>
+        <div class="form-input-enter">
+          <input type="number" [(ngModel)]="product.quantity" #quantity="ngModel" name="quantity" placeholder="Quality"
+            [min]="0" [required]="true">
+        </div>
+        <div *ngIf="quantity.touched && !quantity.valid" class="validate-input">
+          <span *ngIf="quantity.errors?.['required']">Quantity is required</span>
+          <span *ngIf="quantity.errors?.['min']">Must be greater 0</span>
+        </div>
+      </div>
+      <div class="form-input flex-half">
+        <label class="form-label" for="category">Expire Date</label>
+        <div class="form-input-enter">
+          <input type="date" [(ngModel)]="product.expireDate" #expireDate="ngModel" name="expridate"
+            placeholder="Expired Date" [required]="true">
+        </div>
+        <div *ngIf="expireDate.touched && !expireDate.valid" class="validate-input">
+          <span *ngIf="expireDate.errors?.['required']">Expire Date is required</span>
+        </div>
+      </div>
+      <div class="form-input flex-half">
+        <label class="form-label" for="category">Category</label>
+        <div class="form-input-enter">
+          <ng-select class="form-select" [items]="categoryBox" bindLabel="name" bindValue="id"
+            [placeholder]="'Category: '" [(ngModel)]="product.categoryId" name="categoryId"
+            [ngModelOptions]="{ standalone: true }" [searchable]="true" [required]="true" #category="ngModel">
+          </ng-select>
+        </div>
+        <div *ngIf="category.touched && !category.valid" class="validate-input">
+          <span *ngIf="category.errors?.['required']">Category is required</span>
+        </div>
+      </div>
+      <div class="form-input flex-half">
+        <label class="form-label" for="category">Supplier</label>
+        <div class="form-input-enter">
+          <ng-select class="form-select" [items]="supplierBox" bindLabel="name" bindValue="id"
+            [placeholder]="'Supplier: '" [(ngModel)]="product.supplierId" name="supplierId"
+            [ngModelOptions]="{ standalone: true }" [searchable]="true" [required]="true" #supplier="ngModel">
+          </ng-select>
+        </div>
+        <div *ngIf="supplier.touched && !supplier.valid" class="validate-input">
+          <span *ngIf="supplier.errors?.['required']">Supplier is required</span>
+        </div>
+      </div>
 
       <div class="center">
         <button type="submit" class="btn btn-small btn-green">Save</button>

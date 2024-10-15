@@ -30,7 +30,8 @@ export class ApiUrls {
     GET_CATEGORY_BOX: "product/get-category-box",
     GET_SUPPLIER_BOX: "product/get-supplier-box",
     GET_CUSTOMER_BOX: "product/get-customer-box",
-
+    ADD_VOUCHER_PRODUCT: "product/add-voucher",
+    DELETE_VOUCHER_PRODUCT: "product/delete-voucher",
   }
 
   public static readonly Authentication = {

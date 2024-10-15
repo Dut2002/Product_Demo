@@ -28,9 +28,14 @@ import { ProductModalComponent } from './component/product/product-modal/product
 import { ProductComponent } from './component/product/product-list/product.component';
 import { ProductFilterComponent } from './component/product/product-filter/product-filter.component';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { MatInputModule } from '@angular/material/input';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { SearchDropDownComponent } from './component/common/search-drop-down/search-drop-down.component';
+import { ProductVoucherComponent } from './component/product/product-voucher/product-voucher.component';
+import { VoucherDetailComponent } from './component/voucher/voucher-detail/voucher-detail.component';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { MatButtonModule } from '@angular/material/button';
+import { MatPseudoCheckboxModule } from '@angular/material/core';
+import { MatInputModule } from "@angular/material/input";
+import { MatFormFieldModule } from "@angular/material/form-field";
 
 
 @NgModule({
@@ -56,6 +61,8 @@ import { SearchDropDownComponent } from './component/common/search-drop-down/sea
     ProductModalComponent,
     ProductFilterComponent,
     SearchDropDownComponent,
+    ProductVoucherComponent,
+    VoucherDetailComponent,
   ],
   imports: [
     BrowserModule,
@@ -63,12 +70,16 @@ import { SearchDropDownComponent } from './component/common/search-drop-down/sea
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
+    NgSelectModule,
+    MatButtonModule,
+    MatFormFieldModule,
     MatInputModule,
-    MatAutocompleteModule,
+    MatPseudoCheckboxModule,
+    MatButtonModule,
   ],
   providers: [provideHttpClient(withInterceptors([authenInterceptor,])), provideAnimationsAsync()],
   bootstrap: [AppComponent,]
 })
 export class AppModule {
 
- }
+}

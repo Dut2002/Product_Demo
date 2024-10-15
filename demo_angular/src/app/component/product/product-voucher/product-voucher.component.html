@@ -1,0 +1,23 @@
+<div class="voucher-list-container ">
+  <div class="voucher-list flex-third" *ngIf="!input">
+    <div class="voucher-item" *ngFor="let voucher of vouchers">
+      <p (click)="openModal(voucher)" class="voucher-code">{{voucher.code}}</p>
+      <button (click)="deleteConfirm(voucher)" class="btn btn-icon voucher-code-btn">
+        <i class="fa-solid fa-x"></i></button>
+    </div>
+    <button (click)="openInput()" class="btn btn-icon btn-green btn-add"><i class="fa-solid fa-plus"></i></button>
+  </div>
+  <div class="form-input-enter voucher-input-container" *ngIf="input">
+    <input class="voucher-input" type="text" placeholder="Vourcher Code" [(ngModel)]="code" name="code" required />
+    <button (click)="addVoucherProduct()" class="btn btn-icon btn-green voucher-input-btn"><i
+        class="fa-solid fa-plus"></i></button>
+    <button (click)="input = false" class="btn btn-icon btn-red voucher-input-btn"><i
+        class="fa-solid fa-xmark"></i></button>
+  </div>
+</div>
+
+<app-confirm-modal *ngIf="showConfirm" [title]="'Do you want delete this voucher from product?'"
+  (confirmEvent)="onDeleteVoucher()" (closeEvent)="closeConfirm()">
+</app-confirm-modal>
+
+<app-voucher-detail *ngIf="showModal" [voucher]="curretVoucher" (closeEvent)="closeModal()"></app-voucher-detail>

@@ -26,7 +26,6 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private authService: AuthService
   ) {
-    alert('refresh: ' + authService.getRefresh())
     if (!authService.isTokenExpired(authService.getRefresh())) {
       router.navigate([RouterUrl.BASE_URL.path])
     }

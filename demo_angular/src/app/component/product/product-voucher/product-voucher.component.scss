@@ -1,0 +1,60 @@
+$btn-size: 40px;
+
+.voucher-input-container{
+  border: 0.5px solid black;
+  border-radius: 4px;
+  // overflow: hidden;
+  width: 100%;
+}
+
+.voucher-input{
+  width: calc(100% - $btn-size);
+  border: none !important;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  margin: 0%;
+}
+
+.voucher-input:focus {
+  outline: none;
+}
+
+.voucher-input-btn{
+  margin: 0;
+  width: $btn-size;
+  border-radius: 0 ;
+}
+
+.voucher-list{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: stretch;
+  height: auto;
+
+}
+
+.voucher-item{
+  display: inline-flex;
+  align-items: center;
+  background-color: #007bff;
+  border-radius: 4px;
+  color: white;
+}
+
+
+.voucher-item :hover{
+  opacity: 0.8;
+}
+
+.voucher-code-btn, .btn-add{
+  margin: 0;
+  height: 32.8px;
+  padding: auto auto;
+}
+
+.voucher-code{
+  padding: 8px;
+  cursor: pointer;
+}
+

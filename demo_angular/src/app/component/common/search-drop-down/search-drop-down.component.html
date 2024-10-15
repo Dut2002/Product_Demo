@@ -1,16 +1,23 @@
 <div class="form-input-enter">
   <input
     type="text"
-    placeholder="Select Category"
-    [ngModel] = "search"
-    (focus)="showDropdown = true"
+    placeholder="{{placeHolder}}"
+
+    [(ngModel)] = "search"
+    name="search"
+    (focus)="openDropdown()"
     (blur)="hideDropdown()"
-    (input)="filterCategories(search)"
+    (input)="loadList()"
+    autocomplete="off"
+    [required]="isRequired"
   />
 
   <div *ngIf="showDropdown" class="dropdown">
-    <div *ngFor="let category of filteredCategories" (click)="selectCategory(category)">
-      {{ category }}
+    <div (click)="selectOption(null)">
+      -- {{placeHolder}} --
+    </div>
+    <div *ngFor="let option of list" (click)="selectOption(option)">
+      {{ option.name }}
     </div>
   </div>
 </div>

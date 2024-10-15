@@ -1,5 +1,6 @@
 package com.example.demo_oracle_db.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -15,7 +16,7 @@ public class Voucher {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "ID", nullable = false, precision = 0)
-    private BigInteger id;
+    private Long id;
     @Basic
     @Column(name = "CODE", nullable = false, length = 20)
     private String code;
@@ -41,6 +42,7 @@ public class Voucher {
     @Column(name = "MAXIMUM_DISCOUNT", nullable = true, precision = 2)
     private Integer maximumDiscount;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "voucher", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ProductVoucher> productVouchers;
 }

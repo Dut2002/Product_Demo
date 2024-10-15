@@ -21,10 +21,6 @@ export class ProductComponent implements OnInit {
   products: ProductDto[] = [];
   currentProduct: Product = {} as Product;
 
-  categoryBox: SearchBoxDto[] = []
-  supplierBox: SearchBoxDto[] = []
-  customerBox: SearchBoxDto[] = []
-
   productFilter: ProductFilter = new ProductFilter;
 
   showModal = false;

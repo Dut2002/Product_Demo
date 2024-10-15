@@ -9,5 +9,4 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional
 public interface ProductRepository extends CrudRepository<Product, Long>, JpaSpecificationExecutor<Product> {
-
 }

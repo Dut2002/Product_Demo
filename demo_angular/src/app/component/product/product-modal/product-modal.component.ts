@@ -1,36 +1,86 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Product } from '../../../model/product';
-import { ProductComponent } from '../product-list/product.component';
 import { ProductService } from '../../../service/product/product.service';
 import { ApiStatus } from '../../../constant/api.const.urls';
 import { SnackBarService } from '../../../service/snack-bar/snack-bar.service';
 import { ErrorHandleService } from '../../../service/error-handle/error-handle.service';
+import { SearchBoxDto } from '../../../model/dto/search-box-dto';
+import { NgForm, NgModel } from '@angular/forms';
 
 @Component({
   selector: 'app-product-modal',
   templateUrl: './product-modal.component.html',
   styleUrl: './product-modal.component.scss'
 })
-export class ProductModalComponent implements OnChanges {
+export class ProductModalComponent implements OnInit, OnChanges {
 
   @Input() modalTitle: string = '';
-  @Input()  product = {} as Product;
+  @Input() product: Product = {} as Product;
   @Output() successEvent = new EventEmitter<void>(); // Event khi nhấn yes
   @Output() cancelEvent = new EventEmitter<void>();
 
-
+  categoryBox: SearchBoxDto[] = []
+  supplierBox: SearchBoxDto[] = []
   defaultProduct: Product = {} as Product;
+
+  @ViewChild('productForm', { static: false }) productForm!: NgForm;
+  @ViewChild('category', { static: false }) categoryNgModel!: NgModel;
+  @ViewChild('supplier', { static: false }) supplierNgModel!: NgModel;
 
   constructor(private productService: ProductService,
     private snackBarService: SnackBarService,
     private errorHandle: ErrorHandleService,
-  ){}
+  ) {}
+
+  ngOnInit(): void {
+    this.loadCategory(null)
+    this.loadSupplier(null)
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
-      this.defaultProduct = {...this.product}
+    if (changes['product'])
+      this.defaultProduct = { ...this.product }
+  }
+
+  loadCategory(name: string | null) {
+    this.productService.getCategoryBox(name).subscribe({
+      next: (response) => {
+        this.categoryBox = response;
+      },
+      error: (err) => {
+        this.errorHandle.handle(err);
+      }
+    }
+    )
+  }
+
+  loadSupplier(name: string | null) {
+    this.productService.getSupplierBox(name).subscribe({
+      next: (response) => {
+        this.supplierBox = response;
+      },
+      error: (err) => {
+        this.errorHandle.handle(err);
+      }
+    }
+    )
+  }
+
+  onCategorySelected(id: number | null) {
+    if (id) this.product.categoryId = id;
+  }
+
+  onSupplierSelected(id: number | null) {
+    if (id) this.product.supplierId = id;
   }
 
   saveProduct() {
+    if(!this.checkFormValid()) {
+      this.productForm.control.markAllAsTouched();
+      this.categoryNgModel.control.markAsTouched();
+      this.supplierNgModel.control.markAsTouched();
+      return;
+    }
     if (this.product.id) {
       // Update existing product
       this.productService.updateProduct(this.product).subscribe({
@@ -56,16 +106,24 @@ export class ProductModalComponent implements OnChanges {
       });
     }
   }
+  checkFormValid() {
+    return this.productForm.valid && this.categoryNgModel.valid && this.supplierNgModel.valid;
+  }
 
-  onSuccess(){
+
+
+  onSuccess() {
     this.successEvent.emit();
   }
-  onCancel(){
+  onCancel() {
     this.cancelEvent.emit();
   }
 
-  onReset(){
-    this.product = {...this.defaultProduct}
+  onReset() {
+    this.product = { ...this.defaultProduct }
+    this.productForm.control.markAsUntouched();
+    this.categoryNgModel.control.markAsUntouched();
+    this.supplierNgModel.control.markAsUntouched();
   }
 
 }

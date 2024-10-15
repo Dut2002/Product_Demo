@@ -1,0 +1,27 @@
+<div class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title">Voucher</h2>
+      <button (click)="onClose()"><i class="fa-solid fa-x"></i></button>
+    </div>
+    <div class="dl">
+      <div class="brand">
+        <h2>Attractive discount coupons</h2>
+      </div>
+      <div class="discount alizarin">{{voucher.discountPercent}}%
+        <div class="type">off</div>
+      </div>
+      <div class="descr">
+        <strong>{{voucher.description}}</strong>
+        Discount {{voucher.discountPercent}}%, maximum {{voucher.maximumDiscount | currency}} when purchasing unit price
+        from {{voucher.minimumOrderValue | currency}} or more
+      </div>
+      <div class="ends">
+        <small>Start {{voucher.startDate}} to {{voucher.endDate}}</small>
+      </div>
+      <div class="coupon midnight-blue">
+        <div id="code-1" class="collapse code">{{voucher.code}}</div>
+      </div>
+    </div>
+  </div>
+</div>
