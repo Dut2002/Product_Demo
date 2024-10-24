@@ -1,16 +1,25 @@
 <div class="container">
   <div class="screen">
     <div class="screen__content">
-      <form class="login" [formGroup]="loginForm" (ngSubmit)="login()">
+      <form class="login" #loginForm="ngForm" (ngSubmit)="login()">
         <div class="login__field">
           <i class="fa-solid fa-user"></i>
-          <input type="text" formControlName="username" class="login__input" placeholder="User name">
+          <input type="text" #username="ngModel" [(ngModel)]="loginRequest.username" name="username"
+            class="login__input" placeholder="User name" [required]="true" [minlength]="2">
+          <div class="login__error">
+            <span *ngIf="username.touched && username.errors?.['required']">Username is required</span>
+            <span *ngIf="username.touched && username.errors?.['minlength']">Username must be more 2 characters</span>
+          </div>
         </div>
         <div class="login__field">
           <i class="fa-solid fa-lock"></i>
-          <input type="password" formControlName="password" class="login__input" placeholder="Password">
+          <input type="password" #password="ngModel" [(ngModel)]="loginRequest.password" name="password"
+            class="login__input" placeholder="Password" [required]="true">
+          <div class="login__error">
+            <span *ngIf="password.touched && password.errors?.['required']">Password is required</span>
+          </div>
         </div>
-        <button type="submit" class="button login__submit">
+        <button [ngClass]="{'btn-disable': isLoading}" type="submit" class="button login__submit">
           <span class="button__text">Log In Now</span>
           <i class="button__icon fa-solid fa-chevron-right"></i>
         </button>

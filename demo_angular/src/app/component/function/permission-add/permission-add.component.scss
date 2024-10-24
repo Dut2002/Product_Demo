@@ -1,0 +1,21 @@
+.btn-add{
+  height: 45px;
+  width: 100%;
+  font-size: 25px;
+  border: none;
+  cursor: pointer;
+}
+
+.permission-card{
+  margin: 1rem;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.border-dot{
+  border: 1.5px solid;
+}
+
+.permission-card:last-of-type{
+  margin-bottom: 0;
+}

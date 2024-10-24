@@ -5,8 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigInteger;
-import java.util.Objects;
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,10 +14,12 @@ import java.util.Objects;
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID", nullable = false, precision = 0)
+    @Column(name = "ID", nullable = false)
     private Long id;
     @Basic
-    @Column(name = "NAME", nullable = false, length = 100)
+    @Column(name = "NAME", nullable = false, length = 100, unique = true)
     @Size(max = 100)
     private String name;
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Product> products;
 }

@@ -20,4 +20,8 @@ public interface AccountRepository extends CrudRepository<Account, Long>, JpaSpe
     boolean existsByUsername(@NotBlank(message = "Username is required") String username);
 
     boolean existsByEmail(@NotBlank(message = "Email is required") @Size(max = 100) @Email(message = "Email format invalid") String email);
+
+    boolean existsByUsernameAndIdNot(String username, Long id);
+
+    boolean existsByEmailAndIdNot(String email, Long id);
 }

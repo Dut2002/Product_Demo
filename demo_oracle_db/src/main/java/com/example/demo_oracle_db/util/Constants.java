@@ -7,14 +7,17 @@ public class Constants {
         String FAILED = "FAILED";
     }
 
-    public interface Status {
-        String ACTIVE = "ACTIVE";
+    public enum Status {
+        Active, //đang hoạt động
+        Inactive,//không hoạt động
+        Pending, // chờ duyệt
+        Blocked, // bị chăặn
+        Deleted, // bị xóa
+        Banned // bị cấm, không thể khôi phục
     }
     public interface Role {
-
-        String USER = "ROLE_USER";
-        String ADMIN = "ROLE_ADMIN";
-        String SYS_ADMIN = "ROLE_SYS_ADMIN";
-        String CUSTOMER = "ROLE_CUSTOMER";
+        String ADMIN = "ADMIN";
+        String SYS_ADMIN = "STAFF";
+        String CUSTOMER = "CUSTOMER";
     }
 }

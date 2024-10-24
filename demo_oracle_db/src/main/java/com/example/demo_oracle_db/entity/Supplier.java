@@ -4,8 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigInteger;
-import java.util.Objects;
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,24 +14,27 @@ public class Supplier {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID", nullable = false, precision = 0)
+    @Column(name = "ID", nullable = false)
     private Long id;
     @Basic
-    @Column(name = "NAME", nullable = false, length = 255)
+    @Column(name = "NAME", nullable = false)
     private String name;
     @Basic
-    @Column(name = "CONTACT", nullable = true, length = 255)
+    @Column(name = "CONTACT")
     private String contact;
     @Basic
-    @Column(name = "ADDRESS", nullable = true, length = 255)
+    @Column(name = "ADDRESS")
     private String address;
     @Basic
-    @Column(name = "PHONE", nullable = true, length = 20)
+    @Column(name = "PHONE", length = 20)
     private String phone;
     @Basic
-    @Column(name = "EMAIL", nullable = true, length = 255)
+    @Column(name = "EMAIL")
     private String email;
     @Basic
-    @Column(name = "WEBSITE", nullable = true, length = 255)
+    @Column(name = "WEBSITE")
     private String website;
+
+    @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Product> products;
 }

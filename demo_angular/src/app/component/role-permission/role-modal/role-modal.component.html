@@ -1,0 +1,23 @@
+<div class="modal">
+  <div class="modal-content">
+    <h2>{{title}}</h2>
+    <form #roleForm="ngForm" [ngClass]="{'form-disable': isLoading}" (ngSubmit)="saveRole(roleForm)">
+      <div class="form-input flex-full">
+        <label class="form-label" for="name">Role Name</label>
+        <div class="form-input-enter">
+          <input type="text" [(ngModel)]="role.name" #name="ngModel" name="name" placeholder="Role Name. Example: Administrator, Manager, Leader,..."
+            [minlength]="2" [maxlength]="255" [required]="true">
+        </div>
+        <div *ngIf="name.touched && !name.valid" class="validate-input">
+          <span *ngIf="name.errors?.['required']">Name is required</span>
+          <span *ngIf="name.errors?.['minlength'] || name.errors?.['maxlength']">Length from 2 to 255 characters</span>
+        </div>
+      </div>
+      <div class="center">
+        <button type="submit" class="btn btn-small btn-green" [disabled]="isLoading">Save</button>
+        <button type="button" class="btn btn-small btn-orange" (click)="resetModal(roleForm)" [disabled]="isLoading">Reset</button>
+        <button type="button" class="btn btn-small btn-gray" (click)="closeModal()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>

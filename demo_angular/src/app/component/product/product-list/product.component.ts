@@ -8,7 +8,8 @@ import { AuthService } from '../../../service/auth/auth.service';
 import { RouterUrl } from '../../../constant/app.const.router';
 import { ProductDto } from '../../../model/dto/product-dto';
 import { Product } from '../../../model/product';
-import { SearchBoxDto } from '../../../model/dto/search-box-dto';
+
+import { HttpResponse } from '@angular/common/http';
 @Component({
   selector: 'app-product',
   templateUrl: './product.component.html',
@@ -27,7 +28,7 @@ export class ProductComponent implements OnInit {
   modalTitle = '';
   totalPages: number = 0;
 
-  authority = RouterUrl;
+  permission = RouterUrl;
 
   constructor(private productService: ProductService,
     private snackBarService: SnackBarService,
@@ -76,12 +77,12 @@ export class ProductComponent implements OnInit {
   }
 
   openUpdateModal(product: ProductDto) {
-    this.currentProduct = {... product};
+    this.currentProduct = { ...product };
     this.modalTitle = 'Update Product';
     this.showModal = true;
   }
 
-  saveSuccess(){
+  saveSuccess() {
     this.loadProducts();
     this.closeModal();
   }
@@ -91,42 +92,63 @@ export class ProductComponent implements OnInit {
   }
 
   confirmDelete(product: ProductDto) {
-    this.currentProduct = {...product};
+    this.currentProduct = { ...product };
     this.showConfirmation = true;
   }
 
   deleteProduct() {
-// Add new product
-      this.productService.deleteProduct(this.currentProduct.id).subscribe({
-        next: (response) => {
-          // Xử lý khi thêm sản phẩm thành công
-          this.snackBarService.show(null, response.content, ApiStatus.SUCCESS, 5000);
-          console.log('Product deleteing successfully:', response);
-          this.loadProducts();
-        },
-        error: (error) => {
-          // Xử lý lỗi khi thêm sản phẩm
-          this.errorHandle.handle(error);
-        },
-        complete: () => {
-          this.showConfirmation = false;
-        }
-      });
+    // Add new product
+    this.productService.deleteProduct(this.currentProduct.id).subscribe({
+      next: (response) => {
+        // Xử lý khi thêm sản phẩm thành công
+        this.snackBarService.show(null, response.content, ApiStatus.SUCCESS, 5000);
+        console.log('Product deleteing successfully:', response);
+        this.loadProducts();
+      },
+      error: (error) => {
+        // Xử lý lỗi khi thêm sản phẩm
+        this.errorHandle.handle(error);
+      },
+      complete: () => {
+        this.showConfirmation = false;
+      }
+    });
   }
 
-  cancleConfirm(){
+  cancleConfirm() {
     this.showConfirmation = false;
   }
 
   importProducts() {
     // Implement import functionality
     console.log('Import functionality to be implemented');
-    this.snackBarService.show(null, 'There is a message',ApiStatus.NORMAL, 1000000000)
+    this.snackBarService.show(null, 'There is a message', ApiStatus.NORMAL, 1000000000)
   }
 
   exportProducts() {
     // Implement export functionality
-    console.log('Export functionality to be implemented');
+    this.productService.exportProduct('xlsx').subscribe({
+      next: (response:HttpResponse<Blob>) => {
+        const filename = response.headers.get('File-Name');
+        console.log(response.headers.keys()); // In ra tất cả các header
+
+        alert(filename) // Lấy tên file từ header
+        const blob = new Blob([response.body!], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+
+        // Tạo URL cho blob và tải xuống
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename || 'default-filename'; // Sử dụng tên file từ header hoặc tên mặc định
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      },
+      error: err => {
+        this.errorHandle.handle(err);
+      }
+    })
   }
 
   sortTable(column: string) {
@@ -139,5 +161,4 @@ export class ProductComponent implements OnInit {
     }
     this.loadProducts();
   }
-
 }

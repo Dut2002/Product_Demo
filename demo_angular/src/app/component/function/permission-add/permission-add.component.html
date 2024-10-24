@@ -1,0 +1,30 @@
+<div class="permission-card"  *ngIf="!isShow">
+  <button class="btn-add btn-green" (click)="onShow()"><i class="fa-solid fa-plus"></i></button>
+</div>
+<div class="permission-card border-dot" *ngIf="isShow">
+  <form #permissionForm="ngForm" (ngSubmit)="addPermission(permissionForm)" class="form flex-half">
+    <div class="form-input flex-full">
+      <label class="form-label"  for="name">Name:</label>
+      <div class="form-input-enter">
+        <input type="text" [(ngModel)]="permission.name" name="name" [required]="true" placeholder="Name">
+      </div>
+    </div>
+    <div class="form-input flex-full">
+      <label class="form-label"  for="beEndPoint">Back-end Endpoint:</label>
+      <div class="form-input-enter">
+        <input type="text" name="beEndPoint" [(ngModel)]="permission.beEndPoint" [required]="true" placeholder="Format: /api/{function}/{permission}">
+      </div>
+    </div>
+    <div class="form-input flex-full">
+      <label class="form-label"  for="feEndPoint">Fornt-end Route:</label>
+      <div class="form-input-enter">
+        <input type="text" name="feEndPoint" [(ngModel)]="permission.feEndPoint" [required]="true" placeholder="Format: {function}/{permission}">
+      </div>
+    </div>
+    <div class="form-input center flex-full flex-align-end">
+      <input type="submit" class="btn btn-small btn-blue" value="Add">
+      <input type="reset" (click)="onReset(permissionForm)" class="btn btn-small btn-orange" value="Reset">
+      <input type="button" class="btn btn-small btn-gray" value="Cancel" (click)="onClose()">
+    </div>
+  </form>
+</div>

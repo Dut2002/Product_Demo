@@ -2,6 +2,7 @@ package com.example.demo_oracle_db.service.product.response;
 
 import com.example.demo_oracle_db.entity.Account;
 import com.example.demo_oracle_db.entity.Category;
+import com.example.demo_oracle_db.entity.Role;
 import com.example.demo_oracle_db.entity.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,5 +28,10 @@ public class SearchBox {
     public SearchBox(Account customer){
         this.id = customer.getId();
         this.name = customer.getFullName();
+    }
+
+    public SearchBox(Role role){
+        this.id = role.getId();
+        this.name = role.getName();
     }
 }

@@ -1,14 +1,17 @@
 package com.example.demo_oracle_db.config.authen;
 
 import com.example.demo_oracle_db.config.JwtConfig;
+import com.example.demo_oracle_db.config.authen.dto.FunctionInfo;
+import com.example.demo_oracle_db.config.authen.dto.GrantedAuthorityCustom;
+import com.example.demo_oracle_db.config.authen.dto.PermissionInfo;
 import com.example.demo_oracle_db.entity.Account;
-import com.example.demo_oracle_db.entity.Function;
 import com.example.demo_oracle_db.entity.Role;
 import com.example.demo_oracle_db.exception.DodException;
 import com.example.demo_oracle_db.repository.AccountRepository;
-import com.example.demo_oracle_db.repository.FunctionRepository;
+import com.example.demo_oracle_db.repository.PermissionRepository;
 import com.example.demo_oracle_db.repository.RoleRepository;
 import com.example.demo_oracle_db.util.MessageCode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
@@ -19,11 +22,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,10 +42,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Autowired
     AccountRepository accountRepository;
     @Autowired
-    FunctionRepository functionRepository;
+    PermissionRepository permissionRepository;
     @Autowired
     RoleRepository roleRepository;
-
 
 
     //Xử lý filter để phân quyền
@@ -62,42 +65,55 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                     .parseClaimsJws(token)
                     .getBody();
             String username = claims.getSubject();
-            Date expireDate = claims.getExpiration();
             if (username != null) {
-                List<String> authorities = (List<String>) claims.get("authorities");
-                String roleName = (String) claims.get("role");
-                Role role = roleRepository.findByName(roleName).orElseThrow(()-> new DodException(MessageCode.ROLE_NOT_FOUND));
-                String endPoint = request.getRequestURI();
-                Function function = functionRepository.findByEndPointAndRole(endPoint, role.getId()).orElseThrow(()-> new DodException(MessageCode.FUNCTION_NOT_FOUND));
-
-                if(!authorities.contains(function.getName())){
-                    throw new DodException(MessageCode.USER_UNAUTHORIZED);
+                Account account = accountRepository.findByUsername(username)
+                        .orElseThrow(() -> new DodException(MessageCode.USER_NAME_NOT_EXIST, username));
+                if (account.getAccessToken() == null) {
+                    throw new DodException(MessageCode.TOKEN_NOT_EXISTS, username);
                 }
-
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                        username, null, authorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList())
-                );
-                Account account = accountRepository.findByUsername(username).orElse(null);
-                if(account == null){
-                    throw new DodException(MessageCode.USER_NAME_NOT_EXIST, username);
-                }
-                if(account.getAccessToken() == null){
-                    throw new DodException(MessageCode.TOKEN_NOT_EXISTS,username);
-                }else{
-                    if(account.getAccessToken().equals(token) && expireDate.before(new Date())){
-                        throw new DodException(MessageCode.TOKEN_EXPIRED);
+                List<FunctionInfo> functionInfos = extractFucntionInfoFromClaims(claims);
+                List<String> endPoints = new ArrayList<>();
+                for (FunctionInfo functionInfo : functionInfos) {
+                    for (PermissionInfo permissionInfo : functionInfo.getPermissions()) {
+                        endPoints.add(permissionInfo.getBeEndPoint());
                     }
                 }
+                List<Role> roles = roleRepository.findByAccount(account.getId());
+                List<Long> roleIds = roles.stream().map(Role::getId).toList();
+
+                String endPoint = request.getRequestURI();
+                if (this.permissionRepository.findByPermissionAccess(endPoint, roleIds).isEmpty()
+                        || !endPoints.contains(endPoint)
+                ) {
+                    throw new DodException(MessageCode.USER_UNAUTHORIZED);
+                }
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                        username,
+                        roles.stream().map(Role::getName),
+                        functionInfos.stream().map(GrantedAuthorityCustom::new).collect(Collectors.toList())
+                );
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             SecurityContextHolder.clearContext();
         }
-
         System.out.println(response.getHeaderNames());
         System.out.println(request.getHeaderNames());
-
         // go to the next filter in the filter chain
         filterChain.doFilter(request, response);
+    }
+
+    public List<FunctionInfo> extractFucntionInfoFromClaims(Claims claims) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<LinkedHashMap> functionInfoMaps = (List<LinkedHashMap>) claims.get("functions");
+
+        List<FunctionInfo> functionInfos = new ArrayList<>();
+        for (LinkedHashMap map : functionInfoMaps) {
+            // Chuyển đổi từ LinkedHashMap sang FunctionInfo
+            FunctionInfo functionInfo = objectMapper.convertValue(map, FunctionInfo.class);
+            functionInfos.add(functionInfo);
+        }
+
+        return functionInfos;
     }
 }

@@ -1,6 +1,8 @@
 package com.example.demo_oracle_db.config.authen;
 
 import com.example.demo_oracle_db.config.JwtConfig;
+import com.example.demo_oracle_db.config.authen.dto.FunctionInfo;
+import com.example.demo_oracle_db.config.authen.dto.GrantedAuthorityCustom;
 import com.example.demo_oracle_db.config.authen.dto.UserPrincipal;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
@@ -8,14 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -32,39 +31,41 @@ public class TokenProvider {
         return headers.get(jwtConfig.getHeader().toLowerCase()).replace(jwtConfig.getPrefix(), "");
     }
 
-    public String createToken(Authentication authentication){
+    public String createToken(Authentication authentication) {
         try {
             Date date = new Date();
             long now = date.getTime();
             UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-            String role = userPrincipal.getRole();
-            List<String> authorities = authentication.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.toList());
-
+            List<String> roles = userPrincipal.getRoles();
+            // Lấy danh sách quyền (authorities) và endpoint
+            List<GrantedAuthorityCustom> authorities = authentication.getAuthorities().stream()
+                    .map(auth -> (GrantedAuthorityCustom) auth)
+                    .toList();
+            List<FunctionInfo> functionInfos = authorities.stream().map(GrantedAuthorityCustom::getFunctionInfo)
+                    .toList();
             return Jwts.builder().setSubject(authentication.getName())
-                    .claim("role", role)
-                    .claim("authorities",authorities)
+                    .claim("roles", roles)
+                    .claim("functions", functionInfos)
                     .setIssuedAt(date)
-                    .setExpiration(new Date(now+ jwtConfig.getExpiration()*1000L))//milliseconds
+                    .setExpiration(new Date(now + jwtConfig.getExpiration() * 1000L))//milliseconds
                     .signWith(SignatureAlgorithm.HS512, jwtConfig.getSecret().getBytes())
                     .compact();
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("Create Token Failed!");
             return "";
         }
     }
 
-    public String createRefreshToken(Authentication authentication){
+    public String createRefreshToken(Authentication authentication) {
         try {
             Date date = new Date();
             long now = date.getTime();
             return Jwts.builder().setSubject(authentication.getName())
                     .setIssuedAt(date)
-                    .setExpiration(new Date(now+ jwtConfig.getRefreshExpiration()*1000L))//milliseconds
+                    .setExpiration(new Date(now + jwtConfig.getRefreshExpiration() * 1000L))//milliseconds
                     .signWith(SignatureAlgorithm.HS512, jwtConfig.getSecret().getBytes())
                     .compact();
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("Create Refresh Token Failed!");
             return "";
         }
@@ -72,7 +73,7 @@ public class TokenProvider {
 
     public Authentication getAuthentication(String token) {
         UserPrincipal userPrincipal = dodUserDetailService.loadUserByUsername(getUsername(token));
-        return new UsernamePasswordAuthenticationToken(userPrincipal, userPrincipal.getRole(), userPrincipal.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(userPrincipal, userPrincipal.getRoles(), userPrincipal.getAuthorities());
     }
 
     public String getUsername(String token) {
@@ -94,16 +95,6 @@ public class TokenProvider {
             // Xử lý các lỗi khác (nếu có)
             throw new RuntimeException("Error parsing token", e);
         }
-    }
-
-    public List<String> getAuthorities(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(jwtConfig.getSecret().getBytes())
-                .parseClaimsJws(token)
-                .getBody();
-
-        // Lấy danh sách quyền từ claims, giả sử claims chứa key "permissions"
-        return claims.get("authorities", List.class);
     }
 
     public boolean validateJwtToken(String authToken) {

@@ -2,9 +2,11 @@ package com.example.demo_oracle_db.service.login.impl;
 
 import com.example.demo_oracle_db.config.authen.TokenProvider;
 import com.example.demo_oracle_db.entity.Account;
+import com.example.demo_oracle_db.entity.AccountRole;
 import com.example.demo_oracle_db.entity.Role;
 import com.example.demo_oracle_db.exception.DodException;
 import com.example.demo_oracle_db.repository.AccountRepository;
+import com.example.demo_oracle_db.repository.AccountRoleRepository;
 import com.example.demo_oracle_db.repository.RoleRepository;
 import com.example.demo_oracle_db.service.login.LoginService;
 import com.example.demo_oracle_db.service.login.request.LoginReq;
@@ -20,6 +22,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -35,6 +38,8 @@ public class LoginServiceImpl implements LoginService {
     AccountRepository accountRepository;
     @Autowired
     RoleRepository roleRepository;
+    @Autowired
+    AccountRoleRepository accountRoleRepository;
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
@@ -56,9 +61,9 @@ public class LoginServiceImpl implements LoginService {
             res.setUsername(account.getUsername());
             res.setEmail(account.getEmail());
             res.setFullName(account.getFullName());
-            Role role = roleRepository.findById(account.getRoleId())
-                    .orElseThrow(() -> new DodException(MessageCode.ROLE_NOT_FOUND));
-            res.setRoles(List.of(role.getName()));
+            List<Role> role = roleRepository.findByAccount(account.getId());
+            if (role.isEmpty()) throw new DodException(MessageCode.ROLE_NOT_FOUND);
+            res.setRoles(role.stream().map(Role::getName).toList());
             res.setStatus(account.getStatus());
             res.setToken(accessToken);
             res.setRefreshToken(refreshToken);
@@ -94,8 +99,9 @@ public class LoginServiceImpl implements LoginService {
                     res.setUsername(account.getUsername());
                     res.setEmail(account.getEmail());
                     res.setFullName(account.getFullName());
-                    res.setRoles(List.of(roleRepository.findById(account.getRoleId())
-                            .orElseThrow(() -> new DodException(MessageCode.ROLE_NOT_FOUND)).getName()));
+                    List<Role> role = roleRepository.findByAccount(account.getId());
+                    if (role.isEmpty()) throw new DodException(MessageCode.ROLE_NOT_FOUND);
+                    res.setRoles(role.stream().map(Role::getName).toList());
                     res.setStatus(account.getStatus());
                     res.setToken(accessToken);
                     res.setRefreshToken(refreshToken);
@@ -112,6 +118,7 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void register(RegisReq req) throws DodException {
         if (accountRepository.existsByUsername(req.getUsername())) {
             throw new DodException(MessageCode.USER_NAME_ALREADY_EXISTS, req.getUsername());
@@ -121,15 +128,19 @@ public class LoginServiceImpl implements LoginService {
             throw new DodException(MessageCode.EMAIL_ALREADY_EXISTS, req.getEmail());
         }
 
-        try{
+        try {
             Account account = new Account();
             account.setUsername(req.getUsername());
             account.setPassword(bCryptPasswordEncoder.encode(req.getPassword()));
             account.setEmail(req.getEmail());
-            account.setRoleId(req.getRole()!=null?req.getRole(): roleRepository.findByName(Constants.Role.USER).orElseThrow(()-> new DodException(MessageCode.ROLE_NOT_FOUND)).getId());
             account.setFullName(req.getFullName());
-            accountRepository.save(account);
-        }catch (Exception e){
+            account = accountRepository.save(account);
+            Role role = roleRepository.findByName(Constants.Role.CUSTOMER).orElseThrow(() -> new DodException(MessageCode.ROLE_NOT_FOUND));
+            AccountRole accountRole = new AccountRole();
+            accountRole.setAccountId(account.getId());
+            accountRole.setRoleId(role.getId());
+            accountRoleRepository.save(accountRole);
+        } catch (Exception e) {
             throw new DodException(MessageCode.REGISTER_USER_FAILED);
         }
     }
@@ -140,13 +151,13 @@ public class LoginServiceImpl implements LoginService {
         String username = tokenProvider.getUsername(token);
         Account account = accountRepository.findByUsername(username).orElse(null);
         try {
-            if(account!=null){
+            if (account != null) {
                 SecurityContextHolder.clearContext();
                 account.setRefreshToken(null);
                 account.setAccessToken(null);
                 accountRepository.save(account);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("Delete Token Failed!");
         }
         SecurityContextHolder.clearContext();

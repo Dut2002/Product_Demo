@@ -8,7 +8,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 export class ConfirmModalComponent {
   @Input() title = 'Are you sure?';
   @Output() confirmEvent = new EventEmitter<void>(); // Event khi nhấn yes
-  @Output() closeEvent = new EventEmitter<void>(); // Event khi nhấn yes
+  @Output() closeEvent = new EventEmitter<void>(); // Event khi nhấn no
 
 
   constructor(){}

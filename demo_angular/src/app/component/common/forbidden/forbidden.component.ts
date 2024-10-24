@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiHeaders, ApiUrls } from '../../../constant/api.const.urls';
+import { AuthService } from '../../../service/auth/auth.service';
 
 @Component({
   selector: 'app-forbidden',
@@ -8,7 +9,7 @@ import { ApiHeaders, ApiUrls } from '../../../constant/api.const.urls';
   styleUrl: './forbidden.component.scss'
 })
 export class ForbiddenComponent {
-  constructor( private router: Router) {
+  constructor( private router: Router, private authService: AuthService) {
   }
 
   goBack(): void {
@@ -19,6 +20,7 @@ export class ForbiddenComponent {
 
   // Điều hướng về trang login
   goToLogin(): void {
+    this.authService.clearLocalStorage();
     this.router.navigate([ApiUrls.Authentication.LOG_IN]);
   }
 }

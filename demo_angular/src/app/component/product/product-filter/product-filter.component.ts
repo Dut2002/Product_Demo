@@ -85,6 +85,7 @@ export class ProductFilterComponent implements OnInit{
 
 
   onApply(){
+    this.filter.pageNum = 1;
     this.applyEvent.emit(this.filter);
   }
 

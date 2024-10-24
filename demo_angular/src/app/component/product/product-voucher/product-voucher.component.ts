@@ -4,6 +4,8 @@ import { ProductService } from '../../../service/product/product.service';
 import { SnackBarService } from '../../../service/snack-bar/snack-bar.service';
 import { ErrorHandleService } from '../../../service/error-handle/error-handle.service';
 import { ApiStatus } from '../../../constant/api.const.urls';
+import { AuthService } from '../../../service/auth/auth.service';
+import { RouterUrl } from '../../../constant/app.const.router';
 
 @Component({
   selector: 'app-product-voucher',
@@ -14,70 +16,73 @@ export class ProductVoucherComponent {
   @Input() vouchers: Voucher[] = [];
   @Input() productId: number = 0;
   @Output() loadProductEvent = new EventEmitter<void>();
-  curretVoucher : Voucher = {} as Voucher;
+  curretVoucher: Voucher = {} as Voucher;
   showConfirm = false;
   showModal = false;
   code = '';
   input = false;
 
+  permission = RouterUrl;
+
   constructor(private productService: ProductService,
     private snackBarService: SnackBarService,
     private errorHandle: ErrorHandleService,
+    public authService: AuthService,
   ) { }
 
-  addVoucherProduct(){
+  addVoucherProduct() {
     this.productService.addVoucher(this.productId, this.code).subscribe({
-      next: response =>{
+      next: response => {
         this.snackBarService.show(null, response.content, ApiStatus.SUCCESS, 5000)
         this.loadProduct();
       },
       error: err => {
-          this.errorHandle.handle(err);
+        this.errorHandle.handle(err);
       }
     })
     this.input = false;
   }
 
-  deleteConfirm(voucher: Voucher){
+  deleteConfirm(voucher: Voucher) {
 
-    this.curretVoucher = {...voucher};
+    this.curretVoucher = { ...voucher };
     this.showConfirm = true;
   }
 
-  onDeleteVoucher(){
+  onDeleteVoucher() {
     this.productService.deleteVoucher(this.productId, this.curretVoucher.id).subscribe({
-      next: response =>{
+      next: response => {
         this.snackBarService.show(null, response.content, ApiStatus.SUCCESS, 5000)
         this.loadProduct();
 
       },
       error: err => {
-          this.errorHandle.handle(err);
+        this.errorHandle.handle(err);
       }
     })
     this.input = false;
   }
 
-  closeConfirm(){
+  closeConfirm() {
     this.showConfirm = false;
     this.curretVoucher = {} as Voucher;
   }
 
-  loadProduct(){
+  loadProduct() {
     this.loadProductEvent.emit();
   }
 
-  openInput(){
+  openInput() {
     this.input = true;
     this.code = '';
   }
 
-  openModal(voucher: Voucher){
-    this.curretVoucher = {...voucher}
+  openModal(voucher: Voucher) {
+    this.curretVoucher = { ...voucher }
     this.showModal = true;
   }
 
-  closeModal(){
+  closeModal() {
     this.showModal = false;
     this.curretVoucher = {} as Voucher
   }

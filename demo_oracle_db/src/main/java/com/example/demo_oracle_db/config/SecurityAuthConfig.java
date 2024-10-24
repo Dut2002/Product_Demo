@@ -67,18 +67,21 @@ public class SecurityAuthConfig {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable) // Vô hiệu hóa CSRF
                 // Thêm bộ lọc JWT để xác thực
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 // Cấu hình xử lý ngoại lệ cho các yêu cầu không được xác thực
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint()))
 
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Cấu hình quản lý phiên
                 .authorizeHttpRequests(auth -> auth // Cấu hình phân quyền truy cập
-                        .requestMatchers(HttpMethod.POST, "/api/login/**").permitAll() // Cho phép tất cả yêu cầu POST đến /api/login/**
-                        .requestMatchers(HttpMethod.GET, "/api/login/**").permitAll() // Cho phép tất cả yêu cầu GET đến /api/login/**
-                        .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll() // Cho phép tất cả yêu cầu GET đến /swagger-ui/**
+                        .requestMatchers(HttpMethod.POST, "/api/login/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/login/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v3/api-docs/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/user/send-otp-reset-password").permitAll() // Cho phép yêu cầu GET đến /api/user/send-otp-reset-password
-                        .requestMatchers(HttpMethod.POST, "/api/user/reset-password").permitAll() // Cho phép yêu cầu POST đến /api/user/reset-password
+                        .requestMatchers(HttpMethod.GET, "/api/user/send-otp-reset-password").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/user/reset-password").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/file/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/file/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/search/**").permitAll()
                         .anyRequest().authenticated()); // Tất cả yêu cầu còn lại phải được xác thực
         return http.build();
     }

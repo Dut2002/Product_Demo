@@ -42,7 +42,7 @@ public class ProductDto {
         return new PageImpl<>(productDtoList, productPage.getPageable(), productPage.getTotalElements());
     }
 
-    private ProductDto(Product product) {
+    public ProductDto(Product product) {
         this.setId(product.getId());
         this.setName(product.getName());
         this.setYearMaking(product.getYearMaking());

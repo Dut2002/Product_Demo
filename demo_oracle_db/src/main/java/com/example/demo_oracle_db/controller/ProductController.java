@@ -7,15 +7,21 @@ import com.example.demo_oracle_db.service.product.ProductService;
 import com.example.demo_oracle_db.service.product.request.AddVoucherRequest;
 import com.example.demo_oracle_db.service.product.request.ProductFilter;
 import com.example.demo_oracle_db.service.product.request.ProductRequest;
-import com.example.demo_oracle_db.service.product.response.SearchBox;
+import com.example.demo_oracle_db.util.FileType;
+import com.example.demo_oracle_db.util.MessageCode;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -61,48 +67,27 @@ public class ProductController {
         return ResponseEntity.ok(productService.importProducts(products));
     }
 
-    @GetMapping("export-products")
-    private ResponseEntity<?> exportProducts(@RequestParam(required = false) String search,
-                                             @RequestParam(required = false) Long yearMaking,
-                                             @RequestParam(required = false) LocalDate startExpireDate,
-                                             @RequestParam(required = false) LocalDate endExpireDate,
-                                             @RequestParam(required = false) Long startQuality,
-                                             @RequestParam(required = false) Long endQuality,
-                                             @RequestParam(required = false) Double startPrice,
-                                             @RequestParam(required = false) Double endPrice){
-        List<Product> products = productService.exportProduct(search, yearMaking, startExpireDate, endExpireDate, startQuality, endQuality, startPrice, endPrice);
-        return ResponseEntity.ok(products);
-    }
+//    @GetMapping("export-products")
+//    private ResponseEntity<?> exportProducts(@RequestParam(required = false) String search,
+//                                             @RequestParam(required = false) Long yearMaking,
+//                                             @RequestParam(required = false) LocalDate startExpireDate,
+//                                             @RequestParam(required = false) LocalDate endExpireDate,
+//                                             @RequestParam(required = false) Long startQuality,
+//                                             @RequestParam(required = false) Long endQuality,
+//                                             @RequestParam(required = false) Double startPrice,
+//                                             @RequestParam(required = false) Double endPrice){
+//        List<Product> products = productService.exportProduct(search, yearMaking, startExpireDate, endExpireDate, startQuality, endQuality, startPrice, endPrice);
+//        return ResponseEntity.ok(products);
+//    }
 
     @PostMapping("get-products-procedure")
-    private ResponseEntity<?> getProductsProcedure(@RequestBody ProductFilter filter){
+    private ResponseEntity<?> getProductsProcedure(@RequestBody ProductFilter filter) {
         Page<Product> products = productService.getProductsProcedure(filter);
         return ResponseEntity.ok(products);
     }
 
-    @GetMapping("get-category-box")
-    private ResponseEntity<?> getCategoryBox(@RequestParam(required = false) String name)
-    {
-        List<SearchBox> categories = productService.getCategoryBox(name);
-        return  ResponseEntity.ok(categories);
-    }
-
-    @GetMapping("get-supplier-box")
-    private ResponseEntity<?> getSupplierBox(@RequestParam(required = false) String name)
-    {
-        List<SearchBox> suppliers = productService.getSupplierBox(name);
-        return  ResponseEntity.ok(suppliers);
-    }
-
-    @GetMapping("get-customer-box")
-    private ResponseEntity<?> getCustomerBox(@RequestParam(required = false) String name)
-    {
-        List<SearchBox> suppliers = productService.getCustomerBox(name);
-        return  ResponseEntity.ok(suppliers);
-    }
-
     @PostMapping("add-voucher")
-    private  ResponseEntity<?> addVoucherToProduct(@RequestBody @Valid AddVoucherRequest request) throws DodException {
+    private ResponseEntity<?> addVoucherToProduct(@RequestBody @Valid AddVoucherRequest request) throws DodException {
         productService.addVoucherToProduct(request);
         return ResponseEntity.ok(new Res().resOk("Add voucher to product success"));
     }
@@ -111,6 +96,28 @@ public class ProductController {
     private ResponseEntity<?> deleteVoucherFromProduct(@RequestParam Long productId, @RequestParam Long voucherId) throws DodException {
         productService.deleteVoucherFromProduct(productId, voucherId);
         return ResponseEntity.ok(new Res().resOk("Delete voucher from product success"));
+    }
 
+    @GetMapping("export-products")
+    private ResponseEntity<InputStreamResource> exportProduct(@RequestParam String option) throws DodException, IOException {
+        FileType fileType;
+        try {
+            fileType = FileType.fromOption(option);
+        } catch (IllegalArgumentException e) {
+            // Xử lý khi options không hợp lệ
+            throw new DodException(MessageCode.ILLEGAL_EXTENSION, option);
+        }
+        String fileName = "Product Report" +
+                LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME) +
+                "." +
+                fileType.getExtension();
+
+        String contentDisposition = "inline; filename=" + fileName;
+
+        ByteArrayInputStream data = productService.productListReport();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("File-Name", fileName);
+        headers.add("Content-Disposition", contentDisposition);
+        return ResponseEntity.ok().headers(headers).body(new InputStreamResource(data));
     }
 }

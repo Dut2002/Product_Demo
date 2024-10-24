@@ -1,24 +1,30 @@
 package com.example.demo_oracle_db.service.function;
 
-import com.example.demo_oracle_db.entity.Function;
 import com.example.demo_oracle_db.exception.DodException;
-import com.example.demo_oracle_db.service.function.request.AddFunctionReq;
-import com.example.demo_oracle_db.service.function.request.RoleAccess;
-import com.example.demo_oracle_db.service.function.request.UpdateFunctionReq;
-import com.example.demo_oracle_db.service.function.request.UpdateRoleAccess;
+import com.example.demo_oracle_db.service.function.request.AddPermissionRequest;
+import com.example.demo_oracle_db.service.function.request.FunctionRequest;
+import com.example.demo_oracle_db.service.function.request.UpdatePermissionRequest;
+import com.example.demo_oracle_db.service.function.response.FunctionResponse;
+import com.example.demo_oracle_db.service.function.response.PermissionResponse;
 
 import java.util.List;
 
 public interface FunctionService {
-    List<Function> getAll();
+    List<FunctionResponse> getAll();
 
-    void addFunction(AddFunctionReq req) throws DodException;
+    void addFunction(FunctionRequest functionName) throws DodException;
 
-    void updateFunction(UpdateFunctionReq req) throws DodException;
-
-    void modifyFunctionAccess(UpdateRoleAccess req) throws DodException;
+    void updateFunction(FunctionRequest req) throws DodException;
 
     void deleteFunction(Long id) throws DodException;
 
-    List<RoleAccess> getDetails(Long id) throws DodException;
+    List<PermissionResponse> getAllPermissionDetail(Long functionId) throws DodException;
+
+    PermissionResponse getPermissionDetail(Long id) throws DodException;
+
+    void addPermission(AddPermissionRequest request) throws DodException;
+
+    void updatePermission(UpdatePermissionRequest request) throws DodException;
+
+    void deletePermission(Long id) throws DodException;
 }

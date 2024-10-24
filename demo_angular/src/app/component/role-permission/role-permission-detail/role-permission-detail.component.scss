@@ -1,0 +1,59 @@
+.form-container form {
+  padding: 0;
+  justify-content: center;
+}
+
+.form-title {
+  background: rgb(212 212 212);
+  border-bottom: 1px solid;
+  padding: 8px;
+}
+
+.form-title i, .form-label i {
+  margin-right: 10px;
+}
+
+.form-container {
+  border: 2px solid;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 10px;
+}
+
+.form-input-container {
+  flex: 1;
+  max-width: 80%;
+  min-width: 250px;
+
+}
+
+.form-input-param {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+  margin-bottom: 5px;
+  padding: 10px;
+  border-bottom: 1px dotted;
+
+  line-height: 30px;
+}
+
+.form-input-enter input{
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+}
+
+.permissions-container{
+  display: grid;
+  grid-template-columns: 1fr; /* Ban đầu là 1 cột */
+  grid-gap: 10px;
+  padding: 10px;
+}
+
+@media (min-width: 768px) {
+  .permissions-container {
+    grid-template-columns: 1fr 1fr; /* Khi màn hình lớn hơn 768px, chia thành 2 cột */
+  }
+}

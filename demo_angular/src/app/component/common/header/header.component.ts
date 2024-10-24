@@ -26,25 +26,11 @@ export class HeaderComponent{
   @Input() isNavVisible: boolean = false;
   @Output() scrollEvent = new EventEmitter<number>();
 
-
-  // sendRefresh(){
-  //   const refresh = this.authService.getRefresh()||'';
-  //   this.loginService.sendRefreshToken(refresh).subscribe({
-  //     next: (response) => {
-  //       console.log(response)
-  //       alert(response)
-  //     },
-  //     error: (err) => {
-  //       this.errorHandelService.handle(err);
-  //     }
-  //   });
-  // }
-
   logOut(){
     this.loginService.logout().subscribe({
       next: () => {
         this.authService.clearLocalStorage();
-        this.router.navigate([RouterUrl.LOG_IN.path]);
+        this.router.navigate([RouterUrl.LOG_IN]);
       },
       error: (err) => {
         this.errorHandelService.handle(err);

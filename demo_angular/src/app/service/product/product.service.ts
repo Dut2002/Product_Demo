@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ApiUrls } from '../../constant/api.const.urls';
 import { BaseService } from '../base/base.service';
-import { HttpParams } from '@angular/common/http';
+import { HttpEvent, HttpParams, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Product } from '../../model/product';
 import { ProductFilter } from '../../model/dto/product-filter';
@@ -21,7 +21,7 @@ export class ProductService {
       ...productFilter
     };
 
-    return this.baseService.get_body(ApiUrls.Product.GET_PRODUCTS, body);
+    return this.baseService.get_body(ApiUrls.Product.VIEW_PRODUCTS, body);
   }
 
   addProduct(product: Product) {
@@ -41,19 +41,19 @@ export class ProductService {
   getCategoryBox(name: string | null) {
     let params = new HttpParams()
     if (name) params = params.set('name', name)
-    return this.baseService.get(ApiUrls.Product.GET_CATEGORY_BOX, params)
+    return this.baseService.get(ApiUrls.Search.CATEGORY_BOX, params)
   }
 
   getSupplierBox(name: string | null) {
     let params = new HttpParams()
     if (name) params = params.set('name', name)
-    return this.baseService.get(ApiUrls.Product.GET_SUPPLIER_BOX, params)
+    return this.baseService.get(ApiUrls.Search.SUPPLIER_BOX, params)
   }
 
   getCustomerBox(name: string | null) {
     let params = new HttpParams()
     if (name) params = params.set('name', name)
-    return this.baseService.get(ApiUrls.Product.GET_CUSTOMER_BOX, params)
+    return this.baseService.get(ApiUrls.Search.CUSTOMER_BOX, params)
   }
 
   addVoucher(productId: number, code: string) {
@@ -70,5 +70,11 @@ export class ProductService {
     params = params.set('productId', productId)
     params = params.set('voucherId', voucherId)
     return this.baseService.delete(ApiUrls.Product.DELETE_VOUCHER_PRODUCT, params)
+  }
+
+  exportProduct(option: string): Observable<HttpResponse<Blob>>{
+    let params = new HttpParams()
+    params = params.set('option', option);
+    return this.baseService.export(ApiUrls.Product.EXPORT_PRODUCTS, params)
   }
 }

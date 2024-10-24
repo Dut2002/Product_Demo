@@ -23,11 +23,10 @@ public interface FunctionRepository extends CrudRepository<Function, Long>, JpaS
             " WHERE rf.ROLE_ID = :roleId AND rf.STATUS = 1", nativeQuery = true)
     List<Function> findByRole(@Param("roleId") Long roleId);
 
-    boolean existsByName(String name);
+    boolean existsByFunctionName(String functionName);
 
-    boolean existsByEndPoint(String endPoint);
+    Optional<Function> findByFunctionName(String name);
 
-    Optional<Function> findByName(String name);
+    boolean existsByFunctionNameAndIdNot(String name, Long id);
 
-    Optional<Function> findByEndPoint(String endPoint);
 }

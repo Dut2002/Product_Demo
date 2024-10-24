@@ -20,7 +20,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ForbiddenComponent } from './component/common/forbidden/forbidden.component';
 import { NotFoundComponent } from './component/common/not-found/not-found.component';
 import { ErrorComponent } from './component/common/error/error.component';
-import { FunctionComponent } from './component/function/function.component';
+import { FunctionComponent } from './component/function/fuction-list/function.component';
 import { ConfirmModalComponent } from './component/common/confirm-modal/confirm-modal.component';
 import { HeaderComponent } from './component/common/header/header.component';
 import { HomeComponent } from './component/common/home/home.component';
@@ -36,6 +36,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatPseudoCheckboxModule } from '@angular/material/core';
 import { MatInputModule } from "@angular/material/input";
 import { MatFormFieldModule } from "@angular/material/form-field";
+import { FunctionModalComponent } from './component/function/function-modal/function-modal.component';
+import { FunctionDetailComponent } from './component/function/function-detail/function-detail.component';
+import { FileProgressComponent } from './example/file-progress/file-progress.component';
+import { PermissionDetailsComponent } from './component/function/permission-details/permission-details.component';
+import { PermissionAddComponent } from './component/function/permission-add/permission-add.component';
+import { RolePermissionComponent } from './component/role-permission/role-list/role-permission.component';
+import { RoleModalComponent } from './component/role-permission/role-modal/role-modal.component';
+import { RolePermissionDetailComponent } from './component/role-permission/role-permission-detail/role-permission-detail.component';
 
 
 @NgModule({
@@ -63,6 +71,14 @@ import { MatFormFieldModule } from "@angular/material/form-field";
     SearchDropDownComponent,
     ProductVoucherComponent,
     VoucherDetailComponent,
+    FunctionModalComponent,
+    FunctionDetailComponent,
+    FileProgressComponent,
+    PermissionDetailsComponent,
+    PermissionAddComponent,
+    RolePermissionComponent,
+    RoleModalComponent,
+    RolePermissionDetailComponent,
   ],
   imports: [
     BrowserModule,

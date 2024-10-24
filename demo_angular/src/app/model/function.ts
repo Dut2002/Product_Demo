@@ -1,5 +1,4 @@
 export interface Function{
-  id: number
+  id: number|null
   name: string
-  endPoint: string
 }

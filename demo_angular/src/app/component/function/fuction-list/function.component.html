@@ -1,0 +1,35 @@
+<div class="container">
+  <h1 class="title center">Function Management</h1>
+  <div class="table-actions">
+    <button class="btn add-btn btn-medium" (click)="openAddModal()">Add Function</button>
+  </div>
+  <div class="accordion-container">
+    <section class="accordion" *ngFor="let func of listFunction">
+      <div class="accordion-header">
+        <h1 class="title"><a [routerLink]="[]" fragment="{{func.id}}" (click)="toggle(func)">{{func.name}}</a></h1>
+        <div class="accordion-action">
+          <button class="btn btn-icon btn-orange" (click)="openUpdateModal(func)"><i class="fa-solid fa-pen-to-square"></i></button>
+          <button class="btn btn-icon btn-red" (click)="confirmDelete(func)"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>
+      <div class="content hidden" [ngClass]="{'hidden': openSectionId !== func.id}">
+        <div class="wrapper">
+          <app-permission-add [functionId]="func.id" (addEvent)="addPermission(func)">
+          </app-permission-add>
+          <div class="permission-card border-dot" *ngFor="let permission of func.permissions">
+            <app-permission-details [permission]="permission"
+              (updateEvent)="updatePermission(func, permission.id, $event)"
+              (deleteEvent)="deletePermission(func, permission.id)">
+            </app-permission-details>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <app-function-modal *ngIf="showModal" [function]="currentFunction" (updateEvent)="updateFunction($event)" (addEvent)="addFunction()"
+    (closeEvent)="closeModal()">
+  </app-function-modal>
+  <app-confirm-modal *ngIf="showConfirmation" [title]="'Do you want to delete this function?'"
+    (confirmEvent)="deleteFunction()" (closeEvent)="cancleConfirm()">
+  </app-confirm-modal>
+</div>

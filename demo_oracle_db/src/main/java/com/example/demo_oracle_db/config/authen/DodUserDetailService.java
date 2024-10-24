@@ -1,21 +1,24 @@
 package com.example.demo_oracle_db.config.authen;
 
+import com.example.demo_oracle_db.config.authen.dto.FunctionInfo;
+import com.example.demo_oracle_db.config.authen.dto.GrantedAuthorityCustom;
 import com.example.demo_oracle_db.config.authen.dto.UserPrincipal;
 import com.example.demo_oracle_db.entity.Account;
-import com.example.demo_oracle_db.entity.Function;
+import com.example.demo_oracle_db.entity.Permission;
 import com.example.demo_oracle_db.entity.Role;
 import com.example.demo_oracle_db.repository.AccountRepository;
-import com.example.demo_oracle_db.repository.FunctionRepository;
+import com.example.demo_oracle_db.repository.PermissionRepository;
 import com.example.demo_oracle_db.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import java.util.*;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +30,7 @@ public class DodUserDetailService implements UserDetailsService {
     @Autowired
     private AccountRepository accountRepository;
     @Autowired
-    private FunctionRepository functionRepository;
+    private PermissionRepository permissionRepository;
 
 //    public static final ThreadLocal<Account> ACCOUNT = new ThreadLocal<>();
 
@@ -36,20 +39,19 @@ public class DodUserDetailService implements UserDetailsService {
         Account account = accountRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
 //        ACCOUNT.set(account);
-        Role role = roleRepository.findById(account.getRoleId())
-                .orElseThrow(() -> new UsernameNotFoundException("Role not found"));
+        List<Role> roles = roleRepository.findByAccount(account.getId());
+        if (roles.isEmpty()) throw new UsernameNotFoundException("Role not found");
 
-        List<Function> funcList = functionRepository.findByRole(role.getId());
+        List<Permission> permissions = permissionRepository.findPermissionsByRole(roles.stream().map(Role::getId).toList());
 
-        List<String> functions = funcList.stream()
-                .map(Function::getName)
-                .toList();
-
-        Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
+        Set<GrantedAuthorityCustom> grantedAuthorities = new HashSet<>();
         // Thêm các chức năng
-        functions.forEach(functionName ->
-                grantedAuthorities.add(new SimpleGrantedAuthority(functionName))
-        );
-        return new UserPrincipal(account.getUsername(), account.getPassword(), role.getName(),grantedAuthorities);
+        List<FunctionInfo> functionInfos = FunctionInfo.mapToFunctionInfo(permissions);
+        if (!functionInfos.isEmpty()) {
+            functionInfos.forEach(functionInfo ->
+                    grantedAuthorities.add(new GrantedAuthorityCustom(functionInfo))
+            );
+        }
+        return new UserPrincipal(account.getUsername(), account.getPassword(), roles.stream().map(Role::getName).toList(), grantedAuthorities);
     }
 }

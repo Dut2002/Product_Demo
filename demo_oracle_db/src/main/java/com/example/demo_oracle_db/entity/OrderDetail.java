@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Objects;
 
 @Getter
 @Setter
@@ -16,30 +14,30 @@ public class OrderDetail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID", nullable = false, precision = 0)
+    @Column(name = "ID", nullable = false)
     private Long id;
     @Basic
-    @Column(name = "ORDER_ID", nullable = false, precision = 0)
+    @Column(name = "ORDER_ID", nullable = false)
     private Long orderId;
     @Basic
-    @Column(name = "PRODUCT_ID", nullable = false, precision = 0)
+    @Column(name = "PRODUCT_ID", nullable = false)
     private Long productId;
     @Basic
-    @Column(name = "QUANTITY", nullable = true, precision = 0)
+    @Column(name = "QUANTITY")
     private Integer quantity;
     @Basic
-    @Column(name = "UNIT_PRICE", nullable = true, precision = 2)
+    @Column(name = "UNIT_PRICE", precision = 2)
     private BigDecimal unitPrice;
     @Basic
-    @Column(name = "DISCOUNT", nullable = true, precision = 2)
+    @Column(name = "DISCOUNT", precision = 2)
     private BigDecimal discount;
 
     @ManyToOne
-    @JoinColumn(name = "product_id", insertable = false, updatable = false)
+    @JoinColumn(name = "PRODUCT_ID", insertable = false, updatable = false)
     private Product product;
 
     @ManyToOne
-    @JoinColumn(name = "order_id", insertable = false, updatable = false)
+    @JoinColumn(name = "ORDER_ID", insertable = false, updatable = false)
     private Order order;
 
 }

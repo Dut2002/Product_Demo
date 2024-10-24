@@ -17,25 +17,42 @@ security:
     header: "Authorization"
     prefix: "Bearer "
     secret: "demo_oracle_db"
-    expiration: "#{30*60}"
+    expiration: "#{2*60*60}"
     refresh-expiration: "#{7*24*60*60}"
 
 spring:
+#  datasource:
+#    driver-class-name: oracle.jdbc.OracleDriver
+#    url: "jdbc:oracle:thin:@10.10.0.202:1521:ORCL"
+#    username: demo
+#    password: demo
+#    name: DEMO
+#    hikari:
+#      auto-commit: false
+#  jpa:
+#    database-platform: org.hibernate.dialect.OracleDialect
+#    database: oracle
+#    show-sql: true
+#    properties:
+#      hibernate.id.new_generator_mappings: true
+#      hibernate.connection.provider_disables_autocommit: true
+#      hibernate.cache.use_second_level_cache: false
+#      hibernate.cache.use_query_cache: false
+#      hibernate.generate_statistics: false
   datasource:
-    driver-class-name: oracle.jdbc.OracleDriver
-    url: "jdbc:oracle:thin:@10.10.0.202:1521:ORCL"
-    username: demo
-    password: demo
-    name: DEMO
-    hikari:
-      auto-commit: false
+    url: jdbc:mysql://localhost:3306/DEMO?serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&lower_case_table_names=1
+    username: root
+    password: 12345678
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
-    database-platform: org.hibernate.dialect.OracleDialect
-    database: oracle
+    hibernate:
+      ddl-auto: update
     show-sql: true
-    properties:
-      hibernate.id.new_generator_mappings: true
-      hibernate.connection.provider_disables_autocommit: true
-      hibernate.cache.use_second_level_cache: false
-      hibernate.cache.use_query_cache: false
-      hibernate.generate_statistics: false
+#    properties:
+#      hibernate:
+#        implicit_naming_strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+#        physical_naming_strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+  servlet:
+    multipart:
+      max-file-size: 1000000000MB
+      max-request-size: 1000000000MB

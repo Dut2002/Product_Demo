@@ -79,7 +79,7 @@ body {
 .login {
 	width: 320px;
 	padding: 30px;
-	padding-top: 140px;
+	padding-top: 130px;
 }
 
 .login__field {
@@ -171,4 +171,11 @@ body {
 
 .social-login__icon:hover {
 	transform: scale(1.5);
+}
+
+.login__error{
+  height: 30px;
+  color: red;
+  font-size: 12px;
+  padding: 8px 5px;
 }

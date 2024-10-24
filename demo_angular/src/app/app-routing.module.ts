@@ -6,43 +6,55 @@ import { authGuard } from './guard/auth.guard';
 import { ForbiddenComponent } from './component/common/forbidden/forbidden.component';
 import { NotFoundComponent } from './component/common/not-found/not-found.component';
 import { ErrorComponent } from './component/common/error/error.component';
-import { FunctionComponent } from './component/function/function.component';
+import { FunctionComponent } from './component/function/fuction-list/function.component';
 import { HomeComponent } from './component/common/home/home.component';
 import { ProductComponent } from './component/product/product-list/product.component';
+import { FileProgressComponent } from './example/file-progress/file-progress.component';
+import { RolePermissionComponent } from './component/role-permission/role-list/role-permission.component';
 
 export const routes: Routes = [
+
+
   {
-    path: '',
-    redirectTo: RouterUrl.LOG_IN.path,
-    pathMatch: 'full'
-  }, // Redirect đến login
-  {
-    path: RouterUrl.LOG_IN.path,
-    component: LoginComponent
+    path: RouterUrl.VIEW_PRODUCTS,
+    component: ProductComponent,  canActivate: [authGuard]
   },
   {
-    path: RouterUrl.GET_PRODUCTS.path,
-    component: ProductComponent,  canActivate: [authGuard], data: {authority: RouterUrl.GET_PRODUCTS.name}
+    path: RouterUrl.VIEW_ROLES,
+    component: RolePermissionComponent,  canActivate: [authGuard]
   },
   {
-    path: RouterUrl.GET_FUNCTIONS.path,
-    component: FunctionComponent,  canActivate: [authGuard], data: {authority: RouterUrl.GET_FUNCTIONS.name}
+    path: RouterUrl.VIEW_FUNCTIONS,
+    component: FunctionComponent,  canActivate: [authGuard]
   },
   {
-    path: RouterUrl.FORBIDDEN.path,
+    path: RouterUrl.FORBIDDEN,
     component: ForbiddenComponent
   },
   {
-    path: RouterUrl.NOT_FOUND.path,
+    path: RouterUrl.NOT_FOUND,
     component: NotFoundComponent
   },
   {
-    path: RouterUrl.ERROR.path,
+    path: RouterUrl.ERROR,
     component: ErrorComponent
   },
   {
-    path: RouterUrl.BASE_URL.path,
-    component: HomeComponent
+    path: RouterUrl.HOME,
+    component: HomeComponent, canActivate: [authGuard]
+  },
+  {
+    path: RouterUrl.FILE_PROGRESS,
+    component: FileProgressComponent
+  },
+  {
+    path: '',
+    redirectTo: RouterUrl.LOG_IN,
+    pathMatch: 'full'
+  }, // Redirect đến login
+  {
+    path: RouterUrl.LOG_IN,
+    component: LoginComponent
   },
   {
     path: '**',

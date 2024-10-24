@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Objects;
+import java.util.List;
 
 @Getter
 @Setter
@@ -14,10 +14,14 @@ import java.util.Objects;
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID", nullable = false, precision = 0)
+    @Column(name = "ID", nullable = false)
     private Long id;
     @Basic
     @Size(max = 255)
-    @Column(name = "NAME", nullable = true, length = 255)
+    @Column(name = "NAME", unique = true)
     private String name;
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<RolePermission> rolePermission;
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<AccountRole> accountRoles;
 }

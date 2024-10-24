@@ -1,0 +1,42 @@
+<div class="container">
+  <h1 class="title center">Role Permission</h1>
+  <div class="table-actions">
+    <button class="btn add-btn btn-medium" (click)="openAddModal()">Add Role</button>
+    <button class="btn btn-medium btn-blue" (click)="loadData()">Refresh</button>
+  </div>
+  <div class="accordion-container">
+    <section class="accordion" *ngFor="let role of roleList">
+      <div class="accordion-header">
+        <h1 class="title"><a [routerLink]="[]" fragment="{{role.id}}" (click)="toggle(role.id)">{{role.name}}</a></h1>
+        <div class="accordion-action">
+          <button class="btn btn-icon btn-orange" (click)="openUpdateModal(role)"><i class="fa-solid fa-pen-to-square"></i></button>
+          <button class="btn btn-icon btn-red" (click)="confirmDelete(role)"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>
+      <div class="content hidden" [ngClass]="{'hidden': openSectionId !== role.id}">
+        <div class="wrapper">
+          <div class="permission-card" *ngFor="let func of role.functions">
+            <app-role-permission-detail [function]="func" [roleId]="role.id" (changeEvent)="changePermission(role.functions, $event)">
+
+            </app-role-permission-detail>
+          </div>
+
+
+          <!--
+          <div class="permission-card border-dot" *ngFor="let permission of role.permissions">
+            <app-permission-details [permission]="permission"
+              (updateEvent)="updatePermission(role, permission.id, $event)"
+              (deleteEvent)="deletePermission(role, permission.id)">
+            </app-permission-details>
+          </div> -->
+        </div>
+      </div>
+    </section>
+  </div>
+  <app-role-modal *ngIf="showModal" [role]="currentRole" [title]="title" (addEvent)="AddRole()"
+    (updateEvent)="UpdateRole($event)" (closeEvent)="closeModal()">
+  </app-role-modal>
+  <app-confirm-modal *ngIf="showConfirmation" [title]="'Do you want to delete this role?'" (confirmEvent)="deleteRole()"
+    (closeEvent)="closeConfirm()">
+  </app-confirm-modal>
+</div>

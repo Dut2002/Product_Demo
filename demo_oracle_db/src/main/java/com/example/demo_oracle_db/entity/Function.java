@@ -1,25 +1,29 @@
 package com.example.demo_oracle_db.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Objects;
+import java.util.List;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "CMD_FUNCTION", schema = "DEMO")
 public class Function {
-    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID", nullable = false, precision = 0)
+    @Id
+    @Column(name = "ID", nullable = false)
     private Long id;
     @Basic
-    @Column(name = "NAME", nullable = false, length = 255)
-    private String name;
+    @Column(name = "FUNCTION_NAME", nullable = false, unique = true)
+    private String functionName;
     @Basic
-    @Column(name = "END_POINT", nullable = true, length = 255)
-    private String endPoint;
+    @Column(name = "FE_ROUTE")
+    private String feRoute;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "function", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Permission> permissions;
 }

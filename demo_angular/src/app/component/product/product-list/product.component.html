@@ -1,7 +1,7 @@
 <div class="container">
   <h1 class="title center">Product Management</h1>
   <div class="table-actions">
-    <button class="btn add-btn btn-medium" *ngIf="authService.hasAuthority(authority.ADD_PRODUCT.name)"
+    <button class="btn add-btn btn-medium" *ngIf="authService.hasPermission(permission.ADD_PRODUCT)"
       (click)="openAddModal()">Add Product</button>
     <button class="btn import-btn btn-medium" (click)="importProducts()">Import Product</button>
     <button class="btn export-btn btn-medium" (click)="exportProducts()">Export Product</button>
@@ -66,7 +66,7 @@
 
             </th>
             <th
-              *ngIf="authService.hasAuthority(authority.UPDATE_PRODUCT.name)&&authService.hasAuthority(authority.DELETE_PRODUCT.name)">
+              *ngIf="authService.hasPermission(permission.UPDATE_PRODUCT)&&authService.hasPermission(permission.DELETE_PRODUCT)">
               Actions</th>
           </tr>
         </thead>
@@ -87,10 +87,10 @@
               </app-product-voucher>
             </td>
             <td class="col-75"
-              *ngIf="authService.hasAuthority(authority.UPDATE_PRODUCT.name)&&authService.hasAuthority(authority.DELETE_PRODUCT.name)">
-              <button class="btn update-btn btn-icon" *ngIf="authService.hasAuthority(authority.UPDATE_PRODUCT.name)"
+              *ngIf="authService.hasPermission(permission.UPDATE_PRODUCT)&&authService.hasPermission(permission.DELETE_PRODUCT)">
+              <button class="btn update-btn btn-icon" *ngIf="authService.hasPermission(permission.UPDATE_PRODUCT)"
                 (click)="openUpdateModal(product)"><i class="fa-solid fa-pen-to-square"></i></button>
-              <button class="btn delete-btn btn-icon" *ngIf="authService.hasAuthority(authority.DELETE_PRODUCT.name)"
+              <button class="btn delete-btn btn-icon" *ngIf="authService.hasPermission(permission.DELETE_PRODUCT)"
                 (click)="confirmDelete(product)"><i class="fa-solid fa-trash"></i></button>
             </td>
           </tr>

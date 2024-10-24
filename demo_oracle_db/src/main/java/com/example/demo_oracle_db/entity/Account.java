@@ -1,15 +1,14 @@
 package com.example.demo_oracle_db.entity;
 
+import com.example.demo_oracle_db.util.Constants;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import jakarta.validation.constraints.Email;
 
-import java.math.BigInteger;
-import java.sql.Date;
 import java.time.LocalDateTime;
-import java.util.Objects;
+import java.util.List;
 
 @Getter
 @Setter
@@ -19,45 +18,45 @@ public class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID", nullable = false, precision = 0)
+    @Column(name = "ID", nullable = false)
     private Long id;
     @Basic
-    @Column(name = "ACCESS_TOKEN", nullable = true)
+    @Lob
+    @Column(name = "ACCESS_TOKEN", columnDefinition = "LONGTEXT")
     private String accessToken;
     @Basic
-    @Column(name = "FULL_NAME", nullable = false, length = 255)
+    @Column(name = "FULL_NAME", nullable = false)
     @Size(max = 255)
     private String fullName;
     @Basic
-    @Column(name = "PASSWORD", nullable = true, length = 255)
+    @Column(name = "PASSWORD")
     @Size(max = 255)
     private String password;
     @Basic
-    @Column(name = "OTP", nullable = true, length = 10)
+    @Column(name = "OTP", length = 10)
     @Size(max = 10)
     private String otp;
+
     @Basic
-    @Column(name = "ROLE_ID", nullable = false, precision = 0)
-    private Long roleId;
-    @Basic
-    @Column(name = "USERNAME", nullable = false, length = 255)
+    @Column(name = "USERNAME", nullable = false, unique = true)
     private String username;
     @Column(name = "OTP_EXPIRE")
     private LocalDateTime otpExpire;
     @Basic
-    @Column(name = "EMAIL", nullable = false, length = 100)
+    @Column(name = "EMAIL", nullable = false, length = 100, unique = true)
     @Size(max = 100)
     @Email
     private String email;
     @Basic
     @Column(name = "STATUS", nullable = true, length = 10)
+    @Enumerated(EnumType.STRING)
     @Size(max = 10)
-    private String status;
+    private Constants.Status status;
     @Basic
-    @Column(name = "REFRESH_TOKEN", nullable = true)
+    @Lob
+    @Column(name = "REFRESH_TOKEN", columnDefinition = "LONGTEXT")
     private String refreshToken;
 
-    @ManyToOne
-    @JoinColumn(name = "ROLE_ID", insertable=false, updatable=false)
-    private Role role;
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<AccountRole> accountRoles;
 }

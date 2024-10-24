@@ -6,9 +6,10 @@ import com.example.demo_oracle_db.service.product.request.AddVoucherRequest;
 import com.example.demo_oracle_db.service.product.request.ProductFilter;
 import com.example.demo_oracle_db.service.product.request.ProductRequest;
 import com.example.demo_oracle_db.service.product.response.ProductDto;
-import com.example.demo_oracle_db.service.product.response.SearchBox;
 import org.springframework.data.domain.Page;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -17,9 +18,9 @@ public interface ProductService {
 
     Product getProduct(Long id) throws DodException;
 
-    ProductRequest addProduct(ProductRequest product,  int option) throws DodException;
+    void addProduct(ProductRequest product, int option) throws DodException;
 
-    ProductRequest updateProduct(ProductRequest product,  int option) throws DodException;
+    void updateProduct(ProductRequest product, int option) throws DodException;
 
     void deleteProduct(Long id) throws DodException;
 
@@ -29,13 +30,10 @@ public interface ProductService {
 
     Page<Product> getProductsProcedure(ProductFilter filter);
 
-    List<SearchBox> getCategoryBox(String name);
-
-    List<SearchBox> getSupplierBox(String name);
-
-    List<SearchBox> getCustomerBox(String name);
 
     void addVoucherToProduct(AddVoucherRequest request) throws DodException;
 
     void deleteVoucherFromProduct(Long productId, Long voucherId) throws DodException;
+
+    ByteArrayInputStream productListReport() throws IOException;
 }

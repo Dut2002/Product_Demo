@@ -1,8 +1,7 @@
-import { RoleAccess } from "./role-access"
+import { PermissionDto } from "./permission-dto";
 
 export interface FunctionDto{
-  id: number
-  name: string
-  endPoint: string
-  roleAccesses: RoleAccess[]
+  id: number;
+  name: string;
+  permissions: PermissionDto[];
 }

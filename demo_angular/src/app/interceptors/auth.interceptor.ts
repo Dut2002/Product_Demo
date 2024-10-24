@@ -1,24 +1,27 @@
-import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpHandlerFn } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { ApiHeaders } from '../constant/api.const.urls';
+import { HttpRequest, HttpHandlerFn } from '@angular/common/http';
+import { AuthService } from '../service/auth/auth.service';
+import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { RouterUrl } from '../constant/app.const.router';
 
-export function authenInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
-  // Lấy token từ localStorage
-  const token = localStorage.getItem(ApiHeaders.TOKEN_KEY);
+export function authenInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn) {
+  const authService = inject(AuthService);
+  const token = authService.getToken();
+  const router = inject(Router)
 
-  // Kiểm tra xem token có tồn tại hay không
+  let request = req;
+
   if (token) {
-
-
-    // Clone request và thêm Authorization header
-    const authReq = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    return next(authReq);
+    if (authService.isTokenExpired(token)) {
+      authService.clearLocalStorage();
+      router.navigate([RouterUrl.LOG_IN]);
+    } else {
+      request = req.clone({
+        setHeaders: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+    }
   }
-
-  // Nếu không có token, chuyển request gốc
-  return next(req);
+  return next(request);
 }

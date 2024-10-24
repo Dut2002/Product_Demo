@@ -19,6 +19,8 @@ export class ProductModalComponent implements OnInit, OnChanges {
   @Output() successEvent = new EventEmitter<void>(); // Event khi nhấn yes
   @Output() cancelEvent = new EventEmitter<void>();
 
+  isLoading: boolean = false;
+
   categoryBox: SearchBoxDto[] = []
   supplierBox: SearchBoxDto[] = []
   defaultProduct: Product = {} as Product;
@@ -81,6 +83,7 @@ export class ProductModalComponent implements OnInit, OnChanges {
       this.supplierNgModel.control.markAsTouched();
       return;
     }
+    this.isLoading = true;
     if (this.product.id) {
       // Update existing product
       this.productService.updateProduct(this.product).subscribe({
@@ -90,6 +93,9 @@ export class ProductModalComponent implements OnInit, OnChanges {
         },
         error: (error) => {
           this.errorHandle.handle(error)
+        },
+        complete: () => {
+          this.isLoading = false;
         }
       });
     } else {

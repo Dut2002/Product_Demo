@@ -83,7 +83,7 @@
       </div>
 
       <div class="center">
-        <button type="submit" class="btn btn-small btn-green">Save</button>
+        <button [ngClass]="{'btn-disable': isLoading}" type="submit" class="btn btn-small btn-green">Save</button>
         <button type="button" class="btn btn-small btn-orange" (click)="onReset()">Refresh</button>
         <button type="button" class="btn btn-small btn-gray" (click)="onCancel()">Cancel</button>
       </div>

@@ -9,8 +9,14 @@ public enum MessageCode{
 
     FUNCTION_NOT_FOUND("Function not found!"),
     FUNCTION_NAME_EXISTS("Function with name [%s] already exists!"),
-    FUNCTION_ENDPOINT_EXISTS("Function with endpoint [%s] already exists!"),
+
+    PERMISSION_NOT_FOUND("Permission not found!"),
+    PERMISSION_BE_ENDPOINT_EXISTS("Permission with back-end endpoint [%s] already exists!"),
+    PERMISSION_FE_ENDPOINT_EXISTS("Permission with front-end endpoint [%s] already exists!"),
+    PERMISSION_NAME_EXISTS("Permission with name [%s] already exists!"),
+    ACCOUNT_WITH_ROLE_NOT_FOUND("Account with role not found!"),
     ROLE_NOT_FOUND("Role not found!"),
+    USER_NOT_FOUND("User not found!"),
     USER_NAME_NOT_EXIST("User with username [%s] does not exist!"),
     USER_NAME_ALREADY_EXISTS("Username [%s] already exists!"),
     EMAIL_ALREADY_EXISTS("Email [%s] already exists!"),
@@ -38,9 +44,9 @@ public enum MessageCode{
     VOUCHER_ALREADY_ADD("Voucher already added to product!"),
     ADD_VOUCHER_FAILED("Add voucher to product failed!"),
     DELETE_VOUCHER_FAILED("Delete voucher from product failed!"),
-    VOUCHER_PRODUCT_NOT_FOUND("Voucher not found in product")
-
-            ;
+    VOUCHER_PRODUCT_NOT_FOUND("Voucher not found in product"),
+    ILLEGAL_EXTENSION("Unsupported file type [%s]"),
+    STATUS_NOT_FOUND("Status not found!");
 
     private final String code;
 

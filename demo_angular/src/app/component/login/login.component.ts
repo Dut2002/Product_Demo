@@ -1,62 +1,63 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, ViewChild } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { LoginService } from '../../service/login/login.service';
-import { ApiHeaders, ApiStatus, ApiUrls } from '../../constant/api.const.urls';
+import { ApiHeaders, ApiStatus } from '../../constant/api.const.urls';
 import { SnackBarService } from '../../service/snack-bar/snack-bar.service';
 import { ErrorHandleService } from '../../service/error-handle/error-handle.service';
 import { Router } from '@angular/router';
 import { RouterUrl } from '../../constant/app.const.router';
-import { Role } from '../../constant/app.const.role';
 import { AuthService } from '../../service/auth/auth.service';
+import { LoginRequest } from '../../model/dto/login-request';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent {
 
-  loginForm!: FormGroup;
+  loginRequest: LoginRequest = {} as LoginRequest
+  isLoading: boolean = false;
+
+  @ViewChild('loginForm', { static: false }) loginForm!: NgForm;
 
 
   constructor(private loginService: LoginService,
-    private fb: FormBuilder,
     private snackBarService: SnackBarService,
     private errorHandleService: ErrorHandleService,
     private router: Router,
     private authService: AuthService
   ) {
     if (!authService.isTokenExpired(authService.getRefresh())) {
-      router.navigate([RouterUrl.BASE_URL.path])
+      router.navigate([RouterUrl.HOME])
     }
-  }
-
-  ngOnInit(): void {
-    this.loginForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(3)]],
-      password: ['', [Validators.required]],
-    });
   }
 
   login(): void {
     if (this.loginForm.valid) {
-      this.loginService.login(this.loginForm.value).subscribe({
+      this.isLoading = true;
+      this.loginService.login(this.loginRequest).pipe(finalize(()=>{
+        this.isLoading = false;
+      }))
+      .subscribe({
         next: (response) => {
           localStorage.setItem(ApiHeaders.TOKEN_KEY, response.token);
           localStorage.setItem(ApiHeaders.REFRESH_KEY, response.refreshToken);
           localStorage.setItem(ApiHeaders.ROLE_KEY, response.roles[0])
           this.snackBarService.show(null, "Login Success!", ApiStatus.SUCCESS, 5000)
-          this.router.navigate([RouterUrl.BASE_URL.path])
+          this.router.navigate([RouterUrl.HOME])
         },
         error: (error) => {
           this.errorHandleService.handle(error);
         },
         complete: () => {
+          this.isLoading = false;
           console.log('Log in request completed');
         }
       })
     } else {
-      this.snackBarService.show('Form is invalid', 'Please check your input data.', ApiStatus.ERROR, 5000)
+      this.loginForm.control.markAllAsTouched();
     }
   }
 
