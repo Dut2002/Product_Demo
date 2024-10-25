@@ -25,6 +25,10 @@ public class Permission {
     @Column(name = "FUNCTION_ID")
     private Long functionId;
 
+    @Basic
+    @Column(name = "DEFAULT_PERMISSION")
+    private Integer defaultPermission;
+
     @ManyToOne
     @JoinColumn(name = "FUNCTION_ID", insertable = false, updatable = false)
     private Function function;

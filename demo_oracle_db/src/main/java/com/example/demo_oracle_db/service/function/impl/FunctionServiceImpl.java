@@ -1,5 +1,6 @@
 package com.example.demo_oracle_db.service.function.impl;
 
+import com.example.demo_oracle_db.config.authen.dto.FunctionInfo;
 import com.example.demo_oracle_db.entity.Function;
 import com.example.demo_oracle_db.entity.Permission;
 import com.example.demo_oracle_db.entity.RolePermission;
@@ -8,20 +9,18 @@ import com.example.demo_oracle_db.repository.FunctionRepository;
 import com.example.demo_oracle_db.repository.PermissionRepository;
 import com.example.demo_oracle_db.repository.RolePermissionRepository;
 import com.example.demo_oracle_db.service.function.FunctionService;
-import com.example.demo_oracle_db.service.function.request.AddPermissionRequest;
-import com.example.demo_oracle_db.service.function.request.FunctionRequest;
-import com.example.demo_oracle_db.service.function.request.UpdatePermissionRequest;
-import com.example.demo_oracle_db.service.function.response.FunctionResponse;
-import com.example.demo_oracle_db.service.function.response.PermissionResponse;
+import com.example.demo_oracle_db.service.function.request.*;
+import com.example.demo_oracle_db.service.function.response.DeleteConfirm;
 import com.example.demo_oracle_db.util.MessageCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class FunctionServiceImpl implements FunctionService {
+class FunctionServiceImpl implements FunctionService {
     @Autowired
     FunctionRepository functionRepository;
     @Autowired
@@ -31,24 +30,29 @@ public class FunctionServiceImpl implements FunctionService {
     RolePermissionRepository rolePermissionRepository;
 
     @Override
-    public List<FunctionResponse> getAll() {
-        return functionRepository.findAll((root, query, criteriaBuilder) -> null).stream().map(FunctionResponse::new).toList();
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addFunction(FunctionRequest request) throws DodException {
+    public void addFunction(AddFunctionRequest request) throws DodException {
         if (functionRepository.existsByFunctionName(request.getName())) {
             throw new DodException(MessageCode.FUNCTION_NAME_EXISTS, request);
         }
+        if (functionRepository.existsByFunctionName(request.getName())) {
+            throw new DodException(MessageCode.FUNCTION_FE_ROUTE_EXISTS, request);
+        }
         Function function = new Function();
         function.setFunctionName(request.getName());
-        functionRepository.save(function);
+        function = functionRepository.save(function);
+
+        Permission permission = new Permission();
+        permission.setName("View " + function.getFunctionName());
+        permission.setBeEndPoint("/api/" + function.getFeRoute());
+        permission.setFunctionId(function.getId());
+        permission.setDefaultPermission(1);
+        permissionRepository.save(permission);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateFunction(FunctionRequest req) throws DodException {
+    public void updateFunction(UpdateFunctionRequest req) throws DodException {
         Function function = functionRepository.findById(req.getId()).orElseThrow(() -> new DodException(MessageCode.FUNCTION_NOT_FOUND));
         if (functionRepository.existsByFunctionNameAndIdNot(req.getName(), req.getId())) {
             throw new DodException(MessageCode.FUNCTION_NAME_EXISTS, req.getName());
@@ -64,24 +68,14 @@ public class FunctionServiceImpl implements FunctionService {
             throw new DodException(MessageCode.FUNCTION_NOT_FOUND);
         }
         List<Permission> permissions = permissionRepository.findAllByFunctionId(id);
-        for (Permission permission: permissions
-             ) {
-            List<RolePermission> rolePermissions = rolePermissionRepository.findAllByPermissionId(permission.getId());
-            rolePermissionRepository.deleteAll(rolePermissions);
+        List<RolePermission> rolePermissions = new ArrayList<>();
+        for (Permission permission : permissions
+        ) {
+            rolePermissions.addAll(permission.getRolePermissions());
         }
+        rolePermissionRepository.deleteAll(rolePermissions);
         permissionRepository.deleteAll(permissions);
         functionRepository.deleteById(id);
-    }
-
-    @Override
-    public List<PermissionResponse> getAllPermissionDetail(Long functionId) throws DodException {
-        Function function = functionRepository.findById(functionId).orElseThrow(()->new DodException(MessageCode.FUNCTION_NOT_FOUND));
-        return function.getPermissions().stream().map(PermissionResponse::new).toList();
-    }
-
-    @Override
-    public PermissionResponse getPermissionDetail(Long id) throws DodException {
-        return new PermissionResponse(permissionRepository.findById(id).orElseThrow(()->new DodException(MessageCode.PERMISSION_NOT_FOUND)));
     }
 
     @Override
@@ -90,11 +84,11 @@ public class FunctionServiceImpl implements FunctionService {
         if (!functionRepository.existsById(request.getFunctionId())) {
             throw new DodException(MessageCode.FUNCTION_NOT_FOUND);
         }
-        if(permissionRepository.existsByName(request.getName())){
-            throw  new DodException(MessageCode.PERMISSION_NAME_EXISTS, request.getName());
+        if (permissionRepository.existsByName(request.getName())) {
+            throw new DodException(MessageCode.PERMISSION_NAME_EXISTS, request.getName());
         }
-        if(permissionRepository.existsByBeEndPoint(request.getBeEndPoint())){
-            throw  new DodException(MessageCode.PERMISSION_NAME_EXISTS, request.getName());
+        if (permissionRepository.existsByBeEndPoint(request.getBeEndPoint())) {
+            throw new DodException(MessageCode.PERMISSION_NAME_EXISTS, request.getName());
         }
         Permission permission = new Permission();
         permission.setFunctionId(request.getFunctionId());
@@ -107,11 +101,11 @@ public class FunctionServiceImpl implements FunctionService {
     @Transactional(rollbackFor = Exception.class)
     public void updatePermission(UpdatePermissionRequest request) throws DodException {
         Permission permission = permissionRepository.findById(request.getId()).orElseThrow(() -> new DodException(MessageCode.PERMISSION_NOT_FOUND));
-        if(permissionRepository.existsByNameAndIdNot(request.getName(), request.getId())){
-            throw  new DodException(MessageCode.PERMISSION_NAME_EXISTS, request.getName());
+        if (permissionRepository.existsByNameAndFunctionIdAndIdNot(request.getName(), permission.getFunctionId(), request.getId())) {
+            throw new DodException(MessageCode.PERMISSION_NAME_EXISTS, request.getName());
         }
-        if(permissionRepository.existsByBeEndPointAndIdNot(request.getBeEndPoint(), request.getId())){
-            throw  new DodException(MessageCode.PERMISSION_NAME_EXISTS, request.getName());
+        if (permissionRepository.existsByBeEndPointAndFunctionIdAndIdNot(request.getBeEndPoint(), permission.getFunctionId(), request.getId())) {
+            throw new DodException(MessageCode.PERMISSION_BE_ENDPOINT_EXISTS, request.getName());
         }
         permission.setName(request.getName());
         permission.setBeEndPoint(request.getBeEndPoint());
@@ -119,12 +113,47 @@ public class FunctionServiceImpl implements FunctionService {
     }
 
     @Override
-    public void deletePermission(Long id) throws DodException {
-        if (!permissionRepository.existsById(id)) {
-            throw new DodException(MessageCode.PERMISSION_NOT_FOUND);
+    @Transactional(rollbackFor = Exception.class)
+    public void deletePermission(DeletePermissionRequest request) throws DodException {
+        Permission permission = permissionRepository.findById(request.getId())
+                .orElseThrow(() -> new DodException(MessageCode.PERMISSION_NOT_FOUND));
+        if (permission.getDefaultPermission() == 1) {
+            throw new DodException(MessageCode.PERMISSION_REQUIRED);
         }
-        List<RolePermission> rolePermissions = rolePermissionRepository.findAllByPermissionId(id);
+        List<RolePermission> rolePermissions = permission.getRolePermissions();
         rolePermissionRepository.deleteAll(rolePermissions);
-        permissionRepository.deleteById(id);
+        permissionRepository.deleteById(request.getId());
     }
+
+    @Override
+    public List<FunctionInfo> viewAll() {
+        List<Permission> permissions = permissionRepository.findAll((root, query, criteriaBuilder) -> null);
+        return FunctionInfo.mapToFunctionInfo(permissions);
+    }
+
+    @Override
+    public DeleteConfirm checkDeletePermission(Long permissionId) throws DodException {
+        Permission permission = permissionRepository.findById(permissionId)
+                .orElseThrow(() -> new DodException(MessageCode.PERMISSION_NOT_FOUND));
+
+        DeleteConfirm response = new DeleteConfirm();
+        response.setPermissionId(permission.getId());
+
+        if (permission.getDefaultPermission() == 1) {
+            List<Permission> permissions = permissionRepository
+                    .findAllByFunctionIdAndDefaultPermission(permission.getFunctionId(), 1);
+
+            if (permissions.size() > 1) {
+                response.setNeedConfirm(true);
+                response.setMessage("Are you sure you want to remove the default permissions in this function?");
+            } else if (permissions.size() == 1) {
+                response.setNeedConfirm(true);
+                response.setMessage("This is the last default permission in this function. " +
+                        "Removing the permission will also remove the function. " +
+                        "Are you sure you want to delete?");
+            }
+        }
+        return response;
+    }
+
 }

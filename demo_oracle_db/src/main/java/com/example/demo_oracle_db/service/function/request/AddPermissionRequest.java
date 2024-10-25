@@ -14,6 +14,6 @@ public class AddPermissionRequest {
     String name;
     @NotBlank(message = "End Point Back-end is required")
     String beEndPoint;
-
-    String feEndPoint;
+    @NotNull
+    Boolean defaultPermission;
 }

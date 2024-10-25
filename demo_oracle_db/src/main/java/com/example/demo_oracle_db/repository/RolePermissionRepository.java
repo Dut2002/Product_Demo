@@ -5,8 +5,10 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface RolePermissionRepository extends CrudRepository<RolePermission, Long>, JpaSpecificationExecutor<RolePermission> {
-    List<RolePermission> findAllByPermissionId(Long id);
+
+    boolean existsByRoleIdAndPermissionId(Long roleId, Long permissionId);
+
+    void deleteByRoleIdAndPermissionId(Long roleId, Long permissionId);
 }

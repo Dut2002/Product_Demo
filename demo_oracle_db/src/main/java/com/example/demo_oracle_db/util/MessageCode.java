@@ -5,15 +5,19 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public enum MessageCode{
+public enum MessageCode {
 
     FUNCTION_NOT_FOUND("Function not found!"),
     FUNCTION_NAME_EXISTS("Function with name [%s] already exists!"),
-
+    FUNCTION_ALREADY_ADD("Function has been added to role!"),
+    FUNCTION_FE_ROUTE_EXISTS("Function with front-end route [%s] already exists!"),
+    FUNCTION_ROLE_NOT_FOUND("Function of Role not found!"),
     PERMISSION_NOT_FOUND("Permission not found!"),
     PERMISSION_BE_ENDPOINT_EXISTS("Permission with back-end endpoint [%s] already exists!"),
-    PERMISSION_FE_ENDPOINT_EXISTS("Permission with front-end endpoint [%s] already exists!"),
     PERMISSION_NAME_EXISTS("Permission with name [%s] already exists!"),
+    PERMISSION_ALREADY_ADD("Permission has been added to role!"),
+    ROLE_PERMISSION_NOT_FOUND("Permission of Role not found!"),
+    PERMISSION_REQUIRED("Permission is required for functions"),
     ACCOUNT_WITH_ROLE_NOT_FOUND("Account with role not found!"),
     ROLE_NOT_FOUND("Role not found!"),
     USER_NOT_FOUND("User not found!"),

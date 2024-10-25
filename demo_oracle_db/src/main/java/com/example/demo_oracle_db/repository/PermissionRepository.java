@@ -20,10 +20,6 @@ public interface PermissionRepository extends CrudRepository<Permission, Long>, 
 
     boolean existsByBeEndPoint(String beEndPoint);
 
-    boolean existsByNameAndIdNot(String name, Long id);
-
-    boolean existsByBeEndPointAndIdNot(String beEndPoint, Long id);
-
     @Query(value = "select p.ID as id, " +
             " p.NAME as name, " +
             " p.FUNCTION_ID as functionId " +
@@ -44,4 +40,14 @@ public interface PermissionRepository extends CrudRepository<Permission, Long>, 
             "WHERE :endPoint = p.BE_END_POINT AND CRP.ROLE_ID IN :roleIds",
             nativeQuery = true)
     Optional<Permission> findByPermissionAccess(String endPoint, List<Long> roleIds);
+
+    boolean existsByNameAndFunctionIdAndIdNot(String name, Long functionId, Long id);
+
+    boolean existsByBeEndPointAndFunctionIdAndIdNot(String beEndPoint, Long functionId, Long id);
+
+    List<Permission> findAllByFunctionIdAndDefaultPermission(Long functionId, Integer defaultPermission);
+
+    boolean existsByNameAndFunctionId(String name, Long functionId);
+
+    boolean existsByBeEndPointAndFunctionId(String beEndPoint, Long functionId);
 }
