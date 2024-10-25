@@ -4,8 +4,6 @@ import com.example.demo_oracle_db.entity.RolePermission;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
 
-import java.util.List;
-
 public interface RolePermissionRepository extends CrudRepository<RolePermission, Long>, JpaSpecificationExecutor<RolePermission> {
 
     boolean existsByRoleIdAndPermissionId(Long roleId, Long permissionId);
