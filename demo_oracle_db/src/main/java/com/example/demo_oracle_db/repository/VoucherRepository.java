@@ -12,7 +12,5 @@ import java.util.Optional;
 @Transactional
 public interface VoucherRepository extends CrudRepository<Voucher, Long>, JpaSpecificationExecutor<Voucher> {
 
-    boolean existsByCode(String code);
-
     Optional<Voucher> findByCode(String voucherCode);
 }

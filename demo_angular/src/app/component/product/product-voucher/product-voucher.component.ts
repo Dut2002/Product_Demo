@@ -1,11 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ApiStatus, PermissionName } from '../../../constant/api.const.urls';
 import { Voucher } from '../../../model/voucher';
-import { ProductService } from '../../../service/product/product.service';
-import { SnackBarService } from '../../../service/snack-bar/snack-bar.service';
-import { ErrorHandleService } from '../../../service/error-handle/error-handle.service';
-import { ApiStatus } from '../../../constant/api.const.urls';
-import { AuthService } from '../../../service/auth/auth.service';
-import { RouterUrl } from '../../../constant/app.const.router';
+import { CommonService } from '../../../service/common/common.service';
+import { HttpParams } from '@angular/common/http';
 
 @Component({
   selector: 'app-product-voucher',
@@ -13,6 +10,7 @@ import { RouterUrl } from '../../../constant/app.const.router';
   styleUrl: './product-voucher.component.scss'
 })
 export class ProductVoucherComponent {
+  @Input() common!: CommonService
   @Input() vouchers: Voucher[] = [];
   @Input() productId: number = 0;
   @Output() loadProductEvent = new EventEmitter<void>();
@@ -22,22 +20,26 @@ export class ProductVoucherComponent {
   code = '';
   input = false;
 
-  permission = RouterUrl;
 
-  constructor(private productService: ProductService,
-    private snackBarService: SnackBarService,
-    private errorHandle: ErrorHandleService,
-    public authService: AuthService,
+  constructor(
   ) { }
 
   addVoucherProduct() {
-    this.productService.addVoucher(this.productId, this.code).subscribe({
+    const endpoint = this.common.getPermission(PermissionName.ADD_VOUCHER_FOR_PRODUCT);
+    if (!endpoint) {
+      this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
+      return;
+    }
+    this.common.base.post(endpoint, {
+      productId: this.productId,
+      voucherCode: this.code
+    }).subscribe({
       next: response => {
-        this.snackBarService.show(null, response.content, ApiStatus.SUCCESS, 5000)
+        this.common.snackBar.show(null, response.content, ApiStatus.SUCCESS, 5000)
         this.loadProduct();
       },
       error: err => {
-        this.errorHandle.handle(err);
+        this.common.errorHandle.handle(err);
       }
     })
     this.input = false;
@@ -50,14 +52,23 @@ export class ProductVoucherComponent {
   }
 
   onDeleteVoucher() {
-    this.productService.deleteVoucher(this.productId, this.curretVoucher.id).subscribe({
+    const endpoint = this.common.getPermission(PermissionName.DELETE_VOUCHER_OF_PRODUCT);
+    if (!endpoint) {
+      this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
+      return;
+    }
+    const params = new HttpParams()
+    .set("productId", this.productId)
+    .set("voucherId", this.curretVoucher.id);
+
+    this.common.base.delete(endpoint, params).subscribe({
       next: response => {
-        this.snackBarService.show(null, response.content, ApiStatus.SUCCESS, 5000)
+        this.common.snackBar.show(null, response.content, ApiStatus.SUCCESS, 5000)
         this.loadProduct();
 
       },
       error: err => {
-        this.errorHandle.handle(err);
+        this.common.errorHandle.handle(err);
       }
     })
     this.input = false;

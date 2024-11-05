@@ -57,7 +57,7 @@ public class SearchServiceImpl implements SearchService {
     public List<SearchBox> getCustomerBox(String name) {
         List<Account> accounts = accountRepository.findAll((Specification<Account>) (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.add(criteriaBuilder.equal(root.join("role").get("name"), Constants.Role.CUSTOMER));
+            predicates.add(criteriaBuilder.equal(root.join("accountRoles").join("role").get("name"), Constants.Role.CUSTOMER));
             if (name != null && !name.isBlank()) {
                 String key = name.toLowerCase().trim();
                 predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("fullName")), "%" + key + "%"));

@@ -17,8 +17,8 @@ public class UserPermissionController {
     UserPermissionService userPermissionService;
 
     @GetMapping("view-user-permissions")
-    public ResponseEntity<?> getUserPermissions(@RequestParam Long roleId) {
-        return ResponseEntity.ok(userPermissionService.getPermissionsByRole(roleId));
+    public ResponseEntity<?> getUserPermissions(@RequestParam Long id) {
+        return ResponseEntity.ok(userPermissionService.getPermissionsByRole(id));
     }
 
     @PostMapping("add-user-function")

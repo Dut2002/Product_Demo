@@ -1,11 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Permission } from '../../../model/permission';
-import { FunctionService } from '../../../service/function/function.service';
 import { AddPermissionDto } from '../../../model/dto/add-permission-dto';
-import { SnackBarService } from '../../../service/snack-bar/snack-bar.service';
-import { ErrorHandleService } from '../../../service/error-handle/error-handle.service';
-import { ApiStatus } from '../../../constant/api.const.urls';
+import { Permission } from '../../../model/permission';
 
 @Component({
   selector: 'app-permission-add',
@@ -15,51 +11,35 @@ import { ApiStatus } from '../../../constant/api.const.urls';
 export class PermissionAddComponent {
 
   @Input() functionId!: number;
-  @Output() addEvent = new EventEmitter();
-  isShow = false;
+  @Input() isLoading = false;
+  @Input() isShow = false;
+  @Output() addEvent = new EventEmitter<AddPermissionDto>();
+
   permission: Permission = {} as Permission;
 
-  constructor(private functionService: FunctionService,
-    private snackBarService: SnackBarService,
-    private errorHandelService: ErrorHandleService
-  ){
-
-  }
-
-  addPermission(form: NgForm){
-    if(form.valid){
+  addPermission(form: NgForm) {
+    if (form.valid) {
       let permissionDto: AddPermissionDto = {
         functionId: this.functionId,
         name: this.permission.name,
         beEndPoint: this.permission.beEndPoint,
-        feEndPoint: this.permission.feEndPoint,
+        defaultPermission: this.permission.defaultPermission,
       }
-      console.log(permissionDto);
-
-      this.functionService.addPermission(permissionDto).subscribe({
-        next: (res) => {
-          this.snackBarService.show(null, res.content, ApiStatus.SUCCESS, 5000)
-          this.addEvent.emit();
-          this.onClose();
-        },
-        error: (err) => {
-          this.errorHandelService.handle(err);
-        }
-      });
-    }else{
+      this.addEvent.emit(permissionDto)
+    } else {
       form.control.markAllAsTouched();
     }
   }
 
-  onReset(form: NgForm){
+  onReset(form: NgForm) {
     form.control.markAsUntouched();
   }
 
-  onShow(){
+  onShow() {
     this.isShow = true;
   }
 
-  onClose(){
+  onClose() {
     this.isShow = false;
     this.permission = {} as Permission;
   }

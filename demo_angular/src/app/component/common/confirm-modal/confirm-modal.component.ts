@@ -7,18 +7,19 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 })
 export class ConfirmModalComponent {
   @Input() title = 'Are you sure?';
+  showConfirmation = false;
+  @Input() isLoading = false;
   @Output() confirmEvent = new EventEmitter<void>(); // Event khi nhấn yes
-  @Output() closeEvent = new EventEmitter<void>(); // Event khi nhấn no
 
+  constructor() { }
 
-  constructor(){}
-
-  confirm(){
+  confirm() {
+    this.isLoading = true;
     this.confirmEvent.emit();
-    this.cancel();
+    this.showConfirmation = false;
   }
 
   cancel() {
-    this.closeEvent.emit();
+    this.showConfirmation = false;
   }
 }

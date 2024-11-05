@@ -23,7 +23,6 @@ import { ErrorComponent } from './component/common/error/error.component';
 import { FunctionComponent } from './component/function/fuction-list/function.component';
 import { ConfirmModalComponent } from './component/common/confirm-modal/confirm-modal.component';
 import { HeaderComponent } from './component/common/header/header.component';
-import { HomeComponent } from './component/common/home/home.component';
 import { ProductModalComponent } from './component/product/product-modal/product-modal.component';
 import { ProductComponent } from './component/product/product-list/product.component';
 import { ProductFilterComponent } from './component/product/product-filter/product-filter.component';
@@ -44,6 +43,11 @@ import { PermissionAddComponent } from './component/function/permission-add/perm
 import { RolePermissionComponent } from './component/role-permission/role-list/role-permission.component';
 import { RoleModalComponent } from './component/role-permission/role-modal/role-modal.component';
 import { RolePermissionDetailComponent } from './component/role-permission/role-permission-detail/role-permission-detail.component';
+import { ErrorHandleService } from './service/error-handle/error-handle.service';
+import { SnackBarService } from './service/snack-bar/snack-bar.service';
+import { AuthService } from './service/auth/auth.service';
+import { ActivatedRoute } from '@angular/router';
+import { ProductImportComponent } from './component/product/product-import/product-import.component';
 
 
 @NgModule({
@@ -65,7 +69,6 @@ import { RolePermissionDetailComponent } from './component/role-permission/role-
     FunctionComponent,
     ConfirmModalComponent,
     HeaderComponent,
-    HomeComponent,
     ProductModalComponent,
     ProductFilterComponent,
     SearchDropDownComponent,
@@ -79,6 +82,7 @@ import { RolePermissionDetailComponent } from './component/role-permission/role-
     RolePermissionComponent,
     RoleModalComponent,
     RolePermissionDetailComponent,
+    ProductImportComponent,
   ],
   imports: [
     BrowserModule,
@@ -93,7 +97,10 @@ import { RolePermissionDetailComponent } from './component/role-permission/role-
     MatPseudoCheckboxModule,
     MatButtonModule,
   ],
-  providers: [provideHttpClient(withInterceptors([authenInterceptor,])), provideAnimationsAsync()],
+  providers: [
+    provideHttpClient(withInterceptors([authenInterceptor,])),
+    provideAnimationsAsync(),
+  ],
   bootstrap: [AppComponent,]
 })
 export class AppModule {

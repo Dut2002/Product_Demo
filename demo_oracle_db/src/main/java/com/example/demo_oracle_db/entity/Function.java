@@ -24,6 +24,6 @@ public class Function {
     private String feRoute;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "function", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "function", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Permission> permissions;
 }

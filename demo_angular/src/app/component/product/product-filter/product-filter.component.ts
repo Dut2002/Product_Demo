@@ -4,6 +4,7 @@ import { SearchBoxDto } from '../../../model/dto/search-box-dto';
 import { ErrorHandleService } from '../../../service/error-handle/error-handle.service';
 import { SnackBarService } from '../../../service/snack-bar/snack-bar.service';
 import { ProductService } from '../../../service/product/product.service';
+import { CommonService } from '../../../service/common/common.service';
 
 @Component({
   selector: 'app-product-filter',
@@ -48,7 +49,6 @@ export class ProductFilterComponent implements OnInit{
         this.customerSearchBox = response;
       },
       error: (err) => {
-        console.error(err)
         this.errorHandle.handle(err);
       }
     }

@@ -29,7 +29,7 @@ export class HeaderComponent{
   logOut(){
     this.loginService.logout().subscribe({
       next: () => {
-        this.authService.clearLocalStorage();
+        this.authService.endRefreshTimer();
         this.router.navigate([RouterUrl.LOG_IN]);
       },
       error: (err) => {

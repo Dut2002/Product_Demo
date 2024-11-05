@@ -5,7 +5,8 @@ import lombok.Getter;
 @Getter
 public enum FileType {
     XLS("xls"),
-    XLSX("x"),
+    XLSX("xlsx"),
+    CSV("csv"),
     PDF("pdf");
     private final String extension;
     FileType(String extension) {

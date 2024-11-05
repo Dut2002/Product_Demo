@@ -12,6 +12,11 @@
   overflow: hidden;
 }
 
+.permission-card form{
+  background-color: lightcyan;
+
+}
+
 .border-dot{
   border: 1.5px solid;
 }
@@ -19,3 +24,4 @@
 .permission-card:last-of-type{
   margin-bottom: 0;
 }
+

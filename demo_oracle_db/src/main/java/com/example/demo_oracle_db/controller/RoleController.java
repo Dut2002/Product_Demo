@@ -18,7 +18,7 @@ public class RoleController {
     @Autowired
     private RoleService roleService;
 
-    @GetMapping("get-roles")
+    @GetMapping("view-roles")
     public ResponseEntity<?> getRoles() {
         return ResponseEntity.ok(roleService.getAll());
     }

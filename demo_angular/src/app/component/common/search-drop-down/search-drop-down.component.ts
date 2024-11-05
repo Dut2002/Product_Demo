@@ -26,8 +26,6 @@ export class SearchDropDownComponent {
 
   updateSearchValue() {
     if(this.id!=null){
-      console.log(this.list);
-
       const option = this.list.find(opt => opt.id === this.id);
       this.search = option ? option.name : ''; // Cập nhật giá trị input
     }else{

@@ -48,14 +48,14 @@ public class Account {
     @Email
     private String email;
     @Basic
-    @Column(name = "STATUS", nullable = true, length = 10)
+    @Column(name = "STATUS")
     @Enumerated(EnumType.STRING)
-    @Size(max = 10)
     private Constants.Status status;
     @Basic
     @Lob
     @Column(name = "REFRESH_TOKEN", columnDefinition = "LONGTEXT")
     private String refreshToken;
+
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<AccountRole> accountRoles;

@@ -1,15 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { ProductService } from '../../../service/product/product.service';
-import { ProductFilter } from '../../../model/dto/product-filter';
-import { ApiStatus } from '../../../constant/api.const.urls';
-import { SnackBarService } from '../../../service/snack-bar/snack-bar.service';
-import { ErrorHandleService } from '../../../service/error-handle/error-handle.service';
-import { AuthService } from '../../../service/auth/auth.service';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { ApiStatus, PermissionName } from '../../../constant/api.const.urls';
 import { RouterUrl } from '../../../constant/app.const.router';
 import { ProductDto } from '../../../model/dto/product-dto';
+import { ProductFilter } from '../../../model/dto/product-filter';
 import { Product } from '../../../model/product';
 
-import { HttpResponse } from '@angular/common/http';
+import { HttpParams } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
+import { finalize } from 'rxjs';
+import { CommonService } from '../../../service/common/common.service';
+import { ConfirmModalComponent } from '../../common/confirm-modal/confirm-modal.component';
+import { ProductImportComponent } from '../product-import/product-import.component';
+import { ProductModalComponent } from '../product-modal/product-modal.component';
 @Component({
   selector: 'app-product',
   templateUrl: './product.component.html',
@@ -18,39 +20,42 @@ import { HttpResponse } from '@angular/common/http';
 
 
 export class ProductComponent implements OnInit {
-  showConfirmation = false;
+
+  @ViewChild('productModal') productModal!: ProductModalComponent;
+  @ViewChild('productConfirm') productConfirm!: ConfirmModalComponent;
+  @ViewChild('productImport') productImport!: ProductImportComponent;
+
   products: ProductDto[] = [];
   currentProduct: Product = {} as Product;
 
   productFilter: ProductFilter = new ProductFilter;
 
-  showModal = false;
-  modalTitle = '';
   totalPages: number = 0;
 
   permission = RouterUrl;
 
-  constructor(private productService: ProductService,
-    private snackBarService: SnackBarService,
-    private errorHandle: ErrorHandleService,
-    public authService: AuthService
-  ) { }
+  constructor(public common: CommonService,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit() {
+    this.common.setFunctionName(this.route)
     this.loadProducts();
   }
 
   loadProducts(): void {
-    this.productService.getProducts(this.productFilter).subscribe({
+    const endpoint = this.common.getPermission(PermissionName.VIEW_PRODUCTS)
+    if (!endpoint) {
+      this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
+      return;
+    }
+    this.common.base.post(endpoint, this.productFilter).subscribe({
       next: (response) => {
         this.products = response.content; // Gán dữ liệu vào products
         this.totalPages = response.totalPages;
       },
       error: (error) => {
-        this.errorHandle.handle(error)
-      },
-      complete: () => {
-        console.log('Get all products request completed');
+        this.common.errorHandle.handle(error)
       }
     });
   }
@@ -72,81 +77,83 @@ export class ProductComponent implements OnInit {
 
   openAddModal() {
     this.currentProduct = {} as Product;
-    this.modalTitle = 'Add New Product';
-    this.showModal = true;
+    this.productModal.modalTitle = 'Add New Product';
+    this.productModal.openModal(true);
   }
 
   openUpdateModal(product: ProductDto) {
     this.currentProduct = { ...product };
-    this.modalTitle = 'Update Product';
-    this.showModal = true;
+    this.productModal.modalTitle = 'Update Product';
+    this.productModal.openModal(true);
   }
 
   saveSuccess() {
     this.loadProducts();
-    this.closeModal();
-  }
-
-  closeModal() {
-    this.showModal = false;
   }
 
   confirmDelete(product: ProductDto) {
     this.currentProduct = { ...product };
-    this.showConfirmation = true;
+    this.productConfirm.showConfirmation = true;
   }
 
   deleteProduct() {
+    const endpoint = this.common.getPermission(PermissionName.DELETE_PRODUCT)
+    if (!endpoint) {
+      this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
+      return;
+    }
+    let params = new HttpParams();
+    params = params.set("id", this.currentProduct.id);
     // Add new product
-    this.productService.deleteProduct(this.currentProduct.id).subscribe({
-      next: (response) => {
-        // Xử lý khi thêm sản phẩm thành công
-        this.snackBarService.show(null, response.content, ApiStatus.SUCCESS, 5000);
-        console.log('Product deleteing successfully:', response);
-        this.loadProducts();
-      },
-      error: (error) => {
-        // Xử lý lỗi khi thêm sản phẩm
-        this.errorHandle.handle(error);
-      },
-      complete: () => {
-        this.showConfirmation = false;
-      }
-    });
-  }
-
-  cancleConfirm() {
-    this.showConfirmation = false;
+    this.common.base.delete(endpoint, params)
+      .pipe(finalize(() => {
+        this.productConfirm.isLoading = false;
+      }))
+      .subscribe({
+        next: (response) => {
+          // Xử lý khi thêm sản phẩm thành công
+          this.common.snackBar.show(null, response.content, ApiStatus.SUCCESS, 5000);
+          this.loadProducts();
+        },
+        error: (error) => {
+          // Xử lý lỗi khi thêm sản phẩm
+          this.common.errorHandle.handle(error);
+        }
+      });
   }
 
   importProducts() {
     // Implement import functionality
-    console.log('Import functionality to be implemented');
-    this.snackBarService.show(null, 'There is a message', ApiStatus.NORMAL, 1000000000)
+    this.productImport.showModal = true;
   }
 
   exportProducts() {
+    const endpoint = this.common.getPermission(PermissionName.EXPORT_PRODUCT)
+    if (!endpoint) {
+      this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
+      return;
+    }
+    let params = new HttpParams()
+    params = params.set('option', 'xlsx');
     // Implement export functionality
-    this.productService.exportProduct('xlsx').subscribe({
-      next: (response:HttpResponse<Blob>) => {
-        const filename = response.headers.get('File-Name');
-        console.log(response.headers.keys()); // In ra tất cả các header
+    this.common.base.export(endpoint, params).subscribe({
+      next: (response) => {
 
-        alert(filename) // Lấy tên file từ header
-        const blob = new Blob([response.body!], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
-
+        const blob = new Blob([response.body!], { type: response.body?.type || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
         // Tạo URL cho blob và tải xuống
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = filename || 'default-filename'; // Sử dụng tên file từ header hoặc tên mặc định
+        const currentDate = new Date();
+        const formattedDate = currentDate.toISOString().replace(/:/g, '-');
+        a.download = 'Product Report ' + formattedDate + '.xlsx' // Sử dụng tên file từ header hoặc tên mặc định
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
       },
       error: err => {
-        this.errorHandle.handle(err);
+        this.common.errorHandle.handle(err);
       }
     })
   }

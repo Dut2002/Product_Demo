@@ -2,6 +2,8 @@ package com.example.demo_oracle_db.repository;
 
 import com.example.demo_oracle_db.entity.ProductVoucher;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,8 +13,14 @@ import java.util.Optional;
 @Repository
 @Transactional
 public interface ProductVoucherRepository extends CrudRepository<ProductVoucher, Long>, JpaSpecificationExecutor<ProductVoucher> {
+    @Modifying
+    @Transactional
+    @Query(nativeQuery = true, value = "INSERT INTO cmd_product_voucher " +
+            " (product_id, voucher_id) " +
+            " values (?1,?2)")
+    Integer addProductVourcher(Long productId, Long id);
 
-    boolean existsByProductIdAndVoucherId(Long productId, Long voucherId);
+    boolean existsByProductIdAndVoucherId(Long productId, Long id);
 
-    Optional<ProductVoucher> findByProductIdAndVoucherId(Long productId, Long voucherId);
+    void deleteByProductIdAndVoucherId(Long productId, Long voucherId);
 }

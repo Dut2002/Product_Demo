@@ -1,9 +1,9 @@
-<div class="confirmation-modal">
+<div class="confirmation-modal" *ngIf="showConfirmation">
   <div class="confirmation-content">
     <p class="title confirmation-title" >{{title}}</p>
     <div class="confirm-group">
-      <button class="btn btn-small btn-blue" (click)="confirm()">Yes</button>
-      <button class="btn btn-small btn-gray" (click)="cancel()">No</button>
+      <button class="btn btn-small btn-blue" [ngClass]="{'btn-disable': isLoading}" (click)="confirm()">Yes</button>
+      <button class="btn btn-small btn-gray" [ngClass]="{'btn-disable': isLoading}" (click)="cancel()">No</button>
     </div>
   </div>
 </div>

@@ -74,40 +74,33 @@ public class AccountServiceImpl implements AccountService {
         if (accountRepository.existsByEmail(req.getEmail())) {
             throw new DodException(MessageCode.EMAIL_ALREADY_EXISTS);
         }
-        Account account = new Account();
-        account.setEmail(req.getEmail());
-        account.setUsername(req.getUsername());
-        account.setFullName(req.getFullName());
-        account = accountRepository.save(account);
-        List<AccountRole> accountRoles = new ArrayList<>();
+        Integer accountId = accountRepository.addAccount(
+                req.getUsername(),
+                bCryptPasswordEncoder.encode(req.getPassword()),
+                req.getEmail(),
+                req.getFullName());
         for (Long roleId : req.getRoles()
         ) {
             if (!roleRepository.existsById(roleId)) {
                 throw new DodException(MessageCode.ROLE_NOT_FOUND);
             }
-            AccountRole accountRole = new AccountRole();
-            accountRole.setAccountId(account.getId());
-            accountRole.setRoleId(roleId);
-            accountRoles.add(accountRole);
+            accountRoleRepository.addAccountRole(Long.valueOf(accountId), roleId);
         }
-        accountRoleRepository.saveAll(accountRoles);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateUser(EditUserReq req) throws DodException {
-        Account account = accountRepository.findById(req.getId())
-                .orElseThrow(() -> new DodException(MessageCode.USER_NOT_FOUND));
+        if (accountRepository.existsById(req.getId())) {
+            throw new DodException(MessageCode.USER_NOT_FOUND);
+        }
         if (accountRepository.existsByUsernameAndIdNot(req.getUsername(), req.getId())) {
             throw new DodException(MessageCode.USER_NAME_ALREADY_EXISTS, req.getUsername());
         }
         if (accountRepository.existsByEmailAndIdNot(req.getEmail(), req.getId())) {
             throw new DodException(MessageCode.EMAIL_ALREADY_EXISTS, req.getUsername());
         }
-        account.setEmail(req.getEmail());
-        account.setUsername(req.getUsername());
-        account.setFullName(req.getFullName());
-        accountRepository.save(account);
+        accountRepository.updateAccount(req.getId(), req.getUsername(), req.getEmail(), req.getFullName());
     }
 
     @Override
@@ -122,7 +115,7 @@ public class AccountServiceImpl implements AccountService {
             throw new DodException(MessageCode.STATUS_NOT_FOUND);
         }
         account.setStatus(status);
-        accountRepository.save(account);
+        accountRepository.changeStatus(req.getId(), status.name());
     }
 
     @Override
@@ -158,8 +151,8 @@ public class AccountServiceImpl implements AccountService {
     public void deleteRole(ChangeRoleUserReq req) throws DodException {
         if (accountRepository.existsById(req.getAccountId())) throw new DodException(MessageCode.USER_NOT_FOUND);
         if (roleRepository.existsById(req.getRoleId())) throw new DodException(MessageCode.ROLE_NOT_FOUND);
-        if(accountRoleRepository.existsByAccountIdAndRoleId(req.getAccountId(),req.getRoleId()))
+        if (accountRoleRepository.existsByAccountIdAndRoleId(req.getAccountId(), req.getRoleId()))
             throw new DodException(MessageCode.ACCOUNT_WITH_ROLE_NOT_FOUND);
-        accountRoleRepository.deleteByAccountIdAndRoleId(req.getAccountId(),req.getRoleId());
+        accountRoleRepository.deleteByAccountIdAndRoleId(req.getAccountId(), req.getRoleId());
     }
 }

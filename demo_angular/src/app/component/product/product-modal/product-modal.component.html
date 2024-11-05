@@ -1,4 +1,4 @@
-<div class="modal">
+<div class="modal" *ngIf="showModal">
   <div class="modal-content">
     <h2 class="modal-title">{{ modalTitle }}</h2>
     <form class="flex" #productForm="ngForm" (ngSubmit)="saveProduct()">
@@ -84,8 +84,8 @@
 
       <div class="center">
         <button [ngClass]="{'btn-disable': isLoading}" type="submit" class="btn btn-small btn-green">Save</button>
-        <button type="button" class="btn btn-small btn-orange" (click)="onReset()">Refresh</button>
-        <button type="button" class="btn btn-small btn-gray" (click)="onCancel()">Cancel</button>
+        <button [ngClass]="{'btn-disable': isLoading}" type="button" class="btn btn-small btn-orange" (click)="onReset()">Refresh</button>
+        <button [ngClass]="{'btn-disable': isLoading}" type="button" class="btn btn-small btn-gray" (click)="openModal(false)">Cancel</button>
       </div>
     </form>
   </div>

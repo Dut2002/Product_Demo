@@ -2,7 +2,6 @@ package com.example.demo_oracle_db.service.login.impl;
 
 import com.example.demo_oracle_db.config.authen.TokenProvider;
 import com.example.demo_oracle_db.entity.Account;
-import com.example.demo_oracle_db.entity.AccountRole;
 import com.example.demo_oracle_db.entity.Role;
 import com.example.demo_oracle_db.exception.DodException;
 import com.example.demo_oracle_db.repository.AccountRepository;
@@ -61,19 +60,14 @@ public class LoginServiceImpl implements LoginService {
             res.setUsername(account.getUsername());
             res.setEmail(account.getEmail());
             res.setFullName(account.getFullName());
-            List<Role> role = roleRepository.findByAccount(account.getId());
-            if (role.isEmpty()) throw new DodException(MessageCode.ROLE_NOT_FOUND);
-            res.setRoles(role.stream().map(Role::getName).toList());
+            List<Role> roles = roleRepository.findByAccount(account.getId());
+            if (roles.isEmpty()) throw new DodException(MessageCode.ROLE_NOT_FOUND);
+            res.setRoles(roles.stream().map(Role::getName).toList());
             res.setStatus(account.getStatus());
             res.setToken(accessToken);
             res.setRefreshToken(refreshToken);
-
-            account.setAccessToken(accessToken);
-            account.setRefreshToken(refreshToken);
             try {
-
-                accountRepository.save(account);
-//                DodUserDetailService.ACCOUNT.set(account);
+                accountRepository.updateToken(accessToken, refreshToken, account.getId());
                 SecurityContextHolder.getContext().setAuthentication(auth);
                 return res;
             } catch (Exception e) {
@@ -92,7 +86,6 @@ public class LoginServiceImpl implements LoginService {
             Authentication auth = tokenProvider.getAuthentication(refreshToken);
             if (refreshToken.equals(account.getRefreshToken())) {
                 String accessToken = tokenProvider.createToken(auth);
-                account.setAccessToken(accessToken);
                 try {
                     // Tạo LogRes và thiết lập thông tin
                     LogRes res = new LogRes();
@@ -107,7 +100,7 @@ public class LoginServiceImpl implements LoginService {
                     res.setRefreshToken(refreshToken);
 
                     // Lưu thông tin tài khoản với access token mới
-                    accountRepository.save(account);
+                    accountRepository.updateToken(accessToken, refreshToken, account.getId());
                     return res;
                 } catch (Exception e) {
                     throw new DodException(MessageCode.REFRESH_FAILED);
@@ -129,17 +122,14 @@ public class LoginServiceImpl implements LoginService {
         }
 
         try {
-            Account account = new Account();
-            account.setUsername(req.getUsername());
-            account.setPassword(bCryptPasswordEncoder.encode(req.getPassword()));
-            account.setEmail(req.getEmail());
-            account.setFullName(req.getFullName());
-            account = accountRepository.save(account);
-            Role role = roleRepository.findByName(Constants.Role.CUSTOMER).orElseThrow(() -> new DodException(MessageCode.ROLE_NOT_FOUND));
-            AccountRole accountRole = new AccountRole();
-            accountRole.setAccountId(account.getId());
-            accountRole.setRoleId(role.getId());
-            accountRoleRepository.save(accountRole);
+            Integer accountId = accountRepository.addAccount(
+                    req.getUsername(),
+                    bCryptPasswordEncoder.encode(req.getPassword()),
+                    req.getEmail(),
+                    req.getFullName()
+            );
+            Long roleId = roleRepository.findIdByName(Constants.Role.CUSTOMER).orElseThrow(() -> new DodException(MessageCode.ROLE_NOT_FOUND));
+            accountRoleRepository.addAccountRole(Long.valueOf(accountId), roleId);
         } catch (Exception e) {
             throw new DodException(MessageCode.REGISTER_USER_FAILED);
         }
@@ -149,20 +139,14 @@ public class LoginServiceImpl implements LoginService {
     public void logout(Map<String, String> headers) {
         String token = tokenProvider.getToken(headers);
         String username = tokenProvider.getUsername(token);
-        Account account = accountRepository.findByUsername(username).orElse(null);
         try {
-            if (account != null) {
-                SecurityContextHolder.clearContext();
-                account.setRefreshToken(null);
-                account.setAccessToken(null);
-                accountRepository.save(account);
-            }
+            SecurityContextHolder.clearContext();
+            accountRepository.logout(username);
         } catch (Exception e) {
             log.error("Delete Token Failed!");
         }
         SecurityContextHolder.clearContext();
     }
-
 
     @Override
     public LogRes updateProfile() {

@@ -45,13 +45,10 @@ spring:
     password: 12345678
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
-    hibernate:
-      ddl-auto: update
+#    hibernate:
+#      ddl-auto: update
     show-sql: true
-#    properties:
-#      hibernate:
-#        implicit_naming_strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
-#        physical_naming_strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
   servlet:
     multipart:
       max-file-size: 1000000000MB

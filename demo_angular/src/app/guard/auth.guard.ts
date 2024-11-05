@@ -7,11 +7,8 @@ import { ApiHeaders } from '../constant/api.const.urls';
 export const authGuard: CanActivateFn = async (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
-  console.log(route);
-  console.log(state);
-
-
-  if (authService.hasPermission(route.routeConfig?.path!)) {
+  const functionName = authService.getFunction(route.routeConfig?.path!);
+  if (functionName) {
     sessionStorage.setItem(ApiHeaders.PREVIOUS, state.url); // Lưu URL có quyền
     return true; // Cho phép truy cập nếu có JWT
   } else {

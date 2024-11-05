@@ -1,6 +1,6 @@
 export interface PermissionDto{
-  permissionId: number;
+  id: number;
   name: string;
-  status: boolean;
-  functionId: number;
+  beEndPoint:string;
+  defaultPermission: boolean;
 }

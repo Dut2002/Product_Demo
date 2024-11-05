@@ -1,4 +1,5 @@
 export interface Function{
-  id: number|null
-  name: string
+  id: number;
+  name: string;
+  feRoute: string;
 }

@@ -1,18 +1,18 @@
 package com.example.demo_oracle_db.service.role.response;
 
+import com.example.demo_oracle_db.entity.Permission;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 public class PermissionDto {
-    Long permissionId;
+    Long id;
     String name;
-    Long functionId;
-
-    public PermissionDto(IPermissionDto permissionDto) {
-        permissionId = permissionDto.getId();
-        name = permissionDto.getName();
-        functionId = permissionDto.getFunctionId();
+    String beEndPoint;
+    public PermissionDto(Permission permission) {
+        id = permission.getId();
+        name = permission.getName();
+        beEndPoint = permission.getBeEndPoint();
     }
 }

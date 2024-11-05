@@ -10,5 +10,4 @@ import java.util.List;
 public class RoleRes {
     Long id;
     String name;
-    List<FunctionDto> functions;
 }

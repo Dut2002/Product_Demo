@@ -4,6 +4,7 @@ import com.example.demo_oracle_db.entity.Role;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -26,4 +27,17 @@ public interface RoleRepository extends CrudRepository<Role, Long>, JpaSpecifica
             " INNER JOIN CMD_ACCOUNT_ROLE ac on ac.ROLE_ID = c.ID " +
             " WHERE ac.ACCOUNT_ID = :accountId",nativeQuery = true)
     List<Role> findByAccount(Long accountId);
+
+    @Query(value = "select ID from cmd_role where NAME = ?1", nativeQuery = true)
+    Optional<Long> findIdByName(String name);
+
+    @Modifying
+    @Transactional
+    @Query(nativeQuery = true, value = "INSERT INTO cmd_role (NAME) values (?1)")
+    Integer addRole(String name);
+
+    @Modifying
+    @Transactional
+    @Query(nativeQuery = true, value = "UPDATE cmd_role SET NAME = ?2 WHERE ID = ?1 ")
+    void updateRole(Long id, String name);
 }

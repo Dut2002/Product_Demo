@@ -1,11 +1,12 @@
+import { HttpParams } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { Role } from '../../../model/role';
+import { ActivatedRoute } from '@angular/router';
+import { finalize } from 'rxjs';
+import { ApiStatus, PermissionName } from '../../../constant/api.const.urls';
+import { RouterUrl } from '../../../constant/app.const.router';
 import { RoleRes } from '../../../model/dto/role-res';
-import { RoleService } from '../../../service/role/role.service';
-import { SnackBarService } from '../../../service/snack-bar/snack-bar.service';
-import { ErrorHandleService } from '../../../service/error-handle/error-handle.service';
-import { ApiStatus } from '../../../constant/api.const.urls';
-import { FunctionDto } from '../../../model/dto/function-dto';
+import { Role } from '../../../model/role';
+import { CommonService } from '../../../service/common/common.service';
 
 @Component({
   selector: 'app-role-permission',
@@ -13,31 +14,37 @@ import { FunctionDto } from '../../../model/dto/function-dto';
   styleUrl: './role-permission.component.scss'
 })
 export class RolePermissionComponent implements OnInit {
-  openSectionId: number | null = null;
   showModal = false;
+  modalLoading = false
   showConfirmation = false;
+  confirmLoading = false;
   currentRole!: Role
   title!: string
   roleList!: RoleRes[]
 
-
-  constructor(private roleService: RoleService,
-    private snackBarService: SnackBarService,
-    private errorhanderService: ErrorHandleService
-  ) {
+  constructor(
+    private common: CommonService,
+    private route: ActivatedRoute) {
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
+    this.common.setFunctionName(this.route);
     this.loadData();
+
   }
 
   loadData() {
-    this.roleService.getRoles().subscribe({
+    const endpoint = this.common.getPermission(PermissionName.VIEW_ROLES);
+    if (!endpoint) {
+      this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
+      return;
+    }
+    this.common.base.get(endpoint).subscribe({
       next: res => {
         this.roleList = res;
       },
       error: err => {
-        this.errorhanderService.handle(err);
+        this.common.errorHandle.handle(err);
       }
     });
   }
@@ -52,22 +59,33 @@ export class RolePermissionComponent implements OnInit {
   }
 
   deleteRole() {
-    this.roleService.deleteRole(this.currentRole.id).subscribe({
-      next: res => {
-        this.snackBarService.show(null, res.content, ApiStatus.SUCCESS, 5000);
-        this.roleList = this.roleList.filter(r=>r.id !== this.currentRole.id);
-      },
-      error: err => this.errorhanderService.handle(err)
-    })
+    const endpoint = this.common.getPermission(PermissionName.DELETE_ROLE);
+    if (!endpoint) {
+      this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
+      return;
+    }
+    let params = new HttpParams();
+    params = params.set("id", this.currentRole.id)
+    this.common.base.delete(endpoint, params).pipe(
+      finalize(() => {
+        this.confirmLoading = false;
+      }))
+      .subscribe({
+        next: res => {
+          this.common.snackBar.show(null, res.content, ApiStatus.SUCCESS, 5000);
+          this.roleList = this.roleList.filter(r => r.id !== this.currentRole.id);
+        },
+        error: err => this.common.errorHandle.handle(err)
+      })
     this.closeConfirm();
   }
 
-  toggle(id: number) {
-    if (this.openSectionId === id) {
-      this.openSectionId = null;
-    } else {
-      this.openSectionId = id;
-    }
+  viewPermission(roleId: number) {
+    this.common.router.navigate([RouterUrl.USER_PERMISION],{
+      queryParams: {
+        roleId: roleId
+      }
+    });
   }
 
   openAddModal() {
@@ -77,7 +95,7 @@ export class RolePermissionComponent implements OnInit {
   }
 
   openUpdateModal(role: Role) {
-    this.currentRole = {...role}
+    this.currentRole = { ...role }
     this.showModal = true;
     this.title = "Update Role"
   }
@@ -86,25 +104,46 @@ export class RolePermissionComponent implements OnInit {
     this.showModal = false;
   }
 
-  AddRole() {
-    this.loadData();
-    this.closeModal();
+  AddRole(role: Role) {
+    const endpoint = this.common.getPermission(PermissionName.ADD_ROLE);
+    if (!endpoint) {
+      this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
+      return;
+    }
+    this.common.base.post(endpoint, role).pipe(
+      finalize(() => {
+        this.modalLoading = false;
+      }))
+      .subscribe({
+        next: res => {
+          this.common.snackBar.show(null, res.content, ApiStatus.SUCCESS, 5000)
+          this.loadData();
+          this.closeModal();
+        },
+        error: err => this.common.errorHandle.handle(err),
+      });
   }
 
   UpdateRole(role: Role) {
-    const roleIndex = this.roleList.findIndex(r=>r.id == role.id);
-    alert(roleIndex)
-    if(roleIndex!==-1){
-      this.roleList[roleIndex].name = role.name;
+    const endpoint = this.common.getPermission(PermissionName.CHANGE_ROLE_NAME);
+    if (!endpoint) {
+      this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
+      return;
     }
-    this.closeModal();
+    this.common.base.put(endpoint, role).pipe(
+      finalize(() => {
+        this.modalLoading = false;
+      }))
+      .subscribe({
+        next: res => {
+          this.common.snackBar.show(null, res.content, ApiStatus.SUCCESS, 5000);
+          const roleIndex = this.roleList.findIndex(r => r.id == role.id);
+          if (roleIndex !== -1) {
+            this.roleList[roleIndex].name = role.name;
+          }
+          this.closeModal();
+        },
+        error: err => this.common.errorHandle.handle(err),
+      })
   }
-
-  changePermission(list: FunctionDto[], func: FunctionDto){
-    const index = list.findIndex(f=> f.id = func.id);
-    if(index !== -1){
-      list[index] = func;
-    }
-  }
-
 }

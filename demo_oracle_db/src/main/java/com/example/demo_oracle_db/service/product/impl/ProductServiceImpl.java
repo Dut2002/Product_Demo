@@ -2,12 +2,15 @@ package com.example.demo_oracle_db.service.product.impl;
 
 import com.example.demo_oracle_db.config.ValidatorHandler;
 import com.example.demo_oracle_db.entity.Product;
-import com.example.demo_oracle_db.entity.ProductVoucher;
 import com.example.demo_oracle_db.entity.Voucher;
 import com.example.demo_oracle_db.exception.DodException;
 import com.example.demo_oracle_db.repository.ProductRepository;
 import com.example.demo_oracle_db.repository.ProductVoucherRepository;
 import com.example.demo_oracle_db.repository.VoucherRepository;
+import com.example.demo_oracle_db.service.excelParse.ExcelParse;
+import com.example.demo_oracle_db.service.excelParse.response.ParseOptions;
+import com.example.demo_oracle_db.service.excelParse.response.ParseResult;
+import com.example.demo_oracle_db.service.excelParse.response.ProductImportData;
 import com.example.demo_oracle_db.service.product.ProductService;
 import com.example.demo_oracle_db.service.product.request.AddVoucherRequest;
 import com.example.demo_oracle_db.service.product.request.ProductFilter;
@@ -20,14 +23,21 @@ import jakarta.persistence.ParameterMode;
 import jakarta.persistence.StoredProcedureQuery;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.util.AreaReference;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.CellReference;
+import org.apache.poi.xssf.usermodel.*;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTable;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableColumn;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableColumns;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableStyleInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -55,6 +65,9 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private EntityManager entityManager;
 
+    @Autowired
+    private ExcelParse<ProductImportData> excelParse;
+
     private final DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Override
@@ -66,7 +79,7 @@ public class ProductServiceImpl implements ProductService {
             List<Predicate> predicates = new ArrayList<>();
 
             if (productFilter.getName() != null && !productFilter.getName().isBlank()) {
-                String keyword = productFilter.getName().toLowerCase();
+                String keyword = productFilter.getName().toLowerCase().trim();
                 predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + keyword + "%"));
             }
             if (productFilter.getYearMaking() != null) {
@@ -118,8 +131,7 @@ public class ProductServiceImpl implements ProductService {
                 if (productFilter.getSortDesc() != null ? productFilter.getSortDesc() : false) {
                     assert query != null;
                     query.orderBy(criteriaBuilder.desc(root.get(productFilter.getOrderCol())));
-                }
-                else {
+                } else {
                     assert query != null;
                     query.orderBy(criteriaBuilder.asc(root.get(productFilter.getOrderCol())));
                 }
@@ -131,70 +143,46 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product getProduct(Long id) throws DodException {
-        Product product = productRepository.findById(id).orElse(null);
-        if (product == null) {
-            throw new DodException(MessageCode.PRODUCT_NOT_EXIST);
-        }
-        return product;
-    }
-
-    @Override
-    public void addProduct(ProductRequest request, int option) throws DodException {
-        Product product = new Product();
+    public void addProduct(ProductRequest request) throws DodException {
         try {
-            saveProduct(product, request);
-            productRepository.save(product);
+            productRepository.addProduct(
+                    request.getName(),
+                    request.getYearMaking(),
+                    LocalDate.parse(request.getExpireDate(), dateTimeFormat),
+                    request.getQuantity(),
+                    request.getPrice(),
+                    request.getCategoryId(),
+                    request.getSupplierId()
+            );
         } catch (Exception e) {
-            if (option == 0) {
-                request.setStatus(Constants.ApiStatus.FAILED);
-                request.setErrorMessage(MessageCode.ADD_PRODUCT_FAILED.getCode());
-            } else {
-                throw new DodException(MessageCode.ADD_PRODUCT_FAILED);
-            }
+            throw new DodException(MessageCode.ADD_PRODUCT_FAILED);
         }
     }
 
     @Override
     public void updateProduct(ProductRequest request, int option) throws DodException {
-        Product product = productRepository.findById(request.getId()).orElse(null);
-        if (product == null) {
-            if (option == 0) {
-                request.setStatus(Constants.ApiStatus.FAILED);
-                request.setErrorMessage(MessageCode.PRODUCT_NOT_EXIST.getCode());
-                return;
-            } else {
-                throw new DodException(MessageCode.PRODUCT_NOT_EXIST);
-            }
+        if (!productRepository.existsById(request.getId())) {
+            throw new DodException(MessageCode.PRODUCT_NOT_EXIST);
         }
-
         try {
-            saveProduct(product, request);
-            productRepository.save(product);
-            request.setStatus(Constants.ApiStatus.SUCCESS);
+            productRepository.updateProduct(
+                    request.getId(),
+                    request.getName(),
+                    request.getYearMaking(),
+                    LocalDate.parse(request.getExpireDate(), dateTimeFormat),
+                    request.getQuantity(),
+                    request.getPrice(),
+                    request.getCategoryId(),
+                    request.getSupplierId()
+            );
         } catch (Exception e) {
-            if (option == 0) {
-                request.setStatus(Constants.ApiStatus.FAILED);
-                request.setErrorMessage(MessageCode.UPDATE_PRODUCT_FAILED.getCode());
-            } else {
-                throw new DodException(MessageCode.UPDATE_PRODUCT_FAILED, request.getId());
-            }
+            throw new DodException(MessageCode.UPDATE_PRODUCT_FAILED, request.getId());
         }
-    }
-
-    private void saveProduct(Product product, ProductRequest request) {
-        product.setName(request.getName());
-        product.setYearMaking(request.getYearMaking());
-        product.setExpireDate(LocalDate.parse(request.getExpireDate(), dateTimeFormat));
-        product.setQuantity(request.getQuantity());
-        product.setPrice(request.getPrice());
-        product.setCategoryId(request.getCategoryId());
-        product.setSupplierId(request.getSupplierId());
     }
 
     @Override
     public void deleteProduct(Long id) throws DodException {
-        if (productRepository.findById(id).isPresent()) {
+        if (productRepository.existsById(id)) {
             try {
                 productRepository.deleteById(id);
             } catch (Exception e) {
@@ -218,43 +206,10 @@ public class ProductServiceImpl implements ProductService {
             if (request.getId() != null) {
                 updateProduct(request, 0);
             } else {
-                addProduct(request, 0);
+                addProduct(request);
             }
         }
         return requests;
-    }
-
-    @Override
-    public List<Product> exportProduct(String search, Long yearMaking, LocalDate startExpireDate, LocalDate endExpireDate, Long startQuality, Long endQuality, Double startPrice, Double endPrice) {
-        List<Product> products = productRepository.findAll((Specification<Product>) (root, query, criteriaBuilder) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            if (search != null && !search.isBlank()) {
-                predicates.add(criteriaBuilder.like(root.get("PRONAME"), "%" + search + "%"));
-            }
-            if (yearMaking != null) {
-                predicates.add(criteriaBuilder.equal(root.get("YEARMAKING"), yearMaking));
-            }
-            if (startExpireDate != null) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("EXPRIDATE"), startExpireDate));
-            }
-            if (endExpireDate != null) {
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("EXPRIDATE"), endExpireDate));
-            }
-            if (startQuality != null) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("QUALITY"), startQuality));
-            }
-            if (endQuality != null) {
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("QUALITY"), endQuality));
-            }
-            if (startPrice != null) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("PRICE"), startPrice));
-            }
-            if (endPrice != null) {
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("PRICE"), endPrice));
-            }
-            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-        });
-        return products;
     }
 
     @Override
@@ -314,10 +269,7 @@ public class ProductServiceImpl implements ProductService {
             throw new DodException(MessageCode.VOUCHER_ALREADY_ADD);
         }
         try {
-            ProductVoucher productVoucher = new ProductVoucher();
-            productVoucher.setProductId(request.getProductId());
-            productVoucher.setVoucherId(voucher.getId());
-            productVoucherRepository.save(productVoucher);
+            productVoucherRepository.addProductVourcher(request.getProductId(), voucher.getId());
         } catch (Exception ex) {
             throw new DodException(MessageCode.ADD_VOUCHER_FAILED);
         }
@@ -326,9 +278,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void deleteVoucherFromProduct(Long productId, Long voucherId) throws DodException {
-        ProductVoucher productVoucher = productVoucherRepository.findByProductIdAndVoucherId(productId, voucherId).orElseThrow(() -> new DodException(MessageCode.VOUCHER_PRODUCT_NOT_FOUND));
+        if (!productRepository.existsById(productId)) throw new DodException(MessageCode.PRODUCT_NOT_EXIST);
+        if (!voucherRepository.existsById(voucherId)) throw new DodException(MessageCode.VOUCHER_NOT_EXIST);
+        if (!productVoucherRepository.existsByProductIdAndVoucherId(productId, voucherId))
+            throw new DodException(MessageCode.VOUCHER_PRODUCT_NOT_FOUND);
         try {
-            productVoucherRepository.deleteById(productVoucher.getId());
+            productVoucherRepository.deleteByProductIdAndVoucherId(productId, voucherId);
         } catch (Exception ex) {
             throw new DodException(MessageCode.DELETE_VOUCHER_FAILED);
         }
@@ -338,56 +293,116 @@ public class ProductServiceImpl implements ProductService {
     public ByteArrayInputStream productListReport() throws IOException {
         List<ProductDto> products = ((List<Product>) productRepository.findAll()).stream().map(ProductDto::new).toList();
 
-        String[] columns = {"No", "Name", "Year Making", "Price", "Quantity", "Expire Date", "Category", "Supplier"};
-        try (Workbook workbook = new XSSFWorkbook();
+        String[] columns = {"No", "Id","Name", "Year Making", "Price", "Quantity", "Expire Date", "Category", "Supplier"};
+        try (XSSFWorkbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            CreationHelper creationHelper = workbook.getCreationHelper();
 
-            Sheet sheet = workbook.createSheet("Products");
-            sheet.autoSizeColumn(columns.length);
+            XSSFSheet sheet = workbook.createSheet();
 
-            Font headerFont = workbook.createFont();
-            headerFont.setBold(true);
-            headerFont.setColor(IndexedColors.BLUE.getIndex());
+            sheet.setColumnWidth(0, 5 * 256);
+            sheet.setColumnWidth(1, 5 * 256);
+            sheet.setColumnWidth(2, 30 * 256);
+            sheet.setColumnWidth(3, 15 * 256);
+            sheet.setColumnWidth(4, 15 * 256);
+            sheet.setColumnWidth(5, 10 * 256);
+            sheet.setColumnWidth(6, 15 * 256);
+            sheet.setColumnWidth(7, 20 * 256);
+            sheet.setColumnWidth(8, 25 * 256);
 
-            CellStyle cellStyle = workbook.createCellStyle();
-            cellStyle.setFont(headerFont);
+            sheet.createFreezePane(0, 1);
+            sheet.setAutoFilter(new CellRangeAddress(0, products.size(), 1, columns.length - 1));
 
-            Row headerRow = sheet.createRow(0);
-            for (int col = 0; col < columns.length; col++
-            ) {
-                Cell cell = headerRow.createCell(col);
-                cell.setCellValue(columns[col]);
-                cell.setCellStyle(cellStyle);
+
+            AreaReference areaReference = new AreaReference(
+                    new CellReference(0, 0),
+                    new CellReference(products.size()+1, columns.length - 1),
+                    workbook.getSpreadsheetVersion()
+            );
+            XSSFTable table = sheet.createTable(areaReference);
+
+            CTTable ctTable = table.getCTTable();
+            ctTable.setRef(areaReference.formatAsString());
+            ctTable.setDisplayName("MYTABLE");
+            ctTable.setName("Test");
+            ctTable.setId(1L);
+
+            CTTableStyleInfo tableStyleInfo = ctTable.addNewTableStyleInfo();
+            tableStyleInfo.setName("TableStyleLight1");
+            tableStyleInfo.setShowColumnStripes(false);
+            tableStyleInfo.setShowRowStripes(true);
+            tableStyleInfo.setShowLastColumn(false);
+
+
+            CTTableColumns tableColumns = ctTable.addNewTableColumns();
+
+            tableColumns.setCount(columns.length);
+            for (int i = 0; i < columns.length; i++) {
+                CTTableColumn column = tableColumns.addNewTableColumn();
+                column.setName(columns[i]);
+                column.setId(i + 1);
             }
-            CellStyle cellStyle1 = workbook.createCellStyle();
-            cellStyle1.setDataFormat(creationHelper.createDataFormat().getFormat("#"));
-            // Định dạng cho cột ngày (dd/MM/yyyy)
-            CellStyle dateCellStyle = workbook.createCellStyle();
-            dateCellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("dd/MM/yyyy"));
 
-            // Định dạng cho cột giá (tiền tệ USD)
-            CellStyle priceCellStyle = workbook.createCellStyle();
-            priceCellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("$#,##0.00"));
+            XSSFRow header = sheet.createRow(0);
+            for (int col = 0; col < columns.length; col++) {
+                XSSFCell cell = header.createCell(col);
+                cell.setCellValue(columns[col]);
+            }
 
+            XSSFCellStyle dateStyle = workbook.createCellStyle();
+            dateStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat("yyyy-MM-dd"));
+
+            XSSFCellStyle integerStyle = workbook.createCellStyle();
+            integerStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat("0"));
+
+            XSSFCellStyle priceStyle = workbook.createCellStyle();
+            priceStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat("$#,##0.00"));
 
             int rowIndex = 1;
-            for (ProductDto productDto : products
-            ) {
-                Row row = sheet.createRow(rowIndex);
-                row.createCell(0).setCellValue(rowIndex++);
-                row.createCell(1).setCellValue(productDto.getName());
-                row.createCell(2).setCellValue(productDto.getYearMaking());
-                row.createCell(3).setCellValue(productDto.getPrice());
-                row.createCell(3).setCellStyle(priceCellStyle);
-                row.createCell(4).setCellValue(productDto.getQuantity());
-                row.createCell(5).setCellValue(productDto.getExpireDate());
-                row.createCell(5).setCellStyle(dateCellStyle);
-                row.createCell(6).setCellValue(productDto.getCategoryName());
-                row.createCell(7).setCellValue(productDto.getSupplierName());
+            for (ProductDto productDto : products) {
+                XSSFRow row = sheet.createRow(rowIndex);
+
+                row.createCell(0).setCellValue(rowIndex); // Cột số thứ tự
+
+                row.createCell(1).setCellValue(productDto.getId());
+
+                row.createCell(2).setCellValue(productDto.getName()); // Cột tên sản phẩm
+
+                XSSFCell yearMakingCell = row.createCell(3);
+                yearMakingCell.setCellValue(productDto.getYearMaking());
+                yearMakingCell.setCellStyle(integerStyle);
+
+                XSSFCell priceCell = row.createCell(4);
+                priceCell.setCellValue(productDto.getPrice());
+                // Áp dụng kiểu dữ liệu cho cột Price
+                priceCell.setCellStyle(priceStyle);
+
+                XSSFCell quantityCell = row.createCell(5);
+                quantityCell.setCellValue(productDto.getQuantity());
+                // Áp dụng kiểu dữ liệu cho cột Quantity
+                quantityCell.setCellStyle(integerStyle);
+
+                XSSFCell expireDateCell = row.createCell(6);
+                if (productDto.getExpireDate() != null) {
+                    expireDateCell.setCellValue(java.sql.Date.valueOf(productDto.getExpireDate()));
+                    // Áp dụng kiểu dữ liệu cho cột Expire Date
+                    expireDateCell.setCellStyle(dateStyle);
+                }
+
+                row.createCell(7).setCellValue(productDto.getCategoryName());
+                row.createCell(8).setCellValue(productDto.getSupplierName());
+
+                rowIndex++;
             }
+            XSSFRow footer = sheet.createRow(rowIndex);
+
+
             workbook.write(out);
             return new ByteArrayInputStream(out.toByteArray());
         }
+    }
+
+    @Override
+    public ParseResult<ProductImportData> parseProduct(MultipartFile file, ParseOptions options) {
+        return excelParse.parseExcel(file,options);
     }
 }

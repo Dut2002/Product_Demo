@@ -13,7 +13,6 @@ export class ErrorHandleService {
     if (error.status === 401) {
       this.snackBarService.show('Unauthorized access.', 'You do not have permission to access this resource.', ApiStatus.ERROR, 5000);
     } else if (error.status === 400) {
-      console.log(error.error.title);
       this.snackBarService.show(error.error.title, error.error.content || 'Invalid input. Please check your data.', ApiStatus.ERROR, 5000);
     } else if (error.status === 404) {
       this.snackBarService.show("Method Not Found", 'The requested method does not exist.', ApiStatus.ERROR, 5000);
@@ -22,5 +21,9 @@ export class ErrorHandleService {
     } else {
       this.snackBarService.show("Internal Error", 'An internal error occurred.', ApiStatus.ERROR, 5000);
     }
+  }
+
+  show(tilte: string|null, message: string): void{
+    this.snackBarService.show(tilte, message, ApiStatus.ERROR, 5000);
   }
 }

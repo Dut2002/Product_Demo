@@ -1,6 +1,6 @@
 <div class="modal">
   <div class="modal-content">
-    <h2>Add New Function</h2>
+    <h2>{{title}}</h2>
     <form #functionForm="ngForm" [ngClass]="{'form-disable': isLoading}" (ngSubmit)="saveFunction(functionForm)">
       <div class="form-input flex-full">
         <label class="form-label" for="name">Function Name</label>
@@ -11,6 +11,17 @@
         <div *ngIf="name.touched && !name.valid" class="validate-input">
           <span *ngIf="name.errors?.['required']">Name is required</span>
           <span *ngIf="name.errors?.['minlength'] || name.errors?.['maxlength']">Length from 2 to 255 characters</span>
+        </div>
+      </div>
+      <div class="form-input flex-full">
+        <label class="form-label" for="name">Front-end Route</label>
+        <div class="form-input-enter">
+          <input type="text" [(ngModel)]="function.feRoute" #feRoute="ngModel" name="feRoute" placeholder="Format: {function}/{permission-name}"
+            [minlength]="2" [maxlength]="255" [required]="true">
+        </div>
+        <div *ngIf="feRoute.touched && !feRoute.valid" class="validate-input">
+          <span *ngIf="feRoute.errors?.['required']">Front-end route is required</span>
+          <span *ngIf="feRoute.errors?.['minlength'] || feRoute.errors?.['maxlength']">Length from 2 to 255 characters</span>
         </div>
       </div>
       <div class="center">

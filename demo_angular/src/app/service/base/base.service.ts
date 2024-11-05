@@ -55,21 +55,22 @@ export class BaseService {
     })
   }
 
-  export(endpoint: string, params?: HttpParams):Observable<HttpResponse<Blob>> {
+  export(endpoint: string, params?: HttpParams) {
     return this.http.get<Blob>(`${env + endpoint}`,
       {
         params: params,
         reportProgress: true,
-        observe: 'response' as const,
+        observe: 'response',
         responseType: 'blob' as 'json' //      }
       }
     );
   }
 
-  importFile(endpoint: string, file: File): Observable<any> {
+  uploadFile(endpoint: string, file: File, params?: HttpParams): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http.post(`${env+endpoint}`, formData);
+    return this.http.post(`${env + endpoint}`, formData, { params });
   }
+
 
 }

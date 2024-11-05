@@ -12,7 +12,7 @@ export function authenInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn
   let request = req;
 
   if (token) {
-    if (authService.isTokenExpired(token)) {
+    if (authService.isTokenExpired()) {
       authService.clearLocalStorage();
       router.navigate([RouterUrl.LOG_IN]);
     } else {

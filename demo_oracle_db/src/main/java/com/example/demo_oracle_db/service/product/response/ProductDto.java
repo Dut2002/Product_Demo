@@ -32,7 +32,7 @@ public class ProductDto {
     private String categoryName;
     private Long supplierId;
     private String supplierName;
-    private List<Voucher> vouchers;
+    private List<VoucherDto> vouchers;
 
     public static Page<ProductDto> convertToProductDtoPage(Page<Product> productPage) {
         List<ProductDto> productDtoList = productPage.getContent().stream()
@@ -63,7 +63,8 @@ public class ProductDto {
 
         // Assuming product has a method to get vouchers
         this.setVouchers(product.getProductVouchers().stream()
-                .map(ProductVoucher::getVoucher)
-                .collect(Collectors.toList()));
+                .map(ProductVoucher::getVoucher) // Lấy Voucher từ ProductVoucher
+                .map(VoucherDto::new) // Chuyển đổi Voucher thành VoucherDto
+                .collect(Collectors.toList())); // Tập hợp thành danh sách
     }
 }

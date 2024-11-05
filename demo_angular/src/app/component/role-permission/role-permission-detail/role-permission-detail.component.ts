@@ -1,12 +1,10 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { HttpParams } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { PermissionName } from '../../../constant/api.const.urls';
+import { RouterUrl } from '../../../constant/app.const.router';
 import { FunctionDto } from '../../../model/dto/function-dto';
-import { PermissionDto } from '../../../model/dto/permission-dto';
-import { RoleService } from '../../../service/role/role.service';
-import { SnackBarService } from '../../../service/snack-bar/snack-bar.service';
-import { ErrorHandleService } from '../../../service/error-handle/error-handle.service';
-import { ChangeRolePermission } from '../../../model/dto/change-role-permission';
-import { PermissionRequest } from '../../../model/dto/permission-request';
-import { ApiStatus } from '../../../constant/api.const.urls';
+import { CommonService } from '../../../service/common/common.service';
 
 @Component({
   selector: 'app-role-permission-detail',
@@ -15,44 +13,38 @@ import { ApiStatus } from '../../../constant/api.const.urls';
 })
 export class RolePermissionDetailComponent implements OnInit {
 
-  @Input() function!: FunctionDto
-  @Input() roleId!: number
-  save!: PermissionDto[]
-  @Output() changeEvent = new EventEmitter<FunctionDto>()
-
-  constructor(private roleService: RoleService,
-     private snackBarService: SnackBarService,
-     private errorHandleService: ErrorHandleService
+  functions!: FunctionDto[]
+  roleId!: number
+  constructor(private common: CommonService,
+    private route: ActivatedRoute
   ) {
-
   }
+
   ngOnInit(): void {
-    this.save = this.function.permissions.map(permission => ({ ...permission }));
+    this.common.setFunctionName(this.route);
+    this.route.queryParams.subscribe(params => {
+      this.roleId = params['roleId'];
+      if (this.roleId) {
+        this.loadData();
+      } else {
+        this.common.router.navigate([RouterUrl.NOT_FOUND]);
+      }
+    });
   }
-  updateRolePermission() {
-    const role: ChangeRolePermission = {
-      roleId: this.roleId,
-      permissions: this.function.permissions.map(permisions => {
-        const per: PermissionRequest = {
-          id: permisions.permissionId,
-          status: permisions.status
-        }
-        return per;
-      })
+
+  loadData() {
+    const endpoint = this.common.getPermission(PermissionName.VIEW_USER_PERMISSION)
+    if (!endpoint) {
+      this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
+      return;
     }
-    this.roleService.changeRolePermission(role).subscribe({
+    let params = new HttpParams();
+    params = params.set("id", this.roleId)
+    this.common.base.get(endpoint, params).subscribe({
       next: res => {
-        this.snackBarService.show(null, res.content, ApiStatus.SUCCESS, 5000);
-        this.changeEvent.emit(this.function);
-        this.save = this.function.permissions.map(permission => ({ ...permission }));
+        this.functions = res;
       },
-      error: err => this.errorHandleService.handle(err)
+      error: err => this.common.errorHandle.handle(err)
     })
-
-
-  }
-
-  resetForm(){
-    this.function.permissions = this.save.map(permission => ({ ...permission }));
   }
 }

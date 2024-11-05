@@ -2,10 +2,13 @@
   <div class="voucher-list flex-third" *ngIf="!input">
     <div class="voucher-item" *ngFor="let voucher of vouchers">
       <p (click)="openModal(voucher)" class="voucher-code">{{voucher.code}}</p>
-      <button *ngIf="authService.hasPermission(permission.DELETE_VOUCHER_PRODUCT)" (click)="deleteConfirm(voucher)" class="btn btn-icon voucher-code-btn">
+      <button (click)="deleteConfirm(voucher)" class="btn btn-icon voucher-code-btn">
         <i class="fa-solid fa-x"></i></button>
+      <!-- *ngIf="common.getPermission(common.permissionName.ADD_VOUCHER_FOR_PRODUCT)" -->
     </div>
-    <button *ngIf="authService.hasPermission(permission.ADD_PRODUCT)"  (click)="openInput()" class="btn btn-icon btn-green btn-add"><i class="fa-solid fa-plus"></i></button>
+    <button (click)="openInput()" class="btn btn-icon btn-green btn-add">
+      <!-- *ngIf="common.getPermission(common.permissionName.ADD_VOUCHER_FOR_PRODUCT)"  -->
+      <i class="fa-solid fa-plus"></i></button>
   </div>
   <div class="form-input-enter voucher-input-container" *ngIf="input">
     <input class="voucher-input" type="text" placeholder="Vourcher Code" [(ngModel)]="code" name="code" required />

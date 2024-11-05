@@ -2,21 +2,53 @@ import { Injectable } from '@angular/core';
 import { jwtDecode } from 'jwt-decode';
 import { ApiHeaders } from '../../constant/api.const.urls';
 import { LoginService } from '../login/login.service';
-import { catchError, from, Observable, of, switchMap } from 'rxjs';
+import { catchError, Observable, of, Subscription, switchMap, timer } from 'rxjs';
+import { ErrorHandleService } from '../error-handle/error-handle.service';
+import { FunctionDto } from '../../model/dto/function-dto';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  constructor(private loginService: LoginService) { }
+  private refreshTokenTimer: Subscription | null = null;
+  private readonly refresheInterval = 60 * 60 * 1000;
 
-  isLoggedIn() {
-    return !this.isTokenExpired(this.getRefresh());
+  constructor(private loginService: LoginService, private errorHandelService: ErrorHandleService) { }
+
+  startRefreshTimer() {
+    if (this.refreshTokenTimer) {
+      this.refreshTokenTimer.unsubscribe();
+    }
+    const refresh = this.getRefresh();
+    if (!refresh) {
+      this.clearLocalStorage;
+      this.refreshTokenTimer = null;
+      return;
+    }
+    this.refreshTokenTimer = timer(this.refresheInterval)
+      .pipe(
+        switchMap(() => this.loginService.sendRefreshToken(refresh)),
+        catchError(err => {
+          this.errorHandelService.handle(err);
+          this.clearLocalStorage();
+          return of(null);
+        })
+      ).subscribe((response) => {
+        localStorage.setItem(ApiHeaders.TOKEN_KEY, response.token);
+        localStorage.setItem(ApiHeaders.REFRESH_KEY, response.refreshToken)
+        localStorage.setItem(ApiHeaders.ROLE_KEY, response.roles)
+
+        this.startRefreshTimer();
+      })
   }
 
-  isAuthenticated(authority: string): boolean {
-    return this.hasPermission(authority) && !this.isTokenExpired(this.getToken());
+  endRefreshTimer() {
+    if (this.refreshTokenTimer) {
+      this.refreshTokenTimer.unsubscribe();
+      this.refreshTokenTimer = null;
+    }
+    this.clearLocalStorage();
   }
 
   getToken(): string | null {
@@ -31,106 +63,52 @@ export class AuthService {
     return jwtDecode(token);
   }
 
-  getAuthority(): string[] {
+  getRoles(): string[] {
     const token = this.getToken();
     if (!token) return [];
+
     const decodedToken = this.decodeToken(token);
-    const authorities = decodedToken.authorities || [];
-    return authorities;
+    // Kiểm tra xem `roles` có phải là một mảng và chứa các chuỗi không
+    const roles: any[] = decodedToken.roles;
+    return Array.isArray(roles) && roles.every(role => typeof role === 'string') ? roles : [];
   }
 
-  getRole(): string {
+  public getFunction(feRoute?: string): string | undefined {
+    const token = feRoute ? this.getToken() : null;
+    const functions = token ? this.decodeToken(token).functions || [] : [];
+    return functions.find((func: any) => func.feRoute === feRoute)?.name;
+}
+
+  public getPermission(functionName: string, permissionName: string): string | null {
     const token = this.getToken();
-    if (!token) return '';
+    if (!token) return null;
     const decodedToken = this.decodeToken(token);
-    const role = decodedToken.role || '';
-    return role;
+    const functionInfo = decodedToken.functions.find((f: any) => f.name === functionName);
+    // Tìm PermissionInfo theo permissionName
+    const permission = functionInfo.permissions.find((p: any) => p.name === permissionName);
+    return permission ? permission.beEndPoint : null;
   }
 
-  public hasPermission(permission: string): boolean {
-    const token = this.getToken();
-    if (!token) return false;
-
-    console.log(this.decodeToken(token));
-
-    const decodedToken = this.decodeToken(token);
-    // Lấy mảng permissions từ decodedToken
-    const permissions = decodedToken.permissions || [];
-
-    // Tạo danh sách tất cả các feEndPoint
-    const feEndPoints = permissions.map((perm: any) => perm.feEndPoint);
-
-    // Kiểm tra xem permission có trong danh sách feEndPoint không
-    return feEndPoints.includes(permission);
-  }
-
-  public isTokenExpired(token: string | null): boolean {
+  public isTokenExpired(): boolean {
+    const token = this.getToken()
     if (!token) return true;
     const decoded = this.decodeToken(token);
     const expirationDate = decoded.exp * 1000; // Chuyển sang milliseconds
     return Date.now() >= expirationDate;
   }
 
-  public sendRefreshToken(): Promise<boolean> {
-    return new Promise((resolve) => {
-      const refresh = this.getRefresh();
-      if (!refresh) {
-        localStorage.clear();
-        resolve(false);
-        return;
-      }
-      if (this.isTokenExpired(refresh)) {
-        resolve(false)
-        return;
-      }
-      this.loginService.sendRefreshToken(refresh).subscribe({
-        next: (response) => {
-          localStorage.setItem(ApiHeaders.TOKEN_KEY, response.token);
-          localStorage.setItem(ApiHeaders.REFRESH_KEY, response.refreshToken)
-          localStorage.setItem(ApiHeaders.ROLE_KEY, response.role[0])
-          resolve(true);
-          return;
-        },
-        error: () => {
-          localStorage.clear();
-          resolve(false)
-          return;
-        },
-      });
-    });
-  }
-
-
-  checkAndRefreshToken(): Observable<string | null> {
-    const token = this.getToken();
-    if (this.isTokenExpired(token)) {
-      const refresh = this.getRefresh();
-      if (refresh && !this.isTokenExpired(refresh)) {
-        return this.loginService.sendRefreshToken(refresh).pipe(
-          switchMap((response) => {
-            localStorage.setItem(ApiHeaders.TOKEN_KEY, response.token);
-            localStorage.setItem(ApiHeaders.REFRESH_KEY, response.refreshToken);
-            localStorage.setItem(ApiHeaders.ROLE_KEY, response.role[0]);
-            return of(response.token)
-          }),
-          catchError(() => {
-            // Nếu làm mới token thất bại, xóa localStorage và trả về null
-            localStorage.clear();
-            return of(null);
-          })
-        );
-      } else {
-        // Nếu refresh token đã hết hạn, trả về null
-        localStorage.clear();
-        return of(null);
-      }
-    }
-    // Nếu token chưa hết hạn, trả về token hiện tại
-    return of(token);
+  public isRefreshExpired(): boolean {
+    const refresh = this.getToken()
+    if (!refresh) return true;
+    const decoded = this.decodeToken(refresh);
+    const expirationDate = decoded.exp * 1000; // Chuyển sang milliseconds
+    return Date.now() >= expirationDate;
   }
 
   clearLocalStorage() {
     localStorage.clear();
     sessionStorage.clear();
+    this.refreshTokenTimer?.unsubscribe();
+    this.refreshTokenTimer = null;
   };
 }
