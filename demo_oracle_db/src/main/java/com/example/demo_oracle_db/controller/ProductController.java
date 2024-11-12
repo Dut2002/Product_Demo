@@ -11,7 +11,6 @@ import com.example.demo_oracle_db.service.product.ProductService;
 import com.example.demo_oracle_db.service.product.request.AddVoucherRequest;
 import com.example.demo_oracle_db.service.product.request.ProductFilter;
 import com.example.demo_oracle_db.service.product.request.ProductRequest;
-import com.example.demo_oracle_db.util.Constants;
 import com.example.demo_oracle_db.util.FileType;
 import com.example.demo_oracle_db.util.MessageCode;
 import jakarta.validation.Valid;
@@ -22,13 +21,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @CrossOrigin
 @RestController

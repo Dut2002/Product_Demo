@@ -85,7 +85,7 @@ public class AccountServiceImpl implements AccountService {
             if (!roleRepository.existsById(roleId)) {
                 throw new DodException(MessageCode.ROLE_NOT_FOUND);
             }
-            accountRoleRepository.addAccountRole(Long.valueOf(accountId), roleId);
+            accountRoleRepository.addAccountRole(accountId, roleId);
         }
     }
 

@@ -1,7 +1,6 @@
 package com.example.demo_oracle_db.service.userPermisson.impl;
 
 import com.example.demo_oracle_db.entity.Permission;
-import com.example.demo_oracle_db.entity.Role;
 import com.example.demo_oracle_db.entity.RolePermission;
 import com.example.demo_oracle_db.exception.DodException;
 import com.example.demo_oracle_db.repository.FunctionRepository;

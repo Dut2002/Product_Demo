@@ -456,9 +456,7 @@ public class ProductServiceImpl implements ProductService {
 
                 rowIndex++;
             }
-            XSSFRow footer = sheet.createRow(rowIndex);
-
-
+            sheet.createRow(rowIndex);
             workbook.write(out);
             return new ByteArrayInputStream(out.toByteArray());
         }

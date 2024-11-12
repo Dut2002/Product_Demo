@@ -47,7 +47,7 @@ class FunctionServiceImpl implements FunctionService {
         permissionRepository.addPermission(
                 "View " + request.getName(),
                 "/api/" + request.getFeRoute(),
-                Long.valueOf(functionId),
+                functionId,
                 1);
     }
 

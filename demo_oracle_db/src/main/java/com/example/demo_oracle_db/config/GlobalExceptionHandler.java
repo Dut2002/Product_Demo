@@ -7,12 +7,10 @@ import com.example.demo_oracle_db.service.login.response.Res;
 import com.example.demo_oracle_db.util.Constants;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.math3.analysis.function.Constant;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
-import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -63,7 +61,7 @@ public class GlobalExceptionHandler  {
             Map<String, String> errorDetails = new HashMap<>();
             errorDetails.put("error", errorMessage);
 
-            return new ResponseEntity<>(new Res(Constants.ApiStatus.ERROR, "Malformed JSON request", errorMessage) , HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Res(Constants.ApiStatus.ERROR, "Malformed JSON request", errorDetails), HttpStatus.BAD_REQUEST);
         }
 
         // Nếu ngoại lệ không phải là InvalidFormatException, trả về thông báo lỗi mặc định
@@ -78,7 +76,7 @@ public class GlobalExceptionHandler  {
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
-            errors.append(errorMessage).append("<br>");
+            errors.append(fieldName).append(" field error: ").append(errorMessage).append("<br>");
         });
         // Loại bỏ <br> cuối cùng nếu có
         if (!errors.isEmpty()) {

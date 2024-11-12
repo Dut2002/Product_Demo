@@ -1,7 +1,5 @@
 package com.example.demo_oracle_db.util;
 
-import lombok.Getter;
-
 public class Constants {
     public interface ApiStatus {
         String SUCCESS = "SUCCESS";

@@ -15,13 +15,6 @@ public class ParseOptions {
     private Boolean strictMapping;
     private Integer typeImport;
 
-    public ParseOptions() {
-        this.sheets = new ArrayList<>();
-        headerRow = 1;
-        strictMapping = true;
-        typeImport = Constants.TypeImport.ADD;
-    }
-
     public ParseOptions(List<Integer> sheets, Integer headerRow, Boolean strictMapping, Integer typeImport) {
         this.sheets = sheets;
         this.headerRow = headerRow!=null? headerRow:1;

@@ -54,7 +54,7 @@ public enum MessageCode {
     ILLEGAL_EXTENSION("Unsupported file type [%s]"),
     STATUS_NOT_FOUND("Status not found!"),
     CATEGORY_NOT_EXIST("Category not found"),
-    SUPPLIER_NOT_EXIST("Supplier not found"), PRODUCT_IN_ORDER("Product has in order!");
+    SUPPLIER_NOT_EXIST("Supplier not found"), PRODUCT_IN_ORDER("Product has in order!"), TYPE_IMPORT_INVALID("Type import invalid!");
 
     private final String code;
 
