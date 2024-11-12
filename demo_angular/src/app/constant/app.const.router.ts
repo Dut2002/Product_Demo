@@ -1,5 +1,6 @@
 export class RouterUrl {
 
+  static readonly HOME = 'app/index'
   static readonly NOT_FOUND = 'error/not-found';
   static readonly FORBIDDEN = 'error/forbidden';
   static readonly ERROR = 'error/error';

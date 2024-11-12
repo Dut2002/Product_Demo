@@ -10,23 +10,29 @@ import { AuthService } from '../../../service/auth/auth.service';
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
-export class HeaderComponent{
+export class HeaderComponent {
+
+  route = RouterUrl;
 
   constructor(private loginService: LoginService,
     private errorHandelService: ErrorHandleService,
     private router: Router,
     private el: ElementRef,
     private renderer: Renderer2,
-    private authService: AuthService,
-  ){
+    public authService: AuthService,
+  ) {
 
+  }
+
+  public hasFuntions(functionRoute: string): boolean {
+    return this.authService.hasFuntion(functionRoute);
   }
 
   @Input() title = 'Title';
   @Input() isNavVisible: boolean = false;
   @Output() scrollEvent = new EventEmitter<number>();
 
-  logOut(){
+  logOut() {
     this.loginService.logout().subscribe({
       next: () => {
         this.authService.endRefreshTimer();
@@ -44,7 +50,7 @@ export class HeaderComponent{
 
     // Kiểm tra điều kiện cuộn dưới 1000px
     if (scrollTop < 1000) {
-      const backgroundSize =  parseInt((scrollTop).toString()) + '%';
+      const backgroundSize = parseInt((scrollTop).toString()) + '%';
       const top = 50 + (scrollTop * 0.1) + '%';
       const opacity = 1 - (scrollTop * 0.003);
 

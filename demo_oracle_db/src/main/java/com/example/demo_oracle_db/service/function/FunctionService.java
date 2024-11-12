@@ -1,10 +1,13 @@
 package com.example.demo_oracle_db.service.function;
 
-import com.example.demo_oracle_db.config.authen.dto.FunctionInfo;
 import com.example.demo_oracle_db.exception.DodException;
-import com.example.demo_oracle_db.service.function.request.*;
-import com.example.demo_oracle_db.service.function.response.DeleteConfirm;
+import com.example.demo_oracle_db.service.function.request.AddFunctionRequest;
+import com.example.demo_oracle_db.service.function.request.AddPermissionRequest;
+import com.example.demo_oracle_db.service.function.request.UpdateFunctionRequest;
+import com.example.demo_oracle_db.service.function.request.UpdatePermissionRequest;
+import com.example.demo_oracle_db.service.role.response.DeletePermissionRes;
 import com.example.demo_oracle_db.service.role.response.FunctionDto;
+import com.example.demo_oracle_db.service.role.response.PermissionDto;
 
 import java.util.List;
 
@@ -19,9 +22,11 @@ public interface FunctionService {
 
     void updatePermission(UpdatePermissionRequest request) throws DodException;
 
-    void deletePermission(Long id) throws DodException;
+    DeletePermissionRes deletePermission(Long id) throws DodException;
 
     List<FunctionDto> viewAll();
 
-    DeleteConfirm checkDeletePermission(Long permissionId) throws DodException;
+    String checkDeletePermission(Long permissionId) throws DodException;
+
+    List<PermissionDto> getPermissions(Long functionId);
 }

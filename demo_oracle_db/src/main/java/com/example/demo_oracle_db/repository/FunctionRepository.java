@@ -22,7 +22,9 @@ public interface FunctionRepository extends CrudRepository<Function, Long>, JpaS
     @Modifying
     @Transactional
     @Query(value = "INSERT INTO CMD_FUNCTION (FUNCTION_NAME, FE_ROUTE) VALUES (?1, ?2)", nativeQuery = true)
-    Integer addFunction(String name, String feRoute);
+    void addFunction(String name, String feRoute);
+    @Query(value = "SELECT LAST_INSERT_ID()", nativeQuery = true)
+    Long getLastInsertedId();
 
     @Modifying
     @Transactional

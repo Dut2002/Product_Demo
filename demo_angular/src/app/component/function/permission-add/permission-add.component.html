@@ -1,24 +1,43 @@
-<div class="permission-card"  *ngIf="!isShow">
+<div class="permission-card" *ngIf="!isShow; else addPermissionForm">
   <button class="btn-add btn-green" (click)="isShow = true"><i class="fa-solid fa-plus"></i></button>
 </div>
-<div class="permission-card border-dot" *ngIf="isShow">
-  <form #permissionForm="ngForm" (ngSubmit)="addPermission(permissionForm)" class="form flex-half">
-    <div class="form-input flex-full">
-      <label class="form-label"  for="name">Name</label>
-      <div class="form-input-enter">
-        <input type="text" [(ngModel)]="permission.name" name="name" [required]="true" placeholder="Name">
+<ng-template #addPermissionForm>
+  <div class="permission-card border-dot">
+    <form #permissionForm="ngForm" (ngSubmit)="addPermission(permissionForm)" class="form flex-half">
+      <div class="form-input flex-full">
+        <label class="form-label" for="name">Name</label>
+        <div class="form-input-enter">
+          <input type="text" #name="ngModel" [(ngModel)]="permission.name" name="name" [required]="true" [minlength]="2"
+            [maxlength]="255" placeholder="Name">
+        </div>
+        <div *ngIf="name.touched && !name.valid" class="validate-input">
+          <span *ngIf="name.errors?.['required']">Name is required</span>
+          <span *ngIf="name.errors?.['minlength'] || name.errors?.['maxlength']">Length from 2 to 255 characters</span>
+        </div>
       </div>
-    </div>
-    <div class="form-input flex-full">
-      <label class="form-label"  for="beEndPoint">Back-end Endpoint</label>
-      <div class="form-input-enter">
-        <input type="text" name="beEndPoint" [(ngModel)]="permission.beEndPoint" [required]="true" placeholder="Format: /api/{function}/{permission}">
+      <div class="form-input flex-full">
+        <label class="form-label" for="beEndPoint">Back-end Endpoint</label>
+        <div class="form-input-enter">
+          <input type="text" #beEndPoint="ngModel" name="beEndPoint" [(ngModel)]="permission.beEndPoint"
+            [required]="true"  [pattern]="pattern"
+            placeholder="Format: /api/{function}/{permission}">
+        </div>
+        <div *ngIf="beEndPoint.touched && !beEndPoint.valid" class="validate-input">
+          <span *ngIf="beEndPoint.errors?.['required']">Endpoint is required</span>
+          <span *ngIf="beEndPoint.errors?.['pattern']">End point must has pattern like /api/{{ '{' }}function{{ '}' }}/{{ '{' }}permission{{ '}' }}</span>
+        </div>
       </div>
-    </div>
-    <div class="form-input center flex-full flex-align-end">
-      <input type="submit" [ngClass]="{'btn-disabled': isLoading}" class="btn btn-small btn-blue" value="Add">
-      <input type="reset" [ngClass]="{'btn-disabled': isLoading}" (click)="onReset(permissionForm)" class="btn btn-small btn-orange" value="Reset">
-      <input type="button" [ngClass]="{'btn-disabled': isLoading}" class="btn btn-small btn-gray" value="Cancel" (click)="isShow = false">
-    </div>
-  </form>
-</div>
+      <div class="form-input flex-full">
+        <p class="form-label" for="default">Check default</p>
+        <input type="checkbox" #defaultPermission="ngModel" name="defaultPermission" [(ngModel)]="permission.defaultPermission">
+      </div>
+      <div class="form-input center flex-full flex-align-end">
+        <input type="submit" [ngClass]="{'btn-disabled': isLoading}" class="btn btn-small btn-blue" value="Add">
+        <input type="reset" [ngClass]="{'btn-disabled': isLoading}" (click)="onReset(permissionForm)"
+          class="btn btn-small btn-orange" value="Reset">
+        <input type="button" [ngClass]="{'btn-disabled': isLoading}" class="btn btn-small btn-gray" value="Cancel"
+          (click)="onClose()">
+      </div>
+    </form>
+  </div>
+</ng-template>

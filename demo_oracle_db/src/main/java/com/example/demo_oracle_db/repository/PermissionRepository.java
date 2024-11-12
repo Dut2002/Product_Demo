@@ -16,8 +16,6 @@ import java.util.Optional;
 public interface PermissionRepository extends CrudRepository<Permission, Long>, JpaSpecificationExecutor<Permission> {
     List<Permission> findAllByFunctionId(Long functionId);
 
-    boolean existsByName(String name);
-
     boolean existsByBeEndPoint(String beEndPoint);
 
     @Query(value = "select distinct p.*  " +
@@ -40,7 +38,6 @@ public interface PermissionRepository extends CrudRepository<Permission, Long>, 
 
     boolean existsByBeEndPointAndFunctionIdAndIdNot(String beEndPoint, Long functionId, Long id);
 
-    List<Permission> findAllByFunctionIdAndDefaultPermission(Long functionId, Integer defaultPermission);
 
     boolean existsByNameAndFunctionId(String name, Long functionId);
 
@@ -51,8 +48,9 @@ public interface PermissionRepository extends CrudRepository<Permission, Long>, 
     @Transactional
     @Query(value = "INSERT INTO CMD_PERMISSION (NAME, BE_END_POINT, FUNCTION_ID ,default_permission)" +
             "values (?1,?2,?3,?4)", nativeQuery = true)
-    Integer addPermission(String name, String beEndPoint, Long functionId, Integer required);
-
+    void addPermission(String name, String beEndPoint, Long functionId, Integer required);
+    @Query(value = "SELECT LAST_INSERT_ID()", nativeQuery = true)
+    Long getLastInsertedId();
     @Modifying
     @Transactional
     @Query(value = "UPDATE CMD_PERMISSION p" +
@@ -67,7 +65,5 @@ public interface PermissionRepository extends CrudRepository<Permission, Long>, 
 
     @Query(value = "select ID from cmd_permission where FUNCTION_ID = ?1", nativeQuery = true)
     List<Long> getIdByFunctionId(Long id);
-
-    @Query(value = "SELECT EXISTS(SELECT 1 from cmd_permission where FUNCTION_ID = ?1 and default_permission = ?2 and ID <> ?3)", nativeQuery = true)
-    boolean existsRequired(Long functionId, Integer defaultPermission, Long permissionId);
+    boolean existsByIdNotAndFunctionIdAndDefaultPermission(Long permissionId, Long functionId, int i);
 }

@@ -1,5 +1,7 @@
 package com.example.demo_oracle_db.util;
 
+import lombok.Getter;
+
 public class Constants {
     public interface ApiStatus {
         String SUCCESS = "SUCCESS";
@@ -19,5 +21,27 @@ public class Constants {
         String ADMIN = "ADMIN";
         String SYS_ADMIN = "STAFF";
         String CUSTOMER = "CUSTOMER";
+    }
+
+    public interface TypeImport {
+
+        int ADD  = 0;
+        int UPDATE  = 1;
+        int DELETE  = 2;
+
+        static Integer getType(Integer type) {
+            switch (type) {
+                case ADD -> {
+                    return ADD;
+                }
+                case DELETE -> {
+                    return DELETE;
+                }
+                case UPDATE -> {
+                    return UPDATE;
+                }
+                default -> throw new IllegalArgumentException("Unsupported type Import");
+            }
+        }
     }
 }

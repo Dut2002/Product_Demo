@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -28,6 +29,12 @@ import java.util.Objects;
 @Slf4j
 public class GlobalExceptionHandler  {
 
+//    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+//    public ResponseEntity<String> handleMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex) {
+//        ex.printStackTrace();  // In ra toàn bộ stack trace
+//        System.out.println("Exception: " + ex.getMessage());
+//        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(ex.getMessage());
+//    }
     @ExceptionHandler(DodException.class)
     public ResponseEntity<?> handleDobException(DodException ex) {
         return ResponseEntity.badRequest().body(new Res(Constants.ApiStatus.ERROR, "Error" ,ex.getMessage()));

@@ -1,31 +1,34 @@
 package com.example.demo_oracle_db.service.excelParse.response;
 
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.example.demo_oracle_db.util.Constants;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
+@Setter
 public class ParseOptions {
     private List<Integer> sheets;
-    private Boolean skipUnique;
     private Integer headerRow;
     private Boolean strictMapping;
+    private Integer typeImport;
 
-    public void setHeaderRow(Integer headerRow) {
-        // Nếu headerRow được truyền vào là null, gán giá trị mặc định là 1
-        this.headerRow = (headerRow != null) ? headerRow : 1;
+    public ParseOptions() {
+        this.sheets = new ArrayList<>();
+        headerRow = 1;
+        strictMapping = true;
+        typeImport = Constants.TypeImport.ADD;
     }
 
-    public void setSkipUnique(Boolean skipUnique) {
-        this.skipUnique = (skipUnique != null) ? skipUnique : false; // Mặc định là false
+    public ParseOptions(List<Integer> sheets, Integer headerRow, Boolean strictMapping, Integer typeImport) {
+        this.sheets = sheets;
+        this.headerRow = headerRow!=null? headerRow:1;
+        this.strictMapping = strictMapping!=null? strictMapping:true;
+        this.typeImport = typeImport!= null?typeImport: Constants.TypeImport.ADD;
     }
 
-    public void setStrictMapping(Boolean strictMapping) {
-        this.strictMapping = (strictMapping != null) ? strictMapping : false;
-    }
+
+
 }

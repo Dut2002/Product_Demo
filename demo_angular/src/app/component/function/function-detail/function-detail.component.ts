@@ -1,112 +1,57 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { Function } from '../../../model/function';
-import { ErrorHandleService } from '../../../service/error-handle/error-handle.service';
-import { SnackBarService } from '../../../service/snack-bar/snack-bar.service';
+import { HttpParams } from '@angular/common/http';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { PermissionName } from '../../../constant/api.const.urls';
+import { FunctionDto } from '../../../model/dto/function-dto';
+import { Permission } from '../../../model/permission';
+import { CommonService } from '../../../service/common/common.service';
+import { PermissionAddComponent } from '../permission-add/permission-add.component';
 
 @Component({
   selector: 'app-function-detail',
   templateUrl: './function-detail.component.html',
   styleUrl: './function-detail.component.scss'
 })
-export class FunctionDetailComponent implements OnChanges {
+export class FunctionDetailComponent {
 
-  @Input() open: number | null = null
-  @Input() currentFunc!: Function
-  name: string = ''
-  showConfirmation = false;
+  @Input() common!: CommonService;
+  @Input() func!: FunctionDto
+  @Output() deleteEvent = new EventEmitter<number>();
 
-  @Output() toggleEvent = new EventEmitter<void>()
-  @Output() saveEvent = new EventEmitter<void>();
+  @ViewChild('actionTab', { static: false }) actionTab!: PermissionAddComponent
 
-  isLoading = false;
+  loadData() {
+    const endpoint = this.common.getPermission(PermissionName.GET_PERMISSIONS)
+    if (!endpoint) {
+      this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
+      return;
+    }
+    const params = new HttpParams().set('functionId', this.func.id)
+    this.common.base.get(endpoint, params)
+      .subscribe({
+        next: (res) => {
+          this.func.permissions = res;
+        },
+        error: (err) => {
+          this.common.errorHandle.handle(err);
+        }
+      });
+  }
 
-  constructor(
-    private snackbarService: SnackBarService,
-    private errorHandleService: ErrorHandleService
-  ) { }
+  updatePermission(permissionId: number, newPermission: Permission) {
+    // Tìm đối tượng cần cập nhật trong danh sách permissions
+    const permissionIndex = this.func.permissions.findIndex(p => p.id === permissionId);
 
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['currentFunc']) {
-      this.name = this.currentFunc.name;
+    if (permissionIndex !== -1) {
+      // Nếu tìm thấy, cập nhật đối tượng bằng newPermission
+      this.func.permissions[permissionIndex] = newPermission;
     }
   }
 
-  @ViewChild('functionForm', { static: false }) functionForm!: NgForm
-
-
-
-  onUpdateFunc() {
-    // if(this.functionForm.valid){
-    //   this.isLoading = true;
-    //   const func: Function = {
-    //     id: this.currentFunc.id,
-    //     name: this.currentFunc.name,
-    //     feRoute: this.currentFunc.feRoute,
-    //   };
-    //   this.functionService.updateFunction(func).subscribe({
-    //     next: (response) => {
-    //       this.snackbarService.show(null, response.content, ApiStatus.SUCCESS, 5000);
-    //       this.saveFunction();
-    //       this.isLoading = false;
-    //     },
-    //     error: (err) => {
-    //       this.errorHandleService.handle(err);
-    //       this.isLoading = false;
-    //     }
-    //   })
-    // }else{
-    //   this.functionForm.control.markAllAsTouched();
-    // }
-  }
-
-  onChangeAccess() {
-    // const roleAccess: ChangeAccess = {
-    //   id: this.currentFunc.id,
-    //   roleAccesses: this.currentFunc.roleAccesses,
-    // }
-    // this.functionService.changeFunction(roleAccess).subscribe({
-    //   next: (response) => {
-    //     this.snackbarService.show(null, response.content, ApiStatus.SUCCESS, 5000);
-    //     this.saveFunction();
-    //     this.isLoading = false;
-    //   },
-    //   error: (err) => {
-    //     this.errorHandleService.handle(err);
-    //     this.isLoading = false;
-    //   }
-    // })
-
-  }
-
-
-  closeConfirm() {
-    this.showConfirmation = false;
-  }
-
-  deleteConfirm() {
-    this.showConfirmation = true;
-  }
-
-  deleteFunction() {
-    // this.functionService.deleteFunction(this.currentFunc.id!).subscribe({
-    //   next: (response) => {
-    //     this.snackbarService.show(null, response.content, ApiStatus.SUCCESS, 5000);
-    //     this.saveFunction();
-    //     this.closeConfirm()
-    //   },
-    //   error: (err) => {
-    //     this.errorHandleService.handle(err);
-    //   }
-    // })
-  }
-
-  toggle() {
-    this.toggleEvent.emit()
-  }
-
-  saveFunction() {
-    this.saveEvent.emit();
+  deletePermission(permissionId: number, deleteFunc: boolean) {
+    if (deleteFunc) {
+      this.deleteEvent.emit(this.func.id);
+    } else {
+      this.func.permissions = this.func.permissions.filter(p => p.id != permissionId);
+    }
   }
 }

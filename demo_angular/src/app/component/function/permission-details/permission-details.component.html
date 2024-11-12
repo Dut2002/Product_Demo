@@ -1,27 +1,41 @@
 <div class="flex-box form-container">
-  <form #functionForm="ngForm" (ngSubmit)="updatePermission()" class="form flex-half">
+  <form #functionForm="ngForm" (ngSubmit)="updatePermission(functionForm)" class="form flex-half">
     <div class="form-title flex-full center">{{savePermission.name}}</div>
     <input class="form-input-enter" type="hidden" [(ngModel)]="permission.id" name="id" [required]="true">
     <div class="form-input flex-full">
       <label class="form-label" for="name">Name:</label>
       <div class="form-input-enter">
-        <input type="text" [(ngModel)]="permission.name" name="name" [required]="true">
+        <input type="text" #name="ngModel" [(ngModel)]="permission.name" name="name" [required]="true" [minlength]="2"
+          maxlength="255">
+      </div>
+      <div *ngIf="name.touched && !name.valid" class="validate-input">
+        <span *ngIf="name.errors?.['required']">Name is required</span>
+        <span *ngIf="name.errors?.['minlength'] || name.errors?.['maxlength']">Length from 2 to 255 characters</span>
       </div>
     </div>
     <div class="form-input flex-full">
       <label class="form-label" for="name">Back-end Endpoint:</label>
       <div class="form-input-enter">
-        <input type="text" [(ngModel)]="permission.beEndPoint" name="beEndPoint" [required]="true">
+        <input type="text" #beEndPoint="ngModel" [(ngModel)]="permission.beEndPoint" name="beEndPoint" [required]="true"
+          [pattern]="pattern">
       </div>
+      <div *ngIf="beEndPoint.touched && !beEndPoint.valid" class="validate-input">
+        <span *ngIf="beEndPoint.errors?.['required']">Endpoint is required</span>
+        <span *ngIf="beEndPoint.errors?.['pattern']">End point must has pattern like /api/{{ '{' }}function{{ '}' }}/{{
+          '{' }}permission{{ '}' }}</span>
+      </div>
+    </div>
+    <div class="form-input flex-full">
+      <p class="form-label" for="default">Check default</p>
+      <input type="checkbox" name="defaultPermission" [(ngModel)]="permission.defaultPermission">
     </div>
     <div class="form-input center flex-full flex-align-end">
       <input type="submit" class="btn btn-small btn-blue" value="Update">
-      <input type="button" (click)="resetForm()" class="btn btn-small btn-orange" value="Reset">
+      <input type="button" (click)="resetForm(functionForm)" class="btn btn-small btn-orange" value="Reset">
       <input type="button" (click)="deleteConfirm()" class="btn btn-small btn-red" value="Delete">
     </div>
   </form>
 </div>
 
-<app-confirm-modal *ngIf="showConfirmation" [title]="'Do you want to delete this permission?'"
-  (confirmEvent)="deletePermission()" (cancelEvent)="closeModal()">
+<app-confirm-modal #confirmModal [title]="confirmTitle" (confirmEvent)="deletePermission()">
 </app-confirm-modal>

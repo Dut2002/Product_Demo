@@ -1,4 +1,4 @@
-<div class="modal">
+<div class="modal" *ngIf="showModal">
   <div class="modal-content">
     <h2>{{title}}</h2>
     <form #functionForm="ngForm" [ngClass]="{'form-disable': isLoading}" (ngSubmit)="saveFunction(functionForm)">
@@ -27,7 +27,7 @@
       <div class="center">
         <button type="submit" class="btn btn-small btn-green" [disabled]="isLoading">Save</button>
         <button type="button" class="btn btn-small btn-orange" (click)="resetModal(functionForm)" [disabled]="isLoading">Reset</button>
-        <button type="button" class="btn btn-small btn-gray" (click)="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-small btn-gray" (click)="showModal = false">Cancel</button>
       </div>
     </form>
   </div>

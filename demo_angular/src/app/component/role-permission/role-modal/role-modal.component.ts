@@ -11,11 +11,11 @@ export class RoleModalComponent implements OnInit {
 
   save!: Role
   @Input() title = '';
-  @Input() isLoading = false;
+  showModal = false;
+  isLoading = false;
   @Input() role!: Role
   @Output() addEvent = new EventEmitter<Role>();
   @Output() updateEvent = new EventEmitter<Role>();
-  @Output() closeEvent = new EventEmitter();
 
   constructor(){
   }
@@ -43,6 +43,6 @@ export class RoleModalComponent implements OnInit {
   }
 
   closeModal(){
-    this.closeEvent.emit();
+    this.showModal = false;
   }
 }

@@ -40,12 +40,12 @@ export class BaseService {
     return this.http.delete(`${env+endpoint}`, {params});
   }
 
-  uploadFile(endpoint: string, formData: FormData): Observable<HttpEvent<string[]>> {
-    return this.http.post<string[]>(`${env+endpoint}`, formData, {
-      reportProgress:true,
-      observe: 'events'
-    });
-  }
+  // uploadFile(endpoint: string, formData: FormData): Observable<HttpEvent<string[]>> {
+  //   return this.http.post<string[]>(`${env+endpoint}`, formData, {
+  //     reportProgress:true,
+  //     observe: 'events'
+  //   });
+  // }
 
   downloadFile(endpoint: string, name: string):Observable<HttpEvent<Blob>>{
     return this.http.get(`${env+endpoint}/${name}`, {
@@ -66,10 +66,12 @@ export class BaseService {
     );
   }
 
-  uploadFile(endpoint: string, file: File, params?: HttpParams): Observable<any> {
-    const formData = new FormData();
-    formData.append('file', file);
-    return this.http.post(`${env + endpoint}`, formData, { params });
+  uploadFile(endpoint: string, formData: FormData): Observable<any> {
+    return this.http.post(`${env + endpoint}`, formData, {
+      headers: new HttpHeaders({
+        'X-Requested-With': 'XMLHttpRequest',  // Thử thêm cái này nếu có liên quan đến vấn đề boundary
+      })
+    });
   }
 
 

@@ -1,7 +1,11 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { AddPermissionDto } from '../../../model/dto/add-permission-dto';
 import { Permission } from '../../../model/permission';
+import { Pattern } from '../../../constant/paterns.const';
+import { CommonService } from '../../../service/common/common.service';
+import { ApiStatus, PermissionName } from '../../../constant/api.const.urls';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-permission-add',
@@ -10,22 +14,48 @@ import { Permission } from '../../../model/permission';
 })
 export class PermissionAddComponent {
 
+  pattern = Pattern.endPointPattern;
+
+  @Input() common!: CommonService
   @Input() functionId!: number;
-  @Input() isLoading = false;
-  @Input() isShow = false;
-  @Output() addEvent = new EventEmitter<AddPermissionDto>();
+
+  isLoading = false;
+  isShow = false;
+
+  @Output() addEvent = new EventEmitter();
 
   permission: Permission = {} as Permission;
 
   addPermission(form: NgForm) {
     if (form.valid) {
+      this.isLoading = true;
+
+      const endpoint = this.common.getPermission(PermissionName.ADD_PERMISSION)
+      if (!endpoint) {
+        this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
+        this.isLoading = false;
+        return;
+      }
       let permissionDto: AddPermissionDto = {
         functionId: this.functionId,
         name: this.permission.name,
         beEndPoint: this.permission.beEndPoint,
         defaultPermission: this.permission.defaultPermission,
       }
-      this.addEvent.emit(permissionDto)
+      this.common.base.post(endpoint, permissionDto)
+        .pipe(finalize(() => {
+          this.isLoading = false;
+        }))
+        .subscribe({
+          next: (res) => {
+            this.common.snackBar.show(null, res.content, ApiStatus.SUCCESS, 5000)
+            this.addEvent.emit()
+            this.isShow = false;
+          },
+          error: (err) => {
+            this.common.errorHandle.handle(err);
+          }
+        });
     } else {
       form.control.markAllAsTouched();
     }

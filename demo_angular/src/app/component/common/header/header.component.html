@@ -1,9 +1,10 @@
 <nav>
   <div class="nav-bg"></div>
   <ul>
-    <li><a [routerLink]="'app/index'">Home</a></li>
-    <li><a [routerLink]="'file/progress'">File</a></li>
-    <!-- <li><button href="#"(click)="sendRefresh()">Link</button></li> -->
+    <li><a [routerLink]="route.HOME">Home</a></li>
+    <li *ngIf="authService.hasFuntion(route.USER_ROLE)"><a [routerLink]="route.USER_ROLE">Role Permission</a></li>
+    <li *ngIf="authService.hasFuntion(route.FUNCTION_MANAGEMENT)"><a [routerLink]="route.FUNCTION_MANAGEMENT">Function Management</a></li>
+    <li *ngIf="authService.hasFuntion(route.PRODUCT_MANAGEMENT)"><a [routerLink]="route.PRODUCT_MANAGEMENT">Product Management</a></li>
     <li><a (click)="logOut()" >Logout</a></li>
   </ul>
 </nav>

@@ -1,34 +1,28 @@
 package com.example.demo_oracle_db.service.excelParse;
 
-import com.example.demo_oracle_db.service.excelParse.impl.ExcelMapper;
 import com.example.demo_oracle_db.service.excelParse.response.ParseOptions;
 import com.example.demo_oracle_db.service.excelParse.response.ParseResult;
 import com.example.demo_oracle_db.service.excelParse.response.SheetData;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validator;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Component
 public abstract class ExcelParse<T> {
 
-    @Autowired
-    private Validator validator;
 
     public ParseResult<T> parseExcel(MultipartFile file, ParseOptions options) {
         ParseResult<T> parseResult = new ParseResult<>();
         parseResult.setSuccess(true);
+        parseResult.setTypeImport(options.getTypeImport());
         parseResult.setListData(new ArrayList<>());
         parseResult.setGlobalErrors(new ArrayList<>());
         parseResult.setSheets(new ArrayList<>());
@@ -73,6 +67,10 @@ public abstract class ExcelParse<T> {
                     parseResult.setSuccess(false);
                 }
                 parseResult.getListData().addAll(sheetData.getData());
+                if(parseResult.getListData().isEmpty()){
+                    parseResult.setSuccess(false);
+                    parseResult.getGlobalErrors().add("File không có data ");
+                }
             }
         } catch (IOException e) {
             parseResult.setSuccess(false);
@@ -83,11 +81,6 @@ public abstract class ExcelParse<T> {
 
     protected abstract SheetData<T> parseSheet(Sheet sheet, ParseOptions options);
 
-    private List<String> validateProduct(T item) {
-        Set<ConstraintViolation<T>> violations = validator.validate(item);
-        return violations.stream()
-                .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
-                .collect(Collectors.toList());
-    }
+
 }
 

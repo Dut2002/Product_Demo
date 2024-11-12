@@ -4,9 +4,7 @@ import com.example.demo_oracle_db.config.ValidatorHandler;
 import com.example.demo_oracle_db.entity.Product;
 import com.example.demo_oracle_db.entity.Voucher;
 import com.example.demo_oracle_db.exception.DodException;
-import com.example.demo_oracle_db.repository.ProductRepository;
-import com.example.demo_oracle_db.repository.ProductVoucherRepository;
-import com.example.demo_oracle_db.repository.VoucherRepository;
+import com.example.demo_oracle_db.repository.*;
 import com.example.demo_oracle_db.service.excelParse.ExcelParse;
 import com.example.demo_oracle_db.service.excelParse.response.ParseOptions;
 import com.example.demo_oracle_db.service.excelParse.response.ParseResult;
@@ -37,6 +35,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
@@ -47,7 +46,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -57,7 +55,13 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private VoucherRepository voucherRepository;
     @Autowired
+    private CategoryRepository categoryRepository;
+    @Autowired
+    private SupplierRepository supplierRepository;
+    @Autowired
     private ProductVoucherRepository productVoucherRepository;
+    @Autowired
+    private OrderDetailRepository orderDetailRepository;
 
     @Autowired
     ValidatorHandler<ProductRequest> validatorHandler;
@@ -128,11 +132,10 @@ public class ProductServiceImpl implements ProductService {
             }
 
             if (productFilter.getOrderCol() != null && !productFilter.getOrderCol().isBlank()) {
+                assert query != null;
                 if (productFilter.getSortDesc() != null ? productFilter.getSortDesc() : false) {
-                    assert query != null;
                     query.orderBy(criteriaBuilder.desc(root.get(productFilter.getOrderCol())));
                 } else {
-                    assert query != null;
                     query.orderBy(criteriaBuilder.asc(root.get(productFilter.getOrderCol())));
                 }
             }
@@ -194,23 +197,79 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductRequest> importProducts(List<ProductRequest> requests) throws DodException {
-        for (ProductRequest request : requests) {
-            Map<String, String> errors = validatorHandler.validateRequest(request);
-            if (!errors.isEmpty()) {
-                request.setStatus(Constants.ApiStatus.FAILED);
-                request.setErrorMessage(errors);
-                continue;
-            }
-
-            if (request.getId() != null) {
-                updateProduct(request, 0);
-            } else {
-                addProduct(request);
+    @Transactional
+    public ParseResult<ProductImportData> importProducts(ParseResult<ProductImportData> requests) {
+        for (ProductImportData request : requests.getListData()) {
+            if (!request.isFail()) {
+                try {
+                    switch (requests.getTypeImport()) {
+                        case Constants.TypeImport.ADD -> handleAdd(request);
+                        case Constants.TypeImport.UPDATE -> handleUpdate(request);
+                        case Constants.TypeImport.DELETE -> handleDelete(request);
+                    }
+                    request.setSuccess(true);
+                } catch (Exception e) {
+                    request.setSuccess(false);
+                }
             }
         }
+        requests.setSuccess(true);
         return requests;
     }
+
+    private void handleAdd(ProductImportData request) throws DodException {
+        if (productRepository.existsByName(request.getName())) {
+            throw new DodException(MessageCode.PRODUCT_NAME_EXIST);
+        }
+        Long categoryId = categoryRepository.getIdByName(request.getCategoryName())
+                .orElseThrow(() -> new DodException(MessageCode.CATEGORY_NOT_EXIST));
+        Long supplierId = supplierRepository.getIdByName(request.getSupplierName())
+                .orElseThrow(() -> new DodException(MessageCode.SUPPLIER_NOT_EXIST));
+        productRepository.addProduct(
+                request.getName(),
+                request.getYearMaking(),
+                request.getExpireDate(),
+                request.getQuantity(),
+                request.getPrice(),
+                categoryId,
+                supplierId
+        );
+    }
+
+    private void handleUpdate(ProductImportData request) throws DodException {
+        if (!productRepository.existsById(request.getId())) {
+            throw new DodException(MessageCode.PRODUCT_NOT_EXIST);
+        }
+        if (productRepository.existsByNameAndIdNot(request.getName(), request.getId())) {
+            throw new DodException(MessageCode.PRODUCT_NAME_EXIST);
+        }
+        Long categoryId = categoryRepository.getIdByName(request.getCategoryName())
+                .orElseThrow(() -> new DodException(MessageCode.CATEGORY_NOT_EXIST));
+        Long supplierId = supplierRepository.getIdByName(request.getSupplierName())
+                .orElseThrow(() -> new DodException(MessageCode.SUPPLIER_NOT_EXIST));
+        productRepository.updateProduct(
+                request.getId(),
+                request.getName(),
+                request.getYearMaking(),
+                request.getExpireDate(),
+                request.getQuantity(),
+                request.getPrice(),
+                categoryId,
+                supplierId
+        );
+    }
+
+    private void handleDelete(ProductImportData request) throws DodException {
+        if (!productRepository.existsById(request.getId())) {
+            throw new DodException(MessageCode.PRODUCT_NOT_EXIST);
+        }
+        if (orderDetailRepository.existsByProductId(request.getId())) {
+            throw new DodException(MessageCode.PRODUCT_IN_ORDER);
+        }
+        productVoucherRepository.deleteByProductId(request.getId());
+        productRepository.deleteById(request.getId());
+    }
+
 
     @Override
     public Page<Product> getProductsProcedure(ProductFilter filter) {
@@ -269,7 +328,7 @@ public class ProductServiceImpl implements ProductService {
             throw new DodException(MessageCode.VOUCHER_ALREADY_ADD);
         }
         try {
-            productVoucherRepository.addProductVourcher(request.getProductId(), voucher.getId());
+            productVoucherRepository.addProductVoucher(request.getProductId(), voucher.getId());
         } catch (Exception ex) {
             throw new DodException(MessageCode.ADD_VOUCHER_FAILED);
         }
@@ -361,9 +420,13 @@ public class ProductServiceImpl implements ProductService {
             for (ProductDto productDto : products) {
                 XSSFRow row = sheet.createRow(rowIndex);
 
-                row.createCell(0).setCellValue(rowIndex); // Cột số thứ tự
+                XSSFCell noCell = row.createCell(0);
+                noCell.setCellValue(rowIndex);
+                noCell.setCellStyle(integerStyle);
 
-                row.createCell(1).setCellValue(productDto.getId());
+                XSSFCell idCell = row.createCell(1);
+                idCell.setCellValue(productDto.getId());
+                idCell.setCellStyle(integerStyle);
 
                 row.createCell(2).setCellValue(productDto.getName()); // Cột tên sản phẩm
 

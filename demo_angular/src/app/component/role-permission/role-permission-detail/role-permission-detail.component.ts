@@ -43,6 +43,8 @@ export class RolePermissionDetailComponent implements OnInit {
     this.common.base.get(endpoint, params).subscribe({
       next: res => {
         this.functions = res;
+        console.log(this.functions);
+
       },
       error: err => this.common.errorHandle.handle(err)
     })

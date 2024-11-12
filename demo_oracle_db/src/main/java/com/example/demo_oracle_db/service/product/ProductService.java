@@ -14,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.List;
 
 public interface ProductService {
     Page<ProductDto> getProducts(ProductFilter productFilter);
@@ -25,7 +24,7 @@ public interface ProductService {
 
     void deleteProduct(Long id) throws DodException;
 
-    List<ProductRequest> importProducts(List<ProductRequest> products) throws DodException;
+    ParseResult<ProductImportData> importProducts(ParseResult<ProductImportData> products);
 
     Page<Product> getProductsProcedure(ProductFilter filter);
 

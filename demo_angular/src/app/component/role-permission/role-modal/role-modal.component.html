@@ -1,4 +1,4 @@
-<div class="modal">
+<div class="modal" *ngIf="showModal">
   <div class="modal-content">
     <h2>{{title}}</h2>
     <form #roleForm="ngForm" [ngClass]="{'form-disable': isLoading}" (ngSubmit)="saveRole(roleForm)">

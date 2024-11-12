@@ -21,6 +21,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -51,13 +52,21 @@ public class SecurityAuthConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Collections.singletonList("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "PUT", "DELETE", "POST"));
-        configuration.setAllowedHeaders(Arrays.asList("X-Requested-With", "Origin", "Content-Type", "Accept", "Authorization"));
+        configuration.setAllowedOrigins(Collections.singletonList("*")); // Chấp nhận tất cả các nguồn
+        configuration.setAllowedMethods(Arrays.asList(
+                HttpMethod.GET.name(),
+                HttpMethod.POST.name(),
+                HttpMethod.PUT.name(),
+                HttpMethod.DELETE.name(),
+                HttpMethod.PATCH.name())
+        ); // Chấp nhận các phương thức
+//        configuration.setAllowedHeaders(Arrays.asList("X-Requested-With", "Origin", "Content-Type","Content-Length", "Accept", "Authorization"));
+        configuration.setAllowedHeaders(List.of("*"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -79,9 +88,8 @@ public class SecurityAuthConfig {
                         .requestMatchers(HttpMethod.GET, "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/user/send-otp-reset-password").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/user/reset-password").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/file/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/file/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/search/**").permitAll()
+//                        .requestMatchers(HttpMethod.POST, "/api/product/upload-product").permitAll()
                         .anyRequest().authenticated()); // Tất cả yêu cầu còn lại phải được xác thực
         return http.build();
     }

@@ -4,7 +4,7 @@ import com.example.demo_oracle_db.service.excelParse.response.HeaderMapping;
 import com.example.demo_oracle_db.service.excelParse.response.MapResult;
 import com.example.demo_oracle_db.service.excelParse.response.ParseOptions;
 import com.example.demo_oracle_db.service.excelParse.response.SheetData;
-import jakarta.validation.constraints.NotNull;
+import com.example.demo_oracle_db.util.Constants;
 import lombok.AllArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -13,11 +13,12 @@ import org.apache.poi.ss.usermodel.Sheet;
 import java.util.*;
 
 @AllArgsConstructor
-public class ExcelMapper<T> {
+public abstract class ExcelMapper<T> {
     private final Class<T> targetClass;
     private final List<HeaderMapping<T>> mappings;
 
-    public SheetData<T> mapFromExcel(Sheet sheet, ParseOptions options) {
+
+    public SheetData<T> mapFromExcelSheet(Sheet sheet, ParseOptions options) {
         SheetData<T> sheetData = new SheetData<>();
         sheetData.setSheetName(sheet.getSheetName());
         sheetData.setErrors(new ArrayList<>());
@@ -25,7 +26,7 @@ public class ExcelMapper<T> {
         List<T> results = new ArrayList<>();
         Map<String, Set<Object>> uniqueValuesMap = new HashMap<>();
         Map<String, Integer> headerIndexMap = getHeaderIndexMap(sheet.getRow(options.getHeaderRow() - 1));
-        List<String> missingColumns = validateRequiredColumns(headerIndexMap, options.getStrictMapping());
+        List<String> missingColumns = validateRequiredColumns(headerIndexMap, options);
         if (!missingColumns.isEmpty()) {
             for (String missingColumn : missingColumns
             ) {
@@ -37,16 +38,18 @@ public class ExcelMapper<T> {
             Row row = sheet.getRow(i);
             if (row == null) continue;
 
-            MapResult<T> mapResult = mapRow(row, headerIndexMap, uniqueValuesMap, options.getSkipUnique());
+            MapResult<T> mapResult = mapRow(row, headerIndexMap, uniqueValuesMap, options);
             if (!mapResult.getErrors().isEmpty()) {
                 sheetData.getErrors().addAll(mapResult.getErrors());
-            } else if(mapResult.getItem()!=null){
+            }
+            if(mapResult.getItem()!=null){
                 results.add(mapResult.getItem());
             }
         }
         sheetData.setData(results);
         return sheetData;
     }
+
 
     private Map<String, Integer> getHeaderIndexMap(Row headerRow) {
         Map<String, Integer> headerIndexMap = new HashMap<>();
@@ -57,15 +60,9 @@ public class ExcelMapper<T> {
         return headerIndexMap;
     }
 
-    private List<String> validateRequiredColumns(Map<String, Integer> headerIndexMap, @NotNull boolean strictMapping) {
-        return mappings.stream()
-                .filter(header -> header.isRequired() || strictMapping)
-                .map(HeaderMapping::getHeaderName)
-                .filter(header -> !headerIndexMap.containsKey(header))
-                .toList();
-    }
+    protected abstract List<String> validateRequiredColumns(Map<String, Integer> headerIndexMap, ParseOptions options);
 
-    private MapResult<T> mapRow(Row row, Map<String, Integer> headerIndexMap, Map<String, Set<Object>> uniqueValuesMap, @NotNull boolean skipUnique) {
+    private MapResult<T> mapRow(Row row, Map<String, Integer> headerIndexMap, Map<String, Set<Object>> uniqueValuesMap, ParseOptions options) {
         MapResult<T> mapResult = new MapResult<>();
         mapResult.setErrors(new ArrayList<>());
 
@@ -83,7 +80,7 @@ public class ExcelMapper<T> {
                         Object value = mapping.getConverter().apply(cell);
                         if (value != null) {
                             hasData = true;
-                        } else if (mapping.isRequired()) {
+                        } else if (mapping.getRequired().get(options.getTypeImport())) {
                             validData = false;
                             errors.add(
                                     String.format("Giá trị của cột '%s' dòng '%s' bị để trống", mapping.getHeaderName(), row.getRowNum()+1)
@@ -91,41 +88,36 @@ public class ExcelMapper<T> {
                             continue;
                         }
                         mapping.getSetter().accept(item, value);
-                        if (mapping.isUnique() && value != null) {
+                        if (mapping.getUnique().get(options.getTypeImport()) && value != null) {
                             uniqueValuesMap.computeIfAbsent(mapping.getHeaderName(), k -> new HashSet<>());
-                            Set<Object> uniqueValues = uniqueValuesMap.get(mapping.getHeaderName()+1);
-
-                            if (!uniqueValues.add(value)) {
+                            Set<Object> uniqueValues = uniqueValuesMap.get(mapping.getHeaderName());
+                            List<String> checkUnique =  checkUnique(value, uniqueValues, mapping, row.getRowNum()+1, options.getTypeImport());
+                            if(!checkUnique.isEmpty()){
                                 validData = false;
-                                errors.add(
-                                        String.format("Giá trị '%s' của cột '%s' dòng '%s' đã tồn tại trong file Excel",
-                                                value, mapping.getHeaderName(), row.getRowNum()+1)
-                                );
+                                errors.addAll(checkUnique);
                             }
-                            if (mapping.getExists().apply(value)) {
-                                validData = false;
-                                errors.add(
-                                        String.format("Giá trị '%s' của cột '%s' dòng '%s' đã tồn tại trong Database",
-                                                value, mapping.getHeaderName(), row.getRowNum()+1)
-                                );
-                            }
-
                         }
-
                     } catch (Exception e) {
-                        errors.add("Dòng " + row.getRowNum()+1 + " cột " + mapping.getHeaderName() + " lỗi dữ liệu khi chuyển đổi");
+                        errors.add("Dòng " + (row.getRowNum()+1) + " cột " + mapping.getHeaderName() + " lỗi dữ liệu khi chuyển đổi");
                     }
                 }
             }
             if (hasData) {
+                errors.addAll(validateItem(item, row.getRowNum() + 1, options.getTypeImport()));
                 mapResult.setErrors(errors);
-                if(validData){
-                    mapResult.setItem(item);
+                if (!errors.isEmpty() || !validData) {
+                    setFailed(item);
                 }
+                mapResult.setItem(item);
             }
         } catch (Exception e) {
-            mapResult.setErrors(List.of("Dòng " + row.getRowNum()+1 + " không thể convert data"));
+            mapResult.setErrors(List.of("Dòng " + (row.getRowNum()+1) + " không thể convert data"));
         }
         return mapResult;
     }
+
+    protected abstract void setFailed(T item);
+
+    protected abstract List<String> checkUnique(Object value, Set<Object> uniqueValues, HeaderMapping<T> mapping, int rowNum, Integer typeImport);
+    protected abstract List<String> validateItem(T item, int rowNum, Integer typeImport);
 }

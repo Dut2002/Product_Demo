@@ -19,8 +19,8 @@ public class FunctionController {
     @GetMapping("view-functions")
     public ResponseEntity<?> viewFunctions() {
         return ResponseEntity.ok(functionService.viewAll());
-
     }
+
 
     @PostMapping("add-function")
     public ResponseEntity<?> addFunction(@RequestBody AddFunctionRequest request) throws DodException {
@@ -40,6 +40,11 @@ public class FunctionController {
         return ResponseEntity.ok(new Res().resOk("Delete function successfully"));
     }
 
+    @GetMapping("get-permissions")
+    public ResponseEntity<?> getPermissions(@RequestParam Long functionId){
+        return ResponseEntity.ok(functionService.getPermissions(functionId));
+    }
+
     @PostMapping("add-permission")
     public ResponseEntity<?> addPermission(@RequestBody @Valid AddPermissionRequest request) throws DodException {
         functionService.addPermission(request);
@@ -48,8 +53,7 @@ public class FunctionController {
 
     @DeleteMapping("delete-permission")
     public ResponseEntity<?> deletePermission(@RequestParam Long id) throws DodException {
-        functionService.deletePermission(id);
-        return ResponseEntity.ok(new Res().resOk("Delete function successfully"));
+        return ResponseEntity.ok(functionService.deletePermission(id));
     }
 
     @PutMapping("update-permission")
@@ -58,8 +62,8 @@ public class FunctionController {
         return ResponseEntity.ok(new Res().resOk("Update function successfully"));
     }
 
-    @DeleteMapping("check-delete")
+    @GetMapping("check-delete")
     public ResponseEntity<?> checkDelete(Long id) throws DodException {
-        return ResponseEntity.ok(functionService.checkDeletePermission(id));
+        return ResponseEntity.ok(new Res().resOk(functionService.checkDeletePermission(id)));
     }
 }

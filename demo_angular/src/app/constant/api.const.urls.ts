@@ -57,6 +57,7 @@ export class PermissionName {
   public static readonly UPDATE_PRODUCT = 'Update Product';
   public static readonly DELETE_PRODUCT = 'Delete Product';
   public static readonly IMPORT_PRODUCT = 'Import Product';
+  public static readonly UPLOAD_PRODUCT = 'Upload Product';
   public static readonly EXPORT_PRODUCT = 'Export Product';
   public static readonly ADD_VOUCHER_FOR_PRODUCT = 'Add Voucher For Product';
   public static readonly DELETE_VOUCHER_OF_PRODUCT = 'Delete Voucher Of Product';
@@ -68,7 +69,8 @@ export class PermissionName {
   public static readonly ADD_PERMISSION = 'Add Permission';
   public static readonly UPDATE_PERMISSION = 'Update Permission';
   public static readonly DELETE_PERMISSION = 'Delete Permission';
-  public static readonly CHECK_DELETE = 'Check Delete';
+  public static readonly CHECK_DELETE_PERMISSION = 'Check Delete Permission'
+  public static readonly GET_PERMISSIONS = 'Get Permissions';
 }
 
 

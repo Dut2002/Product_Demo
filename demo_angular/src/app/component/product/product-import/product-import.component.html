@@ -1,0 +1,107 @@
+<div class="modal" *ngIf="showModal">
+
+  <div class="modal-content">
+    <h2 class="modal-title">
+      <p>Import Product</p>
+      <div class="modal-action">
+        <div class="input-group" *ngIf="parseResult && parseResult.success === false" >
+          <label for="skip">
+            View Error Details
+          </label><br>
+          <input type="checkbox" [(ngModel)]="viewError">
+        </div>
+        <div class="input-group">
+          <label for="type-import">Type Import</label>
+          <div>
+            <label>
+              <input type="radio" [(ngModel)]="typeImport" [ngClass]="{'btn-disable': isLoading}" (change)="onChangeImport()" [value]="ImportType.ADD"
+                required>
+              Add
+            </label>
+            <label>
+              <input type="radio" [(ngModel)]="typeImport" [ngClass]="{'btn-disable': isLoading}" (change)="onChangeImport()" [value]="ImportType.UPDATE">
+              Update
+            </label>
+            <label>
+              <input type="radio" [(ngModel)]="typeImport" [ngClass]="{'btn-disable': isLoading}" (change)="onChangeImport()" [value]="ImportType.DELETE">
+              Delete
+            </label>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <input #fileInput type="file"
+            accept=".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            (click)="file = null" [ngClass]="{'btn-disable': isLoading}" (change)="onFileChange($event, fileInput)">
+        </div>
+      </div>
+
+    </h2>
+    <div class="modal-result">
+      <div class="result-container" *ngIf="parseResult && parseResult.globalErrors.length === 0 && (parseResult?.success === true || !viewError)">
+        <h3>Import Data</h3>
+        <div class="table-result">
+          <table class="table">
+            <thead>
+              <tr>
+                <th class="flex-25">No</th>
+                <th class="flex-25">Id</th>
+                <th class="flex-120">Name</th>
+                <th class="flex-70">Year Making</th>
+                <th class="flex-80">Price</th>
+                <th class="flex-80">Quantity</th>
+                <th class="flex-100">Expire Date</th>
+                <th class="flex-75">Category</th>
+                <th class="flex-120">Supplier
+              </tr>
+            </thead>
+            <tbody>
+              <tr [ngClass]="{
+                'success': pro.success === true,
+                'failed': pro.success === false
+              }" *ngFor="let pro of listProduct, let i=index">
+                <td class="flex-25">{{i+1}}</td>
+                <td class="flex-25">{{pro.id}}</td>
+                <td class="flex-120">{{pro.name}}</td>
+                <td class="flex-70">{{pro.yearMaking}}</td>
+                <td class="flex-80">{{pro.price| currency}}</td>
+                <td class="flex-80">{{pro.quantity}}</td>
+                <td class="flex-100">{{pro.expireDate| date}}</td>
+                <td class="flex-75">{{pro.categoryName}}</td>
+                <td class="flex-120">{{pro.supplierName}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="result-container" *ngIf="parseResult && ((parseResult?.success === false && viewError)||parseResult.globalErrors.length !== 0)">
+        <h3 class="error-color">Errors</h3>
+        <div class="error-list">
+          <div *ngFor="let sheet of parseResult?.sheets">
+            <div *ngIf="sheet.errors && sheet.errors.length>0">
+              {{sheet.sheetName}}:
+              <ul>
+                <li *ngFor="let error of sheet.errors">
+                  {{error}}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="parseResult.globalErrors.length !== 0" class="error-color">Global Error: {{parseResult.globalErrors}}</div>
+      </div>
+    </div>
+
+    <div class="modal-action center">
+      <button #ImportButton class="btn btn-blue btn-medium" [ngClass]="{'btn-disable': isLoading || disableButton}">
+        Import
+      </button>
+      <button #ImportButton class="btn btn-orange btn-medium" [ngClass]="{'btn-disable': isLoading}" (click)="downloadTemplate()">
+        Template
+      </button>
+      <button class="btn btn-gray btn-medium" [ngClass]="{'btn-disable': isLoading}" (click)="onClose()">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>

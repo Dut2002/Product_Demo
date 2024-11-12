@@ -1,8 +1,8 @@
 package com.example.demo_oracle_db.service.userPermisson;
 
-import com.example.demo_oracle_db.config.authen.dto.FunctionInfo;
 import com.example.demo_oracle_db.exception.DodException;
 import com.example.demo_oracle_db.service.role.response.FunctionDto;
+import com.example.demo_oracle_db.service.role.response.RolePermissionRes;
 import com.example.demo_oracle_db.service.userPermisson.request.*;
 
 import java.util.List;
@@ -14,7 +14,7 @@ public interface UserPermissionService {
 
     void deleteUserPermission(DeleteUserPermissionRequest request) throws DodException;
 
-    List<FunctionDto> getPermissionsByRole(Long roleId);
+    RolePermissionRes getPermissionsByRole(Long roleId) throws DodException;
 
     void addUserFunction(AddUserFunction request) throws DodException;
 

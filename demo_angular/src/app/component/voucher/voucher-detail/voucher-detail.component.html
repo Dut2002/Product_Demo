@@ -1,4 +1,4 @@
-<div class="modal">
+<div class="modal" *ngIf="showDetail">
   <div class="modal-content">
     <div class="modal-header">
       <h2 class="modal-title">Voucher</h2>
@@ -8,13 +8,28 @@
       <div class="brand">
         <h2>Attractive discount coupons</h2>
       </div>
-      <div class="discount alizarin">{{voucher.discountPercent}}%
+      <div *ngIf="voucher.discountPercent !== null; else discountAmount" class="discount alizarin">
+        {{voucher.discountPercent}}%
         <div class="type">off</div>
       </div>
+      <ng-template #discountAmount>
+        <div class="discount alizarin">
+          {{voucher.discountAmount | currency}}
+          <div class="type">off</div>
+        </div>
+      </ng-template>
       <div class="descr">
         <strong>{{voucher.description}}</strong>
-        Discount {{voucher.discountPercent}}%, maximum {{voucher.maximumDiscount | currency}} when purchasing unit price
-        from {{voucher.minimumOrderValue | currency}} or more
+        <p *ngIf="voucher.discountPercent !== null; else discountDescription">
+          Discount {{voucher.discountPercent}}%, maximum {{voucher.maximumDiscount | currency}} when purchasing unit price
+          from {{voucher.minimumOrderValue | currency}} or more
+        </p>
+        <ng-template #discountDescription>
+          <p>
+            Discount {{voucher.discountAmount | currency}} when purchasing unit price
+            from {{voucher.minimumOrderValue | currency}} or more
+          </p>
+        </ng-template>
       </div>
       <div class="ends">
         <small>Start {{voucher.startDate}} to {{voucher.endDate}}</small>

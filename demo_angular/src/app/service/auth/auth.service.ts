@@ -12,7 +12,7 @@ import { FunctionDto } from '../../model/dto/function-dto';
 export class AuthService {
 
   private refreshTokenTimer: Subscription | null = null;
-  private readonly refresheInterval = 60 * 60 * 1000;
+  private readonly refresheInterval = 5 * 60 * 1000;
 
   constructor(private loginService: LoginService, private errorHandelService: ErrorHandleService) { }
 
@@ -77,7 +77,16 @@ export class AuthService {
     const token = feRoute ? this.getToken() : null;
     const functions = token ? this.decodeToken(token).functions || [] : [];
     return functions.find((func: any) => func.feRoute === feRoute)?.name;
-}
+  }
+
+  public hasFuntion(feRoute: string): boolean {
+    const token = this.getToken();
+    if(!token) return false;
+    const functions = this.decodeToken(token).functions;
+    return functions.some((func: any) => func.feRoute === feRoute);
+  }
+
+
 
   public getPermission(functionName: string, permissionName: string): string | null {
     const token = this.getToken();
@@ -87,6 +96,15 @@ export class AuthService {
     // Tìm PermissionInfo theo permissionName
     const permission = functionInfo.permissions.find((p: any) => p.name === permissionName);
     return permission ? permission.beEndPoint : null;
+  }
+
+  public hasPermission(functionName: string, permissionName: string): boolean {
+    const token = this.getToken();
+    if (!token) return false;
+    const decodedToken = this.decodeToken(token);
+    const functionInfo = decodedToken.functions.find((f: any) => f.name === functionName);
+    if (!functionInfo) return false;
+    return functionInfo.permissions.some((p: any) => p.name === permissionName);;
   }
 
   public isTokenExpired(): boolean {

@@ -17,7 +17,6 @@ import java.util.Optional;
 @Transactional
 public interface RoleRepository extends CrudRepository<Role, Long>, JpaSpecificationExecutor<Role> {
 
-    Optional<Role> findByName(String name);
 
     boolean existsByName(@Size(max = 255) @NotBlank String name);
 
@@ -34,10 +33,14 @@ public interface RoleRepository extends CrudRepository<Role, Long>, JpaSpecifica
     @Modifying
     @Transactional
     @Query(nativeQuery = true, value = "INSERT INTO cmd_role (NAME) values (?1)")
-    Integer addRole(String name);
-
+    void addRole(String name);
+    @Query(value = "SELECT LAST_INSERT_ID()", nativeQuery = true)
+    Long getLastInsertedId();
     @Modifying
     @Transactional
     @Query(nativeQuery = true, value = "UPDATE cmd_role SET NAME = ?2 WHERE ID = ?1 ")
     void updateRole(Long id, String name);
+
+    @Query(nativeQuery = true, value = "select NAME from cmd_role WHERE ID = ?1")
+    Optional<String> findNameById(Long roleId);
 }

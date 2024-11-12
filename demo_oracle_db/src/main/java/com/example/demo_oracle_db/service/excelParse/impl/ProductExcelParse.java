@@ -16,7 +16,7 @@ public class ProductExcelParse extends ExcelParse<ProductImportData> {
 
     @Override
     protected SheetData<ProductImportData> parseSheet(Sheet sheet, ParseOptions options) {
-        return excelMapper.mapFromExcel(sheet, options);
+        return excelMapper.mapFromExcelSheet(sheet, options);
     }
 
     @Autowired

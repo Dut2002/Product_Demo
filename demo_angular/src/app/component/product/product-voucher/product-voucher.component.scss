@@ -56,5 +56,9 @@ $btn-size: 40px;
 .voucher-code{
   padding: 8px;
   cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 90px;
+  text-wrap: nowrap;
 }
 

@@ -11,8 +11,9 @@ import com.example.demo_oracle_db.service.function.request.AddFunctionRequest;
 import com.example.demo_oracle_db.service.function.request.AddPermissionRequest;
 import com.example.demo_oracle_db.service.function.request.UpdateFunctionRequest;
 import com.example.demo_oracle_db.service.function.request.UpdatePermissionRequest;
-import com.example.demo_oracle_db.service.function.response.DeleteConfirm;
+import com.example.demo_oracle_db.service.role.response.DeletePermissionRes;
 import com.example.demo_oracle_db.service.role.response.FunctionDto;
+import com.example.demo_oracle_db.service.role.response.PermissionDto;
 import com.example.demo_oracle_db.util.MessageCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,10 +40,10 @@ class FunctionServiceImpl implements FunctionService {
         if (functionRepository.existsByFunctionName(request.getName())) {
             throw new DodException(MessageCode.FUNCTION_FE_ROUTE_EXISTS, request.getFeRoute());
         }
-        Integer functionId = functionRepository.addFunction(
+        functionRepository.addFunction(
                 request.getName(),
                 request.getFeRoute());
-
+        Long functionId = functionRepository.getLastInsertedId();
         permissionRepository.addPermission(
                 "View " + request.getName(),
                 "/api/" + request.getFeRoute(),
@@ -83,7 +84,7 @@ class FunctionServiceImpl implements FunctionService {
         if (!functionRepository.existsById(request.getFunctionId())) {
             throw new DodException(MessageCode.FUNCTION_NOT_FOUND);
         }
-        if (permissionRepository.existsByName(request.getName())) {
+        if (permissionRepository.existsByNameAndFunctionId(request.getName(), request.getFunctionId())) {
             throw new DodException(MessageCode.PERMISSION_NAME_EXISTS, request.getName());
         }
         if (permissionRepository.existsByBeEndPoint(request.getBeEndPoint())) {
@@ -93,7 +94,7 @@ class FunctionServiceImpl implements FunctionService {
                 request.getName(),
                 request.getBeEndPoint(),
                 request.getFunctionId(),
-                request.getDefaultPermission() ? 1 : 0);
+                request.getDefaultPermission() != null && request.getDefaultPermission() ? 1 : 0);
     }
 
     @Override
@@ -117,16 +118,22 @@ class FunctionServiceImpl implements FunctionService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deletePermission(Long permissionId) throws DodException {
+    public DeletePermissionRes deletePermission(Long permissionId) throws DodException {
         Permission permission = permissionRepository.findById(permissionId).orElseThrow(() -> new DodException(MessageCode.PERMISSION_NOT_FOUND));
-
+        DeletePermissionRes res = new DeletePermissionRes();
         if (permission.getDefaultPermission() == 1 && !permissionRepository
-                .existsRequired(permission.getFunctionId(),
-                        permission.getDefaultPermission(), permissionId)) {
-            throw new DodException(MessageCode.PERMISSION_REQUIRED);
+                .existsByIdNotAndFunctionIdAndDefaultPermission(permissionId, permission.getFunctionId(),
+                        1)) {
+            deleteFunction(permission.getFunctionId());
+            res.setDeleteFunc(true);
+            res.setMessage("Delete Functions Successfully!");
+        } else {
+            rolePermissionRepository.deleteByPermissionId(permissionId);
+            permissionRepository.deleteById(permissionId);
+            res.setDeleteFunc(false);
+            res.setMessage("Delete Permission Successfully!");
         }
-        rolePermissionRepository.deleteByPermissionId(permissionId);
-        permissionRepository.deleteById(permissionId);
+        return res;
     }
 
     @Override
@@ -136,27 +143,25 @@ class FunctionServiceImpl implements FunctionService {
     }
 
     @Override
-    public DeleteConfirm checkDeletePermission(Long permissionId) throws DodException {
+    public String checkDeletePermission(Long permissionId) throws DodException {
         Permission permission = permissionRepository.findById(permissionId)
                 .orElseThrow(() -> new DodException(MessageCode.PERMISSION_NOT_FOUND));
-
-        DeleteConfirm response = new DeleteConfirm();
-        response.setPermissionId(permission.getId());
-        response.setNeedConfirm(false);
-
+        String message = "";
         if (permission.getDefaultPermission() == 1) {
-            if (!permissionRepository.existsRequired(permission.getFunctionId(),
-                    permission.getDefaultPermission(), permissionId)) {
-                response.setNeedConfirm(true);
-                response.setMessage("This is the last default permission in this function. " +
-                        "Removing the permission will also remove the function. " +
-                        "Are you sure you want to delete?");
+            if (permissionRepository.existsByIdNotAndFunctionIdAndDefaultPermission(permissionId, permission.getFunctionId(), 1)) {
+                message += "This is the default permission in this function.";
             } else {
-                response.setNeedConfirm(true);
-                response.setMessage("Are you sure you want to remove the default permissions in this function?");
+                message += "This is the last default permission in this function. " +
+                        "Removing the permission will also remove the function. ";
             }
         }
-        return response;
+        return message + " Are you sure you want to delete this permission?";
+    }
+
+    @Override
+    public List<PermissionDto> getPermissions(Long functionId) {
+        List<Permission> permissions = permissionRepository.findAllByFunctionId(functionId);
+        return permissions.stream().map(PermissionDto::new).toList();
     }
 
 }

@@ -1,8 +1,9 @@
 server:
   port: 8080
-#  servlet:
-#    context-path: /identity
-
+  servlet:
+    encoding:
+      enabled: true
+      charset: UTF-8
 #Swagger
 springdoc:
   api-docs:
@@ -21,7 +22,7 @@ security:
     refresh-expiration: "#{7*24*60*60}"
 
 spring:
-#  datasource:
+  #  datasource:
 #    driver-class-name: oracle.jdbc.OracleDriver
 #    url: "jdbc:oracle:thin:@10.10.0.202:1521:ORCL"
 #    username: demo
@@ -51,5 +52,7 @@ spring:
 
   servlet:
     multipart:
-      max-file-size: 1000000000MB
-      max-request-size: 1000000000MB
+      max-file-size: 10000MB
+      max-request-size: 10000MB
+      enabled: true
+      resolve-lazily: true

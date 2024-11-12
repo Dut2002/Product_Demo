@@ -28,8 +28,10 @@ public interface RolePermissionRepository extends CrudRepository<RolePermission,
     @Query(nativeQuery = true, value = "Insert Into  cmd_role_permission " +
             " (permission_id, role_id) " +
             "values (?1,?2)")
-    Integer addPermissionRole(Long permissionId, Long roleId);
+    void addPermissionRole(Long permissionId, Long roleId);
 
+    @Query(value = "SELECT LAST_INSERT_ID()", nativeQuery = true)
+    Long getLastInsertedId();
     @Modifying
     @Transactional
     @Query(value = "DELETE from cmd_role_permission crp " +

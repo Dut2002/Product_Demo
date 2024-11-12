@@ -8,8 +8,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Repository
 @Transactional
 public interface ProductVoucherRepository extends CrudRepository<ProductVoucher, Long>, JpaSpecificationExecutor<ProductVoucher> {
@@ -18,9 +16,20 @@ public interface ProductVoucherRepository extends CrudRepository<ProductVoucher,
     @Query(nativeQuery = true, value = "INSERT INTO cmd_product_voucher " +
             " (product_id, voucher_id) " +
             " values (?1,?2)")
-    Integer addProductVourcher(Long productId, Long id);
+    void addProductVoucher(Long productId, Long id);
+
+    @Query(value = "SELECT LAST_INSERT_ID()", nativeQuery = true)
+    Long getLastInsertedId();
 
     boolean existsByProductIdAndVoucherId(Long productId, Long id);
 
+    @Modifying
+    @Transactional
+    @Query(nativeQuery = true, value = "DELETE FROM cmd_product_voucher where PRODUCT_ID = ?1 && VOUCHER_ID = ?2")
     void deleteByProductIdAndVoucherId(Long productId, Long voucherId);
+
+    @Modifying
+    @Transactional
+    @Query(nativeQuery = true, value = "DELETE FROM cmd_product_voucher where PRODUCT_ID = ?1")
+    void deleteByProductId(Long id);
 }

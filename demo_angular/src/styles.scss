@@ -148,7 +148,7 @@
   background: white;
   border: 1px solid black;
   top:100%;
-  left: 0%;
+  left: 0;
 }
 
 .form-input .select-label{
@@ -363,7 +363,7 @@ ng-dropdown-panel .scroll-host{
 .modal,
 .confirmation-modal {
   position: fixed;
-  z-index: 1;
+  z-index: 9999;
   left: 0;
   top: 0;
   width: 100%;
@@ -404,7 +404,7 @@ ng-dropdown-panel .scroll-host{
   min-height: 80px;
 }
 
-.modal-content .validate-input{
+.validate-input{
   color: red;
   font-size: 10px;
   margin-top: 8px;
@@ -472,6 +472,21 @@ ng-dropdown-panel .scroll-host{
     width: #{$i}px;
   }
 }
+
+/* Tạo các lớp với giá trị flex động */
+[class^="flex-"] {
+  word-break: break-word;
+  /* Dùng flex cho các lớp bắt đầu với flex- */
+  flex: attr(data-flex);
+}
+@for $i from 20 through 500 {
+  .flex-#{$i} {
+    flex: #{$i};
+  }
+}
+
+
+
 
 .table-container th i{
   position: absolute;
@@ -563,14 +578,17 @@ section h1.title{
   border-radius: min(8px, 0.5rem);
 }
 
+.accordion-selected{
+  z-index: 10 !important;
+}
 .accordion {
 	--circle-x: 1.8rem;
 	--circle-y: 0;
 	--circle-r: 200%;
 	color: #000;
+  position: relative;
+  z-index: 1;
   border: 0.5px solid black;
-
-
 	margin-bottom: 1rem;
 	border-radius: min(8px, 0.5rem);
 	transition-timing-function: var(--slide-ease);
@@ -628,4 +646,13 @@ section h1.title{
 
 .hidden {
   display: none;
+}
+
+
+.success{color: #8BC34A;}
+
+.failed{color: red;}
+
+.border-dot{
+  border: 1.5px dotted;
 }

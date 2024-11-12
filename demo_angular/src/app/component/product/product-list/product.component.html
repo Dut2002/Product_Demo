@@ -1,11 +1,12 @@
 <div class="container">
   <h1 class="title center">Product Management</h1>
   <div class="table-actions">
-    <button class="btn add-btn btn-medium"
+    <button class="btn add-btn btn-medium" *ngIf="common.hasPermission(common.permissionName.ADD_PRODUCT)"
       (click)="openAddModal()">Add Product</button>
-      <!-- *ngIf="authService.hasFunction(permission.ADD_FUNCTION)" -->
-    <button class="btn import-btn btn-medium" (click)="importProducts()">Import Product</button>
-    <button class="btn export-btn btn-medium" (click)="exportProducts()">Export Product</button>
+    <button class="btn import-btn btn-medium" *ngIf="common.hasPermission(common.permissionName.IMPORT_PRODUCT)"
+      (click)="importProducts()">Import Product</button>
+    <button class="btn export-btn btn-medium" *ngIf="common.hasPermission(common.permissionName.EXPORT_PRODUCT)"
+      (click)="exportProducts()">Export Product</button>
   </div>
 
   <app-product-filter [filter]="productFilter" (applyEvent)="applyFilter($event)" (resetEvent)="resetFilter()">
@@ -67,9 +68,9 @@
 
             </th>
             <th
-              >
-              <!-- *ngIf="authService.hasFunction(permission.ADD_PERMISION)&&authService.hasFunction(permission.ADD_FUNCTION)" -->
-              Actions</th>
+              *ngIf="common.hasPermission(common.permissionName.UPDATE_PRODUCT) || common.hasPermission(common.permissionName.DELETE_PRODUCT)">
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -85,13 +86,17 @@
             <td class="col-250" style="height: auto;">
               <app-product-voucher [common]="common" [vouchers]="product.vouchers" [productId]="product.id"
                 (loadProductEvent)="loadProducts()">
-
               </app-product-voucher>
             </td>
-            <td class="col-75">
-              <button class="btn update-btn btn-icon" (click)="openUpdateModal(product)"><i
+            <td class="col-75"
+              *ngIf="common.hasPermission(common.permissionName.UPDATE_PRODUCT) || common.hasPermission(common.permissionName.DELETE_PRODUCT)"
+              >
+              <button *ngIf="common.hasPermission(common.permissionName.UPDATE_PRODUCT)"
+
+                class="btn update-btn btn-icon" (click)="openUpdateModal(product)"><i
                   class="fa-solid fa-pen-to-square"></i></button>
-              <button class="btn delete-btn btn-icon" (click)="confirmDelete(product)"><i
+              <button *ngIf="common.hasPermission(common.permissionName.DELETE_PRODUCT)"
+                class="btn delete-btn btn-icon" (click)="confirmDelete(product)"><i
                   class="fa-solid fa-trash"></i></button>
             </td>
           </tr>
@@ -120,15 +125,13 @@
     <h1 class="title center">No data available</h1>
   </ng-template>
 
-  <app-product-modal #productModal [common]="common" [product]="currentProduct"
-    (successEvent)="saveSuccess()">
+  <app-product-modal #productModal [common]="common" [product]="currentProduct" (successEvent)="saveSuccess()">
   </app-product-modal>
 
-  <app-confirm-modal #productConfirm [title]="'Do you want to delete this product?'"
-    (confirmEvent)="deleteProduct()">
+  <app-confirm-modal #productConfirm [title]="'Do you want to delete this product?'" (confirmEvent)="deleteProduct()">
   </app-confirm-modal>
 
-  <app-product-import #productImport [common]="common">
+  <app-product-import #productImport [common]="common" (successEvent)="loadProducts()">
 
   </app-product-import>
 </div>

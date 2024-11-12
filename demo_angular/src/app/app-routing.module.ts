@@ -25,7 +25,7 @@ export const routes: Routes = [
   },
   {
     path: RouterUrl.FUNCTION_MANAGEMENT,
-    component: FunctionComponent,  canActivate: [authGuard]
+    component: FunctionComponent, canActivate: [authGuard]
   },
   {
     path: RouterUrl.USER_PERMISION,

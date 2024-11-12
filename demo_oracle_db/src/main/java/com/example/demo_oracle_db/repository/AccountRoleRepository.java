@@ -14,12 +14,12 @@ public interface AccountRoleRepository extends CrudRepository<AccountRole,Long>,
 
     void deleteByAccountIdAndRoleId(Long accountId, Long roleId);
 
-
-
     @Modifying
     @Transactional
     @Query(value = "INSERT INTO cmd_account_role" +
             " (ACCOUNT_ID, ROLE_ID) " +
             " values (?1,?2)",nativeQuery = true)
-    Integer addAccountRole(Long accountId, Long roleId);
+    void addAccountRole(Long accountId, Long roleId);
+    @Query(value = "SELECT LAST_INSERT_ID()", nativeQuery = true)
+    Long getLastInsertedId();
 }

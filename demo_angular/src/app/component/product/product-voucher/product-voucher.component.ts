@@ -1,8 +1,10 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { ApiStatus, PermissionName } from '../../../constant/api.const.urls';
 import { Voucher } from '../../../model/voucher';
 import { CommonService } from '../../../service/common/common.service';
 import { HttpParams } from '@angular/common/http';
+import { ConfirmModalComponent } from '../../common/confirm-modal/confirm-modal.component';
+import { VoucherDetailComponent } from '../../voucher/voucher-detail/voucher-detail.component';
 
 @Component({
   selector: 'app-product-voucher',
@@ -14,9 +16,12 @@ export class ProductVoucherComponent {
   @Input() vouchers: Voucher[] = [];
   @Input() productId: number = 0;
   @Output() loadProductEvent = new EventEmitter<void>();
+
+  @ViewChild('confirmModal') confirmModal!: ConfirmModalComponent;
+  @ViewChild('detailComponent') detailComponent!: VoucherDetailComponent;
+
+
   curretVoucher: Voucher = {} as Voucher;
-  showConfirm = false;
-  showModal = false;
   code = '';
   input = false;
 
@@ -48,7 +53,7 @@ export class ProductVoucherComponent {
   deleteConfirm(voucher: Voucher) {
 
     this.curretVoucher = { ...voucher };
-    this.showConfirm = true;
+    this.confirmModal.showConfirmation = true;
   }
 
   onDeleteVoucher() {
@@ -75,7 +80,7 @@ export class ProductVoucherComponent {
   }
 
   closeConfirm() {
-    this.showConfirm = false;
+    this.confirmModal.showConfirmation = false;
     this.curretVoucher = {} as Voucher;
   }
 
@@ -90,11 +95,11 @@ export class ProductVoucherComponent {
 
   openModal(voucher: Voucher) {
     this.curretVoucher = { ...voucher }
-    this.showModal = true;
+    this.detailComponent.showDetail = true;
   }
 
   closeModal() {
-    this.showModal = false;
+    this.detailComponent.showDetail = false;
     this.curretVoucher = {} as Voucher
   }
 }

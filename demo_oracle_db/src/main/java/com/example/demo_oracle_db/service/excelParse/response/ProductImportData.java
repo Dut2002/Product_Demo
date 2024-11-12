@@ -1,5 +1,6 @@
 package com.example.demo_oracle_db.service.excelParse.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -32,4 +33,11 @@ public class ProductImportData {
     private String categoryName;
     @NotBlank
     private String supplierName;
+
+    private Boolean success;
+
+    @JsonIgnore
+    public boolean isFail(){
+        return success!=null && !success;
+    }
 }

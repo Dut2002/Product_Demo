@@ -9,13 +9,14 @@ import { Function } from '../../../model/function';
 })
 export class FunctionModalComponent implements OnInit{
 
-  @Input() isLoading = false;
+  showModal = false
+  isLoading = false;
   @Input() title = '';
   @Input() function!: Function;
-  save!: Function;
+  private save!: Function;
+
   @Output() addEvent = new EventEmitter<Function>();
   @Output() updateEvent = new EventEmitter<Function>();
-  @Output() closeEvent = new EventEmitter<void>();
 
   ngOnInit(): void {
       this.save = {...this.function};
@@ -25,6 +26,7 @@ export class FunctionModalComponent implements OnInit{
     if (!form.valid) {
       form.control.markAllAsTouched();
     } else {
+      this.isLoading = true;
       if (this.function.id) {
         this.updateEvent.emit(this.function);
       } else {
@@ -36,10 +38,6 @@ export class FunctionModalComponent implements OnInit{
   resetModal(form: NgForm){
     this.function = {...this.save}
     form.control.markAsUntouched();
-  }
-
-  closeModal() {
-    this.closeEvent.emit()
   }
 
 }

@@ -19,7 +19,10 @@ public interface ProductRepository extends CrudRepository<Product, Long>, JpaSpe
     @Query(value = "INSERT INTO cmd_product " +
             " (NAME, YEAR_MAKING, EXPIRE_DATE, QUANTITY, PRICE, CATEGORY_ID, SUPPLIER_ID) " +
             " values (?1,?2,?3,?4,?5, ?6, ?7)", nativeQuery = true)
-    Integer addProduct(String name, Long yearMaking, LocalDate expireDate, Integer quantity, Double price, Long categoryId, Long supplierId);
+    void addProduct(String name, Long yearMaking, LocalDate expireDate, Integer quantity, Double price, Long categoryId, Long supplierId);
+
+    @Query(value = "SELECT LAST_INSERT_ID()", nativeQuery = true)
+    Long getLastInsertedId();
 
     @Modifying
     @Transactional
@@ -29,4 +32,6 @@ public interface ProductRepository extends CrudRepository<Product, Long>, JpaSpe
     void updateProduct(Long id, String name, Long yearMaking, LocalDate expireDate, Integer quantity, Double price, Long categoryId, Long supplierId);
 
     Boolean existsByName(String name);
+
+    boolean existsByNameAndIdNot(String name, Long id);
 }

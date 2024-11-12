@@ -1,47 +1,19 @@
-<section class="accordion">
-  <div class="accordion-header">
-    <h1 class="title"><a [routerLink]="[]" fragment="{{currentFunc.id}}" (click)="toggle()">{{ name }}</a></h1>
-    <button class="btn btn-icon btn-red" (click)="deleteConfirm()"><i class="fa-solid fa-trash"></i></button>
+<div class="function-route">
+  <label class="form-label" for="beEndPoint">Front-end Route</label>
+  <div class="form-input-enter">
+    <input type="text" name="feRoute" [(ngModel)]="func.feRoute" [required]="true" disabled="true">
   </div>
-  <div class="content" *ngIf="open===currentFunc.id">
-    <div class="wrapper">
-      <div class="flex-box form-container">
-        <form #functionForm="ngForm" (ngSubmit)="onUpdateFunc()" class="form flex-half">
-          <div class="form-title flex-full">Function Details</div>
-          <input class="form-input-enter" type="hidden" [(ngModel)]="currentFunc.id" name="id" [required]="true">
-          <div class="form-input flex-full">
-            <label class="form-label" for="name">Name:</label>
-            <div class="form-input-enter">
-              <input type="text" [(ngModel)]="currentFunc.name" name="name" [required]="true">
-            </div>
-          </div>
-          <!-- <div class="form-input flex-full">
-            <label class="form-label" for="name">End Point:</label>
-            <div class="form-input-enter">
-              <input type="text" [(ngModel)]="currentFunc.endPoint" name="endPoint" [required]="true">
-            </div>
-            </div> -->
-          <div class="form-input center flex-full flex-align-end">
-            <input type="submit" class="btn btn-small btn-orange" value="Update">
-          </div>
-        </form>
-        <!-- <form (ngSubmit)="onChangeAccess()" class="form flex-half">
-          <div class="form-title flex-full">Role Accesses</div>
-          <input type="hidden" [(ngModel)]="currentFunc.id" name="id">
-          <div class="form-input flex-half" *ngFor="let roleAccess of currentFunc.roleAccesses;">
-            <label class="form-label">{{ roleAccess.roleName.replace('ROLE_', '') }}</label>
-            <input type="hidden" [(ngModel)]="roleAccess.roleId" name="roleId{{roleAccess.roleId}}" required>
-            <input type="checkbox" [(ngModel)]="roleAccess.permission" name="permission{{roleAccess.roleId}}">
-          </div>
-          <div class="form-input center flex-full flex-align-end">
-            <input type="submit" class="btn btn-small btn-blue" value="Change">
-          </div>
-        </form> -->
-      </div>
-    </div>
+</div>
+<div class="function-permission-list">
+  <div class="function-permission-title center">
+    Permission List
   </div>
-
-
-</section>
-
-
+  <app-permission-add [common]="common" [functionId]="func.id" (addEvent)="loadData()">
+  </app-permission-add>
+  <div class="permission-card border-dot" *ngFor="let permission of func.permissions">
+    <app-permission-details [common]="common" [permission]="permission"
+      (updateEvent)="updatePermission(permission.id, $event)"
+      (deleteEvent)="deletePermission(permission.id, $event)">
+    </app-permission-details>
+  </div>
+</div>

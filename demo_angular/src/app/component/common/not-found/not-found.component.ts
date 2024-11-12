@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ApiHeaders, ApiUrls } from '../../../constant/api.const.urls';
+import { RouterUrl } from '../../../constant/app.const.router';
+import { AuthService } from '../../../service/auth/auth.service';
 
 @Component({
   selector: 'app-not-found',
@@ -8,7 +10,7 @@ import { ApiHeaders, ApiUrls } from '../../../constant/api.const.urls';
   styleUrl: './not-found.component.scss'
 })
 export class NotFoundComponent {
-  constructor( private router: Router) {
+  constructor( private router: Router, private authen : AuthService) {
   }
 
   goBack(): void {
@@ -19,6 +21,7 @@ export class NotFoundComponent {
 
   // Điều hướng về trang login
   goToLogin(): void {
-    this.router.navigate([ApiUrls.Authentication.LOG_IN]);
+    this.authen.clearLocalStorage();
+    this.router.navigate([RouterUrl.LOG_IN]);
   }
 }

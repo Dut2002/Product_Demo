@@ -14,6 +14,5 @@ public class UpdatePermissionRequest {
     String name;
     @NotBlank
     String beEndPoint;
-    @NotNull
     Boolean defaultPermission;
 }

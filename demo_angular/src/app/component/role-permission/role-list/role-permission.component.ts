@@ -1,5 +1,5 @@
 import { HttpParams } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { finalize } from 'rxjs';
 import { ApiStatus, PermissionName } from '../../../constant/api.const.urls';
@@ -7,6 +7,8 @@ import { RouterUrl } from '../../../constant/app.const.router';
 import { RoleRes } from '../../../model/dto/role-res';
 import { Role } from '../../../model/role';
 import { CommonService } from '../../../service/common/common.service';
+import { ConfirmModalComponent } from '../../common/confirm-modal/confirm-modal.component';
+import { RoleModalComponent } from '../role-modal/role-modal.component';
 
 @Component({
   selector: 'app-role-permission',
@@ -14,13 +16,12 @@ import { CommonService } from '../../../service/common/common.service';
   styleUrl: './role-permission.component.scss'
 })
 export class RolePermissionComponent implements OnInit {
-  showModal = false;
-  modalLoading = false
-  showConfirmation = false;
-  confirmLoading = false;
   currentRole!: Role
   title!: string
   roleList!: RoleRes[]
+
+  @ViewChild('confirmModal') confirmModal!: ConfirmModalComponent;
+  @ViewChild('actionModal') actionModal!: RoleModalComponent;
 
   constructor(
     private common: CommonService,
@@ -50,12 +51,12 @@ export class RolePermissionComponent implements OnInit {
   }
 
   confirmDelete(role: RoleRes) {
-    this.showConfirmation = true
+    this.confirmModal.showConfirmation = true;
     this.currentRole = { ...role }
   }
 
   closeConfirm() {
-    this.showConfirmation = false;
+    this.confirmModal.showConfirmation = false;
   }
 
   deleteRole() {
@@ -68,7 +69,7 @@ export class RolePermissionComponent implements OnInit {
     params = params.set("id", this.currentRole.id)
     this.common.base.delete(endpoint, params).pipe(
       finalize(() => {
-        this.confirmLoading = false;
+        this.confirmModal.isLoading = false;
       }))
       .subscribe({
         next: res => {
@@ -77,7 +78,7 @@ export class RolePermissionComponent implements OnInit {
         },
         error: err => this.common.errorHandle.handle(err)
       })
-    this.closeConfirm();
+    this.confirmModal.close();
   }
 
   viewPermission(roleId: number) {
@@ -91,17 +92,13 @@ export class RolePermissionComponent implements OnInit {
   openAddModal() {
     this.currentRole = {} as Role
     this.title = "Add New Role"
-    this.showModal = true;
+    this.actionModal.showModal = true;
   }
 
   openUpdateModal(role: Role) {
     this.currentRole = { ...role }
-    this.showModal = true;
+    this.actionModal.showModal = true;
     this.title = "Update Role"
-  }
-
-  closeModal() {
-    this.showModal = false;
   }
 
   AddRole(role: Role) {
@@ -112,13 +109,13 @@ export class RolePermissionComponent implements OnInit {
     }
     this.common.base.post(endpoint, role).pipe(
       finalize(() => {
-        this.modalLoading = false;
+        this.actionModal.isLoading = false;
       }))
       .subscribe({
         next: res => {
           this.common.snackBar.show(null, res.content, ApiStatus.SUCCESS, 5000)
           this.loadData();
-          this.closeModal();
+          this.actionModal.closeModal();
         },
         error: err => this.common.errorHandle.handle(err),
       });
@@ -132,7 +129,7 @@ export class RolePermissionComponent implements OnInit {
     }
     this.common.base.put(endpoint, role).pipe(
       finalize(() => {
-        this.modalLoading = false;
+        this.actionModal.isLoading = false;
       }))
       .subscribe({
         next: res => {
@@ -141,7 +138,7 @@ export class RolePermissionComponent implements OnInit {
           if (roleIndex !== -1) {
             this.roleList[roleIndex].name = role.name;
           }
-          this.closeModal();
+          this.actionModal.closeModal();
         },
         error: err => this.common.errorHandle.handle(err),
       })

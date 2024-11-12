@@ -10,7 +10,9 @@ export class VoucherDetailComponent {
   @Input() voucher = {} as Voucher
   @Output() closeEvent = new EventEmitter<void>();
 
-  onClose(){
+  showDetail = false;
+
+  onClose() {
     this.closeEvent.emit();
   }
 }

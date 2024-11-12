@@ -3,7 +3,6 @@ package com.example.demo_oracle_db.repository;
 import com.example.demo_oracle_db.entity.Account;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -36,11 +35,12 @@ public interface AccountRepository extends CrudRepository<Account, Long>, JpaSpe
     void updateToken(String accessToken, String refreshToken, Long id);
 
     @Modifying
-    @Transactional
     @Query(value = "INSERT INTO cmd_account" +
             " (USERNAME, PASSWORD, EMAIL, FULL_NAME) " +
             " values (?1,?2,?3,?4)",nativeQuery = true)
-    Integer addAccount(String username, String password, String email, String fullName);
+    void addAccount(String username, String password, String email, String fullName);
+    @Query(value = "SELECT LAST_INSERT_ID()", nativeQuery = true)
+    Long getLastInsertedId();
 
     @Modifying
     @Transactional

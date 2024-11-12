@@ -17,7 +17,7 @@ public class UserPermissionController {
     UserPermissionService userPermissionService;
 
     @GetMapping("view-user-permissions")
-    public ResponseEntity<?> getUserPermissions(@RequestParam Long id) {
+    public ResponseEntity<?> getUserPermissions(@RequestParam Long id) throws DodException {
         return ResponseEntity.ok(userPermissionService.getPermissionsByRole(id));
     }
 

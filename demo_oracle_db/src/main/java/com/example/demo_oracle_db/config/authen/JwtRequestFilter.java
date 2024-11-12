@@ -97,8 +97,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             SecurityContextHolder.clearContext();
         }
-        System.out.println(response.getHeaderNames());
-        System.out.println(request.getHeaderNames());
         // go to the next filter in the filter chain
         filterChain.doFilter(request, response);
     }

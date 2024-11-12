@@ -1,6 +1,7 @@
 package com.example.demo_oracle_db.service.userPermisson.impl;
 
 import com.example.demo_oracle_db.entity.Permission;
+import com.example.demo_oracle_db.entity.Role;
 import com.example.demo_oracle_db.entity.RolePermission;
 import com.example.demo_oracle_db.exception.DodException;
 import com.example.demo_oracle_db.repository.FunctionRepository;
@@ -8,6 +9,7 @@ import com.example.demo_oracle_db.repository.PermissionRepository;
 import com.example.demo_oracle_db.repository.RolePermissionRepository;
 import com.example.demo_oracle_db.repository.RoleRepository;
 import com.example.demo_oracle_db.service.role.response.FunctionDto;
+import com.example.demo_oracle_db.service.role.response.RolePermissionRes;
 import com.example.demo_oracle_db.service.userPermisson.UserPermissionService;
 import com.example.demo_oracle_db.service.userPermisson.request.*;
 import com.example.demo_oracle_db.util.MessageCode;
@@ -32,9 +34,15 @@ public class UserPermissionServiceImpl implements UserPermissionService {
     RoleRepository roleRepository;
 
     @Override
-    public List<FunctionDto> getPermissionsByRole(Long roleId) {
+    public RolePermissionRes getPermissionsByRole(Long roleId) throws DodException {
+        String roleName = roleRepository.findNameById(roleId).orElseThrow(()->new DodException(MessageCode.ROLE_NOT_FOUND));
         List<Permission> permissions = permissionRepository.findPermissionsByRole(List.of(roleId));
-        return FunctionDto.mapByPermission(permissions);
+        List<FunctionDto> functions = FunctionDto.mapByPermission(permissions);
+        RolePermissionRes res = new RolePermissionRes();
+        res.setId(roleId);
+        res.setName(roleName);
+        res.setFunctions(functions);
+        return res;
     }
 
     @Override
@@ -86,17 +94,16 @@ public class UserPermissionServiceImpl implements UserPermissionService {
         if (functionRepository.existsByFeRoute(request.getFeRoute())) {
             throw new DodException(MessageCode.FUNCTION_FE_ROUTE_EXISTS, request.getFeRoute());
         }
-
-        Integer functionId = functionRepository.addFunction(request.getFunctionName(),request.getFeRoute());
-
-        Integer permissionId = permissionRepository.addPermission(
+        functionRepository.addFunction(request.getFunctionName(),request.getFeRoute());
+        Long functionId = functionRepository.getLastInsertedId();
+        permissionRepository.addPermission(
                 "View " + request.getFunctionName(),
                 "/api/" + request.getFeRoute().trim(),
-                Long.valueOf(functionId),
+                functionId,
                 1
                 );
-
-        rolePermissionRepository.addPermissionRole(Long.valueOf(permissionId), request.getRoleId());
+        Long permissionId = permissionRepository.getLastInsertedId();
+        rolePermissionRepository.addPermissionRole(permissionId, request.getRoleId());
     }
 
     @Override
@@ -141,8 +148,9 @@ public class UserPermissionServiceImpl implements UserPermissionService {
         if (permissionRepository.existsByBeEndPointAndFunctionId(request.getBeEndPoint(), request.getFunctionId())) {
             throw new DodException(MessageCode.PERMISSION_BE_ENDPOINT_EXISTS);
         }
-        Integer permissionId = permissionRepository.addPermission(request.getName(), request.getBeEndPoint(), request.getFunctionId(), request.getDefaultPermission() ? 1 : 0);
-        rolePermissionRepository.addPermissionRole(Long.valueOf(permissionId), request.getRoleId());
+        permissionRepository.addPermission(request.getName(), request.getBeEndPoint(), request.getFunctionId(), request.getDefaultPermission() ? 1 : 0);
+        Long permissionId = permissionRepository.getLastInsertedId();
+        rolePermissionRepository.addPermissionRole(permissionId, request.getRoleId());
     }
 
     @Override

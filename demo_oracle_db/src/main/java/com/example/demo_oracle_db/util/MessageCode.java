@@ -35,6 +35,7 @@ public enum MessageCode {
     REFRESH_FAILED("Refresh failed!"),
     USER_UNAUTHORIZED("User is unauthorized to access this resource!"),
     PRODUCT_NOT_EXIST("Product does not exist!"),
+    PRODUCT_NAME_EXIST("Product name already exist!"),
     ADD_PRODUCT_FAILED("Add new product failed!"),
     UPDATE_PRODUCT_FAILED("Update product with [%id] failed!"),
     DELETE_PRODUCT_FAILED("Delete product with [%id] failed!"),
@@ -51,7 +52,9 @@ public enum MessageCode {
     DELETE_VOUCHER_FAILED("Delete voucher from product failed!"),
     VOUCHER_PRODUCT_NOT_FOUND("Voucher not found in product"),
     ILLEGAL_EXTENSION("Unsupported file type [%s]"),
-    STATUS_NOT_FOUND("Status not found!");
+    STATUS_NOT_FOUND("Status not found!"),
+    CATEGORY_NOT_EXIST("Category not found"),
+    SUPPLIER_NOT_EXIST("Supplier not found"), PRODUCT_IN_ORDER("Product has in order!");
 
     private final String code;
 

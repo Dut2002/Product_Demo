@@ -3,46 +3,28 @@
   <div class="table-actions">
     <button class="btn add-btn btn-medium" (click)="openAddModal()">Add Function</button>
     <button class="btn add-btn btn-medium" (click)="loadList()">Refresh</button>
-
   </div>
   <div class="accordion-container">
-    <section class="accordion" *ngFor="let func of listFunction">
+    <section class="accordion" [ngClass]="{'accordion-selected':openSectionId == func.id}" *ngFor="let func of listFunction">
       <div class="accordion-header">
         <h1 class="title"><a [routerLink]="[]" fragment="{{func.id}}" (click)="toggle(func)">{{func.name}}</a></h1>
         <div class="accordion-action">
-          <button class="btn btn-icon btn-orange" (click)="openUpdateModal(func)"><i class="fa-solid fa-pen-to-square"></i></button>
+          <button class="btn btn-icon btn-orange" (click)="openUpdateModal(func)"><i
+              class="fa-solid fa-pen-to-square"></i></button>
           <button class="btn btn-icon btn-red" (click)="confirmDelete(func)"><i class="fa-solid fa-trash"></i></button>
         </div>
       </div>
       <div class="content hidden" [ngClass]="{'hidden': openSectionId !== func.id}">
         <div class="wrapper">
-          <div class="function-route">
-            <label class="form-label"  for="beEndPoint">Front-end Route</label>
-            <div class="form-input-enter">
-              <input type="text" name="feRoute" [(ngModel)]="func.feRoute" [required]="true" disabled="true">
-            </div>
-          </div>
-          <div class="function-permission-list">
-            <div class="function-permission-title center">
-              Permission List
-            </div>
-            <app-permission-add  [functionId]="func.id" [isLoading]="addLoading" [isShow]="showAdd" (addEvent)="addPermission($event)">
-            </app-permission-add>
-            <div class="permission-card border-dot" *ngFor="let permission of func.permissions">
-              <app-permission-details  [permission]="permission"
-                (updateEvent)="updatePermission(func, permission.id, $event)"
-                (deleteEvent)="deletePermission(func, permission.id)">
-              </app-permission-details>
-            </div>
-          </div>
+          <app-function-detail [common]="common" [func]="func" (deleteEvent)="removeFunction($event)">
+          </app-function-detail>
         </div>
       </div>
     </section>
   </div>
-  <app-function-modal *ngIf="showModal" [isLoading]="modalLoading" [function]="currentFunction" [title]="modalTitle" (updateEvent)="updateFunction($event)" (addEvent)="addFunction($event)"
-    (closeEvent)="closeModal()">
+  <app-function-modal #actionModal [function]="currentFunction" [title]="modalTitle" (updateEvent)="updateFunction($event)"
+    (addEvent)="addFunction($event)">
   </app-function-modal>
-  <app-confirm-modal *ngIf="showConfirmation" [title]="'Do you want to delete this function?'"
-    (confirmEvent)="deleteFunction()" (closeEvent)="cancleConfirm()">
+  <app-confirm-modal #confirmModal [title]="'Do you want to delete this function?'" (confirmEvent)="deleteFunction()">
   </app-confirm-modal>
 </div>

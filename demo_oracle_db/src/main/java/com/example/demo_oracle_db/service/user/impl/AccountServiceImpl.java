@@ -74,11 +74,12 @@ public class AccountServiceImpl implements AccountService {
         if (accountRepository.existsByEmail(req.getEmail())) {
             throw new DodException(MessageCode.EMAIL_ALREADY_EXISTS);
         }
-        Integer accountId = accountRepository.addAccount(
+         accountRepository.addAccount(
                 req.getUsername(),
                 bCryptPasswordEncoder.encode(req.getPassword()),
                 req.getEmail(),
                 req.getFullName());
+        Long accountId = accountRepository.getLastInsertedId();
         for (Long roleId : req.getRoles()
         ) {
             if (!roleRepository.existsById(roleId)) {

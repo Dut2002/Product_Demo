@@ -122,14 +122,15 @@ public class LoginServiceImpl implements LoginService {
         }
 
         try {
-            Integer accountId = accountRepository.addAccount(
+            accountRepository.addAccount(
                     req.getUsername(),
                     bCryptPasswordEncoder.encode(req.getPassword()),
                     req.getEmail(),
                     req.getFullName()
             );
+            Long accountId = accountRepository.getLastInsertedId();
             Long roleId = roleRepository.findIdByName(Constants.Role.CUSTOMER).orElseThrow(() -> new DodException(MessageCode.ROLE_NOT_FOUND));
-            accountRoleRepository.addAccountRole(Long.valueOf(accountId), roleId);
+            accountRoleRepository.addAccountRole(accountId, roleId);
         } catch (Exception e) {
             throw new DodException(MessageCode.REGISTER_USER_FAILED);
         }
