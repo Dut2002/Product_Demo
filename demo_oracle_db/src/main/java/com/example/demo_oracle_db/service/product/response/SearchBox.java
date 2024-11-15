@@ -34,4 +34,9 @@ public class SearchBox {
         this.id = role.getId();
         this.name = role.getName();
     }
+
+    public SearchBox(Object[] o) {
+        this.id = ((Long) o[0]);
+        this.name = o[1].toString();
+    }
 }

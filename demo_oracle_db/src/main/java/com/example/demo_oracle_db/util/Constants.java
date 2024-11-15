@@ -1,5 +1,8 @@
 package com.example.demo_oracle_db.util;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 public class Constants {
     public interface ApiStatus {
         String SUCCESS = "SUCCESS";
@@ -16,9 +19,10 @@ public class Constants {
         Banned // bị cấm, không thể khôi phục
     }
     public interface Role {
-        String ADMIN = "ADMIN";
-        String SYS_ADMIN = "STAFF";
-        String CUSTOMER = "CUSTOMER";
+        String ADMIN = "ROLE_ADMIN";
+        String SYS_ADMIN = "ROLE_STAFF";
+        String CUSTOMER = "ROLE_CUSTOMER";
+        String SUPPLIER = "ROLE_SUPPLIER";
     }
 
     public interface TypeImport {
@@ -41,5 +45,21 @@ public class Constants {
                 default -> throw new IllegalArgumentException("Unsupported type Import");
             }
         }
+    }
+
+    public enum ApprovalType {
+        SUPPLIER_REGISTRATION,
+        PRODUCT,
+        PROMOTION
+    }
+
+    @AllArgsConstructor
+    @Getter
+    public enum ApprovalStatus {
+        PENDING("Pending"),
+        APPROVED("Approved"),
+        REJECTED("Rejected"),
+        CANCELED("Canceled");
+        private final String status;
     }
 }

@@ -221,7 +221,7 @@ export class ProductImportComponent implements OnInit {
   validateData(skipError: boolean) {
     this.isLoading = true;
     this.disableButton = true;
-    const endpoint = this.common.getPermission(PermissionName.UPLOAD_PRODUCT)
+    const endpoint = this.common.getPermission(PermissionName.ProductManagement.UPLOAD_PRODUCT)
     if (!endpoint) {
       this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
       return;
@@ -278,7 +278,7 @@ export class ProductImportComponent implements OnInit {
     this.disableButton = true;
     this.isLoading = true;
 
-    const endpoint = this.common.getPermission(PermissionName.IMPORT_PRODUCT)
+    const endpoint = this.common.getPermission(PermissionName.ProductManagement.IMPORT_PRODUCT)
     if (!endpoint) {
       this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
       return;

@@ -40,6 +40,13 @@ export class BaseService {
     return this.http.delete(`${env+endpoint}`, {params});
   }
 
+  deleteBody(endpoint: string, body: any): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+    return this.http.delete(`${env+endpoint}`, {headers, body});
+  }
+
   // uploadFile(endpoint: string, formData: FormData): Observable<HttpEvent<string[]>> {
   //   return this.http.post<string[]>(`${env+endpoint}`, formData, {
   //     reportProgress:true,

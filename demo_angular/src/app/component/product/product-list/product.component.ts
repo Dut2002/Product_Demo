@@ -45,7 +45,7 @@ export class ProductComponent implements OnInit {
   }
 
   loadProducts(): void {
-    const endpoint = this.common.getPermission(PermissionName.VIEW_PRODUCTS)
+    const endpoint = this.common.getPermission(PermissionName.ProductManagement.VIEW_PRODUCTS)
     if (!endpoint) {
       this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
       return;
@@ -98,7 +98,7 @@ export class ProductComponent implements OnInit {
   }
 
   deleteProduct() {
-    const endpoint = this.common.getPermission(PermissionName.DELETE_PRODUCT)
+    const endpoint = this.common.getPermission(PermissionName.ProductManagement.DELETE_PRODUCT)
     if (!endpoint) {
       this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
       return;
@@ -129,7 +129,7 @@ export class ProductComponent implements OnInit {
   }
 
   exportProducts() {
-    const endpoint = this.common.getPermission(PermissionName.EXPORT_PRODUCT)
+    const endpoint = this.common.getPermission(PermissionName.ProductManagement.EXPORT_PRODUCT)
     if (!endpoint) {
       this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
       return;

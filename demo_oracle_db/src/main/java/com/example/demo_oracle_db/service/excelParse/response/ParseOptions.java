@@ -1,9 +1,10 @@
 package com.example.demo_oracle_db.service.excelParse.response;
 
 import com.example.demo_oracle_db.util.Constants;
-import lombok.*;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data

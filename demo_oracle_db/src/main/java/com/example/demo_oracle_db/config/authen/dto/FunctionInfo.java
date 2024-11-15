@@ -29,7 +29,7 @@ public class FunctionInfo {
             Function func = entry.getKey();
             List<Permission> permissionsList = entry.getValue();
             return new FunctionInfo(
-                    func.getFunctionName(),
+                    func.getName(),
                     func.getFeRoute(),
                     permissionsList.stream().map(PermissionInfo::new).toList()
             );

@@ -17,4 +17,12 @@ public class PermissionDto {
         beEndPoint = permission.getBeEndPoint();
         defaultPermission = permission.getDefaultPermission()==1;
     }
+
+    public PermissionDto(Long id, String name, String beEndPoint, Integer defaultPermission) {
+        this.id = id;
+        this.name = name;
+        this.beEndPoint = beEndPoint;
+        this.defaultPermission = defaultPermission==1;
+    }
+
 }

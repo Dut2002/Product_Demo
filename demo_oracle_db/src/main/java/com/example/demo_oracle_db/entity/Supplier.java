@@ -35,6 +35,14 @@ public class Supplier {
     @Column(name = "WEBSITE")
     private String website;
 
+    @Basic
+    @Column(name = "ACCOUNT_ID")
+    private Long accountId;
+
+    @OneToOne(optional = false)
+    @JoinColumn(name = "ACCOUNT_ID", updatable = false, insertable = false)
+    private Account account;
+
     @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Product> products;
 }

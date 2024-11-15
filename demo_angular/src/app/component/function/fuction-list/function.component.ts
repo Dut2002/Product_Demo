@@ -41,7 +41,7 @@ export class FunctionComponent implements OnInit {
   }
 
   loadList() {
-    const endpoint = this.common.getPermission(PermissionName.VIEW_FUNCTIONS)
+    const endpoint = this.common.getPermission(PermissionName.FunctionManagement.VIEW_FUNCTIONS)
     if (!endpoint) {
       this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
       return;
@@ -73,7 +73,7 @@ export class FunctionComponent implements OnInit {
 
 
   addFunction(func: Function) {
-    const endpoint = this.common.getPermission(PermissionName.ADD_FUNCTION)
+    const endpoint = this.common.getPermission(PermissionName.FunctionManagement.ADD_FUNCTION)
     if (!endpoint) {
       this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
       return;
@@ -97,7 +97,7 @@ export class FunctionComponent implements OnInit {
   }
 
   updateFunction(func: Function) {
-    const endpoint = this.common.getPermission(PermissionName.UPDATE_FUNCTION)
+    const endpoint = this.common.getPermission(PermissionName.FunctionManagement.UPDATE_FUNCTION)
     if (!endpoint) {
       this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
       return;
@@ -123,7 +123,7 @@ export class FunctionComponent implements OnInit {
   }
 
   deleteFunction() {
-    const endpoint = this.common.getPermission(PermissionName.DELETE_FUNCTION)
+    const endpoint = this.common.getPermission(PermissionName.FunctionManagement.DELETE_FUNCTION)
     if (!endpoint) {
       this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
       return;

@@ -35,7 +35,7 @@ export class PermissionDetailsComponent implements OnInit {
   updatePermission(form: NgForm) {
     if (form.valid) {
       this.isLoading = true;
-      const endpoint = this.common.getPermission(PermissionName.UPDATE_PERMISSION);
+      const endpoint = this.common.getPermission(PermissionName.FunctionManagement.UPDATE_PERMISSION);
       if (!endpoint) {
         this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
         return;
@@ -63,7 +63,7 @@ export class PermissionDetailsComponent implements OnInit {
   }
 
   deleteConfirm() {
-    const endpoint = this.common.getPermission(PermissionName.CHECK_DELETE_PERMISSION);
+    const endpoint = this.common.getPermission(PermissionName.FunctionManagement.CHECK_DELETE_PERMISSION);
     if (!endpoint) {
       this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
       return;
@@ -80,7 +80,7 @@ export class PermissionDetailsComponent implements OnInit {
   }
 
   deletePermission() {
-    const endpoint = this.common.getPermission(PermissionName.DELETE_PERMISSION);
+    const endpoint = this.common.getPermission(PermissionName.FunctionManagement.DELETE_PERMISSION);
     if (!endpoint) {
       this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
       return;

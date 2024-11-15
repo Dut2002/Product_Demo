@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class RegisReq {
@@ -27,4 +29,6 @@ public class RegisReq {
     @Size(max = 100)
     @Email(message = "Email format invalid")
     private String email;
+
+    private List<Long> roles;
 }

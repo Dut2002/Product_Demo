@@ -29,8 +29,8 @@ export class HeaderComponent {
   }
 
   @Input() title = 'Title';
-  @Input() isNavVisible: boolean = false;
-  @Output() scrollEvent = new EventEmitter<number>();
+
+  isOpen = false;
 
   logOut() {
     this.loginService.logout().subscribe({
@@ -44,35 +44,7 @@ export class HeaderComponent {
     });
   }
 
-  @HostListener('window:scroll', [])
-  onWindowScroll() {
-    const scrollTop = document.documentElement.scrollTop || document.body.scrollTop || 0;
-
-    // Kiểm tra điều kiện cuộn dưới 1000px
-    if (scrollTop < 1000) {
-      const backgroundSize = parseInt((scrollTop).toString()) + '%';
-      const top = 50 + (scrollTop * 0.1) + '%';
-      const opacity = 1 - (scrollTop * 0.003);
-
-      this.renderer.setStyle(this.el.nativeElement.querySelector('.hero'), 'background-size', backgroundSize);
-      this.renderer.setStyle(this.el.nativeElement.querySelector('.hero h1'), 'top', top);
-      this.renderer.setStyle(this.el.nativeElement.querySelector('.hero h1'), 'opacity', opacity);
-    }
-
-    this.scrollEvent.emit(scrollTop);  // Phát sự kiện với vị trí cuộn
-
-    this.updateNavBackground(scrollTop);
-
-  }
-
-  private updateNavBackground(scrollTop: number) {
-    const navBg = this.el.nativeElement.querySelector('.nav-bg');
-    if (this.isNavVisible) {
-      this.renderer.removeClass(navBg, 'bg-hidden');
-      this.renderer.addClass(navBg, 'bg-visible');
-    } else {
-      this.renderer.removeClass(navBg, 'bg-visible');
-      this.renderer.addClass(navBg, 'bg-hidden');
-    }
+  clickNav(){
+    this.isOpen = !this.isOpen;
   }
 }

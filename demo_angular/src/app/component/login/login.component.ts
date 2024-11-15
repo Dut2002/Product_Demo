@@ -61,15 +61,9 @@ export class LoginComponent {
   redirectToPage() {
     const roles = this.common.auth.getRoles();
     if (!this.common.auth.isTokenExpired() && roles.length > 0) {
-      if (roles.includes(Role.ADMIN)) {
-        this.router.navigate([RouterUrl.USER_ROLE]);
-      } else if (roles.includes(Role.STAFF)) {
-        this.router.navigate([RouterUrl.PRODUCT_MANAGEMENT]);
-      } else if (roles.includes(Role.CUSTOMER)) {
-        this.router.navigate([RouterUrl.SHOPPING]);
-      } else {
-        this.common.auth.clearLocalStorage();
-      }
+      this.router.navigate([RouterUrl.HOME]);
+    }else{
+      this.common.auth.clearLocalStorage();
     }
   }
 }

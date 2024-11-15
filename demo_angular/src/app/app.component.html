@@ -1,4 +1,4 @@
-<app-header (scrollEvent)="onScroll($event)" [title]="'APP MANAGEMENT'" [isNavVisible]="isNavVisible"
+<app-header [title]="'APP MANAGEMENT'"
 *ngIf="!authService.isTokenExpired()"
 ></app-header>
 <div class="content-wrapper">

@@ -1,10 +1,8 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChange } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ProductFilter } from '../../../model/dto/product-filter';
 import { SearchBoxDto } from '../../../model/dto/search-box-dto';
 import { ErrorHandleService } from '../../../service/error-handle/error-handle.service';
-import { SnackBarService } from '../../../service/snack-bar/snack-bar.service';
 import { ProductService } from '../../../service/product/product.service';
-import { CommonService } from '../../../service/common/common.service';
 
 @Component({
   selector: 'app-product-filter',

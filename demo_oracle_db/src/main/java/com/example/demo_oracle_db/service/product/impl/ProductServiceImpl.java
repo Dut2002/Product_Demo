@@ -179,7 +179,7 @@ public class ProductServiceImpl implements ProductService {
                     request.getSupplierId()
             );
         } catch (Exception e) {
-            throw new DodException(MessageCode.UPDATE_PRODUCT_FAILED, request.getId());
+            throw new DodException(MessageCode.UPDATE_PRODUCT_FAILED, request.getId(),null);
         }
     }
 

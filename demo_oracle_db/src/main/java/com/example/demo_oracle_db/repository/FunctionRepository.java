@@ -8,14 +8,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 @Transactional
 public interface FunctionRepository extends CrudRepository<Function, Long>, JpaSpecificationExecutor<Function> {
 
 
-    boolean existsByFunctionName(String functionName);
+    boolean existsByName(String functionName);
 
-    boolean existsByFunctionNameAndIdNot(String name, Long id);
+    boolean existsByNameAndIdNot(String name, Long id);
 
     boolean existsByFeRoute(String feRoute);
 
@@ -31,4 +33,10 @@ public interface FunctionRepository extends CrudRepository<Function, Long>, JpaS
     @Query(value = "UPDATE cmd_function SET FUNCTION_NAME = ?2, FE_ROUTE = ?3 " +
             " WHERE ID = ?1 ", nativeQuery = true)
     void updateFunction(Long id, String name, String feRoute);
+
+    @Query(value = "select f.ID, f.FUNCTION_NAME from cmd_function f" +
+            " where NOT EXISTS(" +
+            " select 1 from cmd_function_role" +
+            " where function_id = f.ID and role_id = ?1)" , nativeQuery = true)
+    List<Object[]> getFunctionRoleNot(Long id);
 }

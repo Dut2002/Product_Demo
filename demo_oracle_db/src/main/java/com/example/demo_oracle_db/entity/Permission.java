@@ -34,5 +34,5 @@ public class Permission {
     private Function function;
 
     @OneToMany(mappedBy = "permission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<RolePermission> rolePermissions;
+    private List<RolePermission> rolePermissionList;
 }

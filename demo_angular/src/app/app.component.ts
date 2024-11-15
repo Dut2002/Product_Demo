@@ -9,11 +9,5 @@ import { AuthService } from './service/auth/auth.service';
 export class AppComponent {
   constructor(public authService: AuthService
   ) { }
-
-  isNavVisible = false;
-
-  onScroll(scrollTop: number) {
-    this.isNavVisible = scrollTop >= 150; // Ví dụ, nếu cuộn đến 300px
-  }
   title = 'demo_angular';
 }

@@ -62,7 +62,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public void deleteRole(Long id) throws DodException {
         if (!roleRepository.existsById(id)) {
-            throw new DodException(MessageCode.ROLE_NOT_EXIST, id);
+            throw new DodException(MessageCode.ROLE_NOT_EXIST);
         }
         roleRepository.deleteById(id);
     }

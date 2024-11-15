@@ -66,4 +66,26 @@ public interface PermissionRepository extends CrudRepository<Permission, Long>, 
     @Query(value = "select ID from cmd_permission where FUNCTION_ID = ?1", nativeQuery = true)
     List<Long> getIdByFunctionId(Long id);
     boolean existsByIdNotAndFunctionIdAndDefaultPermission(Long permissionId, Long functionId, int i);
+
+    @Query(nativeQuery = true, value = "select cmd_permission.ID, cmd_permission.NAME from cmd_function " +
+            " inner join cmd_permission on cmd_function.Id = ?2 and cmd_function.ID = cmd_permission.FUNCTION_ID " +
+            " where not exists(" +
+            " select 1 from cmd_role inner join cmd_role_permission crp " +
+            " on cmd_role.ID = ?1 AND cmd_role.ID = crp.ROLE_ID" +
+            " AND crp.PERMISSION_ID = cmd_permission.ID)")
+    List<Object[]> getPermissionRoleNot(Long roleId, Long functionId);
+
+    @Query(nativeQuery = true, value = " select p.* from cmd_function " +
+            " inner join demo.cmd_permission p on cmd_function.ID = ?2 AND cmd_function.ID = p.FUNCTION_ID" +
+            " inner join demo.cmd_role_permission crp on crp.ROLE_ID=?1 AND p.ID = crp.PERMISSION_ID")
+    List<Permission> getUserFunctionPermission(Long roleId, Long functionId);
+
+    boolean existsByIdAndDefaultPermission(Long permissionId, int defaultPermission);
+
+    @Query(value = "select ID from cmd_permission where FUNCTION_ID = ?1 AND default_permission = ?2", nativeQuery = true)
+
+    List<Long> getIdByFunctionIdAndDefaultPermission(Long functionId, int defaultPermission);
+
+    @Query(value = "select FUNCTION_ID from cmd_permission where ID = ?1", nativeQuery = true)
+    Long getFunctionIdById(Long permissionId);
 }

@@ -18,7 +18,7 @@ public class Function {
     private Long id;
     @Basic
     @Column(name = "FUNCTION_NAME", nullable = false, unique = true)
-    private String functionName;
+    private String name;
     @Basic
     @Column(name = "FE_ROUTE")
     private String feRoute;
@@ -26,4 +26,8 @@ public class Function {
     @JsonIgnore
     @OneToMany(mappedBy = "function", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Permission> permissions;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "function", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    private List<FunctionRole> functionRoleList;
 }

@@ -30,7 +30,7 @@ export class PermissionAddComponent {
     if (form.valid) {
       this.isLoading = true;
 
-      const endpoint = this.common.getPermission(PermissionName.ADD_PERMISSION)
+      const endpoint = this.common.getPermission(PermissionName.FunctionManagement.ADD_PERMISSION)
       if (!endpoint) {
         this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
         this.isLoading = false;
@@ -50,7 +50,7 @@ export class PermissionAddComponent {
           next: (res) => {
             this.common.snackBar.show(null, res.content, ApiStatus.SUCCESS, 5000)
             this.addEvent.emit()
-            this.isShow = false;
+            this.onClose()
           },
           error: (err) => {
             this.common.errorHandle.handle(err);
@@ -65,9 +65,7 @@ export class PermissionAddComponent {
     form.control.markAsUntouched();
   }
 
-  onShow() {
-    this.isShow = true;
-  }
+
 
   onClose() {
     this.isShow = false;

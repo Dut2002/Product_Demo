@@ -96,7 +96,7 @@ public class AccountServiceImpl implements AccountService {
             throw new DodException(MessageCode.USER_NOT_FOUND);
         }
         if (accountRepository.existsByUsernameAndIdNot(req.getUsername(), req.getId())) {
-            throw new DodException(MessageCode.USER_NAME_ALREADY_EXISTS, req.getUsername());
+            throw new DodException(MessageCode.USER_NAME_ALREADY_EXISTS, req.getUsername(),null);
         }
         if (accountRepository.existsByEmailAndIdNot(req.getEmail(), req.getId())) {
             throw new DodException(MessageCode.EMAIL_ALREADY_EXISTS, req.getUsername());

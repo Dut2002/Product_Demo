@@ -129,8 +129,16 @@ public class LoginServiceImpl implements LoginService {
                     req.getFullName()
             );
             Long accountId = accountRepository.getLastInsertedId();
-            Long roleId = roleRepository.findIdByName(Constants.Role.CUSTOMER).orElseThrow(() -> new DodException(MessageCode.ROLE_NOT_FOUND));
-            accountRoleRepository.addAccountRole(accountId, roleId);
+            if(req.getRoles()!=null){
+                for (Long roleId: req.getRoles()
+                     ) {
+                    if(!roleRepository.existsById(roleId)) throw new DodException(MessageCode.ROLE_NOT_FOUND);
+                    accountRoleRepository.addAccountRole(accountId, roleId);
+                }
+            }else{
+                Long roleId = roleRepository.findIdByName(Constants.Role.CUSTOMER).orElseThrow(() -> new DodException(MessageCode.ROLE_NOT_FOUND));
+                accountRoleRepository.addAccountRole(accountId, roleId);
+            }
         } catch (Exception e) {
             throw new DodException(MessageCode.REGISTER_USER_FAILED);
         }

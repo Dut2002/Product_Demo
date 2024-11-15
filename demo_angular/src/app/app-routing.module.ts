@@ -11,6 +11,7 @@ import { RouterUrl } from './constant/app.const.router';
 import { FileProgressComponent } from './example/file-progress/file-progress.component';
 import { authGuard } from './guard/auth.guard';
 import { FunctionComponent } from './component/function/fuction-list/function.component';
+import { MySupplierComponent } from './component/my-supplier/container/my-supplier.component';
 
 export const routes: Routes = [
 
@@ -30,6 +31,10 @@ export const routes: Routes = [
   {
     path: RouterUrl.USER_PERMISION,
     component: RolePermissionDetailComponent, canActivate: [authGuard]
+  },
+  {
+    path: RouterUrl.MY_SUPPLIER,
+    component: MySupplierComponent, canActivate: [authGuard]
   },
   {
     path: RouterUrl.FORBIDDEN,

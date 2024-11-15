@@ -62,5 +62,12 @@ public interface AccountRepository extends CrudRepository<Account, Long>, JpaSpe
             " SET STATUS = ?4 " +
             " WHERE ID = ?1",nativeQuery = true)
     void changeStatus(Long id, String status);
+
+    @Query(value = "select ID from cmd_account " +
+            " WHERE USERNAME = ?1",nativeQuery = true)
+    Optional<Long> getIdByUserName(String username);
+    @Query(value = "select FULL_NAME from cmd_account " +
+            " WHERE ID = ?1",nativeQuery = true)
+    Optional<String> getFullNameById(Long accountId);
 }
 

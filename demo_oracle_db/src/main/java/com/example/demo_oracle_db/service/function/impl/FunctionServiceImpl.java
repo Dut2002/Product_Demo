@@ -27,17 +27,16 @@ class FunctionServiceImpl implements FunctionService {
     FunctionRepository functionRepository;
     @Autowired
     PermissionRepository permissionRepository;
-
     @Autowired
     RolePermissionRepository rolePermissionRepository;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addFunction(AddFunctionRequest request) throws DodException {
-        if (functionRepository.existsByFunctionName(request.getName())) {
+        if (functionRepository.existsByName(request.getName())) {
             throw new DodException(MessageCode.FUNCTION_NAME_EXISTS, request.getName());
         }
-        if (functionRepository.existsByFunctionName(request.getName())) {
+        if (functionRepository.existsByName(request.getName())) {
             throw new DodException(MessageCode.FUNCTION_FE_ROUTE_EXISTS, request.getFeRoute());
         }
         functionRepository.addFunction(
@@ -57,7 +56,7 @@ class FunctionServiceImpl implements FunctionService {
         if (!functionRepository.existsById(req.getId())) {
             throw new DodException(MessageCode.FUNCTION_NOT_FOUND);
         }
-        if (functionRepository.existsByFunctionNameAndIdNot(req.getName(), req.getId())) {
+        if (functionRepository.existsByNameAndIdNot(req.getName(), req.getId())) {
             throw new DodException(MessageCode.FUNCTION_NAME_EXISTS, req.getName());
         }
         functionRepository.updateFunction(req.getId(), req.getName(), req.getFeRoute());
@@ -90,11 +89,22 @@ class FunctionServiceImpl implements FunctionService {
         if (permissionRepository.existsByBeEndPoint(request.getBeEndPoint())) {
             throw new DodException(MessageCode.PERMISSION_NAME_EXISTS, request.getName());
         }
+
+        Integer isDefault = request.getDefaultPermission() != null && request.getDefaultPermission() ? 1 : 0;
         permissionRepository.addPermission(
                 request.getName(),
                 request.getBeEndPoint(),
                 request.getFunctionId(),
-                request.getDefaultPermission() != null && request.getDefaultPermission() ? 1 : 0);
+                isDefault
+        );
+        if(isDefault.equals(1)){
+            Long permissionId = permissionRepository.getLastInsertedId();
+            List<Long> roles = rolePermissionRepository.findRoleWithFuctionId(request.getFunctionId());
+            for (Long role: roles
+                 ) {
+                rolePermissionRepository.addPermissionRole(permissionId, role);
+            }
+        }
     }
 
     @Override
@@ -107,13 +117,22 @@ class FunctionServiceImpl implements FunctionService {
         if (permissionRepository.existsByBeEndPointAndFunctionIdAndIdNot(request.getBeEndPoint(), permission.getFunctionId(), request.getId())) {
             throw new DodException(MessageCode.PERMISSION_BE_ENDPOINT_EXISTS, request.getName());
         }
-        permission.setName(request.getName());
-        permission.setBeEndPoint(request.getBeEndPoint());
+//        permission.setName(request.getName());
+//        permission.setBeEndPoint(request.getBeEndPoint());
+        Integer isDefault = request.getDefaultPermission() != null && request.getDefaultPermission() ? 1 : 0;
         permissionRepository.updatePermission(
                 request.getId(),
                 request.getName(),
                 request.getBeEndPoint(),
-                request.getDefaultPermission() ? 1 : 0);
+                isDefault);
+
+        if(permission.getDefaultPermission().equals(0) && isDefault.equals(1)){
+            List<Long> roles = rolePermissionRepository.findRoleWithFuctionIdAndPermissionIdNot(permission.getFunctionId(), permission.getId());
+            for (Long role: roles
+            ) {
+                rolePermissionRepository.addPermissionRole(permission.getId(), role);
+            }
+        }
     }
 
     @Override

@@ -35,7 +35,7 @@ export class RolePermissionComponent implements OnInit {
   }
 
   loadData() {
-    const endpoint = this.common.getPermission(PermissionName.VIEW_ROLES);
+    const endpoint = this.common.getPermission(PermissionName.UserRole.VIEW_ROLES);
     if (!endpoint) {
       this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
       return;
@@ -60,7 +60,7 @@ export class RolePermissionComponent implements OnInit {
   }
 
   deleteRole() {
-    const endpoint = this.common.getPermission(PermissionName.DELETE_ROLE);
+    const endpoint = this.common.getPermission(PermissionName.UserRole.DELETE_ROLE);
     if (!endpoint) {
       this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
       return;
@@ -102,7 +102,7 @@ export class RolePermissionComponent implements OnInit {
   }
 
   AddRole(role: Role) {
-    const endpoint = this.common.getPermission(PermissionName.ADD_ROLE);
+    const endpoint = this.common.getPermission(PermissionName.UserRole.ADD_ROLE);
     if (!endpoint) {
       this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
       return;
@@ -122,7 +122,7 @@ export class RolePermissionComponent implements OnInit {
   }
 
   UpdateRole(role: Role) {
-    const endpoint = this.common.getPermission(PermissionName.CHANGE_ROLE_NAME);
+    const endpoint = this.common.getPermission(PermissionName.UserRole.CHANGE_ROLE_NAME);
     if (!endpoint) {
       this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
       return;

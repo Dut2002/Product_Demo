@@ -54,7 +54,16 @@ public enum MessageCode {
     ILLEGAL_EXTENSION("Unsupported file type [%s]"),
     STATUS_NOT_FOUND("Status not found!"),
     CATEGORY_NOT_EXIST("Category not found"),
-    SUPPLIER_NOT_EXIST("Supplier not found"), PRODUCT_IN_ORDER("Product has in order!"), TYPE_IMPORT_INVALID("Type import invalid!");
+    SUPPLIER_NOT_EXIST("Supplier not found"),
+    PRODUCT_IN_ORDER("Product has in order!"),
+    TYPE_IMPORT_INVALID("Type import invalid!"),
+    PERMISSION_DEFAULT("Permission is default"),
+    JSON_PARSE_ERROR("Error serializing request to JSON"),
+    ADD_REQUEST_FAILED("Send request failed!"),
+    PROCESS_REQUEST_ERROR("Process request error!"),
+    REQUEST_NOT_FOUND("Request not found!"),
+    REQUEST_COMPLETED("This request has already been processed."),
+    UNABLE_REQUEST("Unable to submit additional requests"), REQUESTER_NOT_MATCH("Requester not match with account"), SUPPLIER_ALREADY_REGISTER("Supplier already register!");
 
     private final String code;
 

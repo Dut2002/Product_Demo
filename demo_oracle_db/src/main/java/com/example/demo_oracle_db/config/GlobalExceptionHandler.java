@@ -35,7 +35,7 @@ public class GlobalExceptionHandler  {
 //    }
     @ExceptionHandler(DodException.class)
     public ResponseEntity<?> handleDobException(DodException ex) {
-        return ResponseEntity.badRequest().body(new Res(Constants.ApiStatus.ERROR, "Error" ,ex.getMessage()));
+        return ResponseEntity.status(ex.getStatus()).body(new Res(Constants.ApiStatus.ERROR, "Error" ,ex.getMessage()));
     }
 
     @ExceptionHandler(EntityValidationException.class)

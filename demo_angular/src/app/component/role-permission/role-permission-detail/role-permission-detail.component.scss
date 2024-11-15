@@ -1,59 +1,96 @@
-.form-container form {
-  padding: 0;
-  justify-content: center;
+.content {
+  width: 70%;
+  min-width: 580px;
+  margin: auto;
 }
 
-.form-title {
-  background: rgb(212 212 212);
-  border-bottom: 1px solid;
-  padding: 8px;
-}
-
-.form-title i, .form-label i {
-  margin-right: 10px;
-}
-
-.form-container {
-  border: 2px solid;
-  border-radius: 4px;
-  overflow: hidden;
-  margin: 10px;
-}
-
-.form-input-container {
-  flex: 1;
-  max-width: 80%;
-  min-width: 250px;
-
-}
-
-.form-input-param {
+.header-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 0;
-  margin-bottom: 5px;
-  padding: 10px;
-  border-bottom: 1px dotted;
-
-  line-height: 30px;
 }
 
-.form-input-enter input{
-  cursor: pointer;
-  width: 20px;
-  height: 20px;
+.func-header-card{
+  padding-bottom: 5px;
+  border-bottom: 2px solid #4F4F4F;
 }
 
-.permissions-container{
-  display: grid;
-  grid-template-columns: 1fr; /* Ban đầu là 1 cột */
-  grid-gap: 10px;
-  padding: 10px;
+
+body {
+  font-family: 'Space Mono', monospace;
+  display: flex;
+  flex-direction: column;
+  max-width: 420px;
+  padding: 32px;
+  margin: 60px auto;
+  border: 1px solid #eee;
+  box-shadow: 0px 12px 24px rgba(0, 0, 0, 0.06);
 }
 
-@media (min-width: 768px) {
-  .permissions-container {
-    grid-template-columns: 1fr 1fr; /* Khi màn hình lớn hơn 768px, chia thành 2 cột */
+* {
+  // make it sexy
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizelegibility;
+  letter-spacing: -0.25px;
+}
+
+.alternating-colors {
+  padding-left: 50px;
+}
+
+ol.alternating-colors li.func-item {
+  color: #4F4F4F;
+  padding-left: 16px;
+  margin-top: 24px;
+  position: relative;
+  font-size: 16px;
+  line-height: 20px;
+
+  &:before {
+    content: '';
+    display: block;
+    height: 42px;
+    width: 42px;
+    border-radius: 50%;
+    border: 2px solid #ddd;
+    position: absolute; // yeah, you have to manually position it based on the text size, line height, etc. (in the parent li style). it's not the smarest solution
+    top: -12px;
+    left: -35px;
   }
+}
+
+strong {
+  color: #292929;
+}
+
+ol.alternating-colors {
+  li:nth-child(odd):before {
+    border-color: #0BAD02;
+  }
+
+  li:nth-child(even):before {
+    border-color: #2378D5;
+  }
+}
+
+.func-content{
+  margin-top: 10px;
+}
+
+
+
+.action-card{
+  background-color: #0BAD02 !important;
+  color: white;
+}
+
+.function-form form{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.form-input-enter{
+  width: 300px;
 }

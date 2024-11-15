@@ -1,3 +1,6 @@
+$mono: 'Source Code Pro', monospace;
+
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -7,10 +10,10 @@
 
 /* You can add global styles to this file, and also import other style files */
 .container {
-  font-family: Arial, sans-serif;
+  font-family: $mono;
   font-size: 14px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 80px 20px 20px;
   min-height: 100vh;
   background-color: #e6e6e6;
 }
@@ -35,12 +38,12 @@
   margin: 10px;
 }
 
-.flex-box{
+.flex-box {
   display: flex;
   flex-wrap: wrap;
 }
 
-.flex-align-end{
+.flex-align-end {
   // align-self: flex-end;
   margin-top: auto;
 }
@@ -68,7 +71,7 @@
   opacity: 0.6;
 }
 
-.form-title{
+.form-title {
   display: inline;
   font-weight: bold;
   font-size: large;
@@ -110,29 +113,34 @@
 /* Nếu muốn 2 phần tử trên mỗi dòng, dùng media query */
 @media (max-width: 600px) {
   .flex-half {
-    flex: 1 1 100%; /* Mỗi phần tử chiếm 100% chiều rộng */
+    flex: 1 1 100%;
+    /* Mỗi phần tử chiếm 100% chiều rộng */
   }
 }
 
 .flex-third {
-  flex: 1 1 30%; /* Mỗi phần tử chiếm 30% chiều rộng */
+  flex: 1 1 30%;
+  /* Mỗi phần tử chiếm 30% chiều rộng */
 }
 
 /* Nếu muốn 2 phần tử trên mỗi dòng khi màn hình nhỏ hơn 900px */
 @media (max-width: 900px) {
   .flex-third {
-    flex: 1 1 45%; /* Mỗi phần tử chiếm 45% chiều rộng */
+    flex: 1 1 45%;
+    /* Mỗi phần tử chiếm 45% chiều rộng */
   }
 }
 
 /* Nếu muốn 1 phần tử trên mỗi dòng khi màn hình nhỏ hơn 600px */
 @media (max-width: 650px) {
   .flex-third {
-    flex: 1 1 100%; /* Mỗi phần tử chiếm 100% chiều rộng */
+    flex: 1 1 100%;
+    /* Mỗi phần tử chiếm 100% chiều rộng */
   }
 }
 
-.form-input-enter input, .form-select{
+.form-input-enter input,
+.form-select {
   flex: 1;
   /* Mỗi input chiếm đều không gian */
   margin-right: 8px;
@@ -143,33 +151,33 @@
   max-height: 33.6px;
 }
 
-.form-select ng-dropdown-panel{
+.form-select ng-dropdown-panel {
   border-radius: 4px;
   background: white;
   border: 1px solid black;
-  top:100%;
+  top: 100%;
   left: 0;
 }
 
-.form-input .select-label{
+.form-input .select-label {
   flex: 1;
 }
 
-.form-input .select-container{
+.form-input .select-container {
   gap: 8px
 }
 
-.form-input .select-input-container{
+.form-input .select-input-container {
   border: 0.5px solid #ddd;
   padding: 6px 4px;
   border-radius: 4px;
 }
 
-.ng-placeholder{
+.ng-placeholder {
   opacity: 0.7;
 }
 
-ng-dropdown-panel .scroll-host{
+ng-dropdown-panel .scroll-host {
   max-height: 150px !important;
 }
 
@@ -177,17 +185,21 @@ ng-dropdown-panel .scroll-host{
   outline: -webkit-focus-ring-color auto 1px black;
 }
 
-.ng-option{
-  padding:  4px 8px;
+.ng-option {
+  padding: 4px 8px;
 }
 
-.form-input-enter input[type='text'], .form-input-enter input[type='number'], .form-input-enter input[type='date'], .form-select{
+.form-input-enter input[type='text'],
+.form-input-enter input[type='number'],
+.form-input-enter input[type='date'],
+.form-select {
   border: 1px solid black;
   background-color: #ffffff;
 }
 
 
-.form-input-enter input:last-child,  .form-input .form-select:last-child{
+.form-input-enter input:last-child,
+.form-input .form-select:last-child {
   margin-right: 0;
   /* Xóa khoảng cách bên phải của input cuối cùng */
 }
@@ -400,11 +412,11 @@ ng-dropdown-panel .scroll-host{
   border-radius: 4px;
 }
 
-.modal-content .form-input{
+.modal-content .form-input {
   min-height: 80px;
 }
 
-.validate-input{
+.validate-input {
   color: red;
   font-size: 10px;
   margin-top: 8px;
@@ -420,27 +432,28 @@ ng-dropdown-panel .scroll-host{
   transition: background-color 0.3s;
 }
 
-.modal-title, .confirmation-title{
+.modal-title,
+.confirmation-title {
   font-size: 20px;
   padding: 10px 0;
 }
 
-.modal-header{
+.modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.modal-header button{
+.modal-header button {
   margin: 0;
   background-color: transparent;
 }
 
-.modal-header button:hover{
+.modal-header button:hover {
   background-color: #e3e3e3;
 }
 
-.confirm-group   {
+.confirm-group {
   display: flex;
   justify-content: flex-end;
 }
@@ -452,7 +465,7 @@ ng-dropdown-panel .scroll-host{
   /* Tùy chọn: Thêm khoảng cách phía trên và dưới */
 }
 
-.table-container th{
+.table-container th {
   position: relative;
   padding-right: 20px; // Tạo khoảng trống cho icon ở phía phải
   cursor: pointer;
@@ -460,7 +473,8 @@ ng-dropdown-panel .scroll-host{
 
 [class^="col-"] {
   /* Tìm class bắt đầu bằng col- */
-  min-width: attr(data-width px); /* Áp dụng width từ giá trị data-width */
+  min-width: attr(data-width px);
+  /* Áp dụng width từ giá trị data-width */
   max-width: attr(data-width px);
   width: attr(data-width px);
 }
@@ -479,6 +493,7 @@ ng-dropdown-panel .scroll-host{
   /* Dùng flex cho các lớp bắt đầu với flex- */
   flex: attr(data-flex);
 }
+
 @for $i from 20 through 500 {
   .flex-#{$i} {
     flex: #{$i};
@@ -488,7 +503,7 @@ ng-dropdown-panel .scroll-host{
 
 
 
-.table-container th i{
+.table-container th i {
   position: absolute;
   right: 0; // Căn lề phải cho icon
   top: 50%;
@@ -531,7 +546,7 @@ table tbody {
   background-color: #ffffff;
 }
 
-mat-form-field{
+mat-form-field {
   width: 100%;
   // position: absolute;
   // bottom: -100%;
@@ -553,54 +568,62 @@ mat-form-field{
   padding: 8px 8px;
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
 
 
 :root {
-	--size-header: 2.25rem;
-	--size-accordion-title: 1.25rem;
-	--size-accordion-content: 1rem;
-	--animation-speed: 100;
-	--slide-ease: cubic-bezier(0.86, 0, 0.07, 1);
-	--slide-duration: calc(400ms * 100 / var(--animation-speed));
-	--slide-delay: calc(450ms * 100 / var(--animation-speed));
-	--circle-duration: calc(900ms * 100 / var(--animation-speed));
+  --size-header: 2.25rem;
+  --size-accordion-title: 1.25rem;
+  --size-accordion-content: 1rem;
+  --animation-speed: 100;
+  --slide-ease: cubic-bezier(0.86, 0, 0.07, 1);
+  --slide-duration: calc(400ms * 100 / var(--animation-speed));
+  --slide-delay: calc(450ms * 100 / var(--animation-speed));
+  --circle-duration: calc(900ms * 100 / var(--animation-speed));
 }
 
-.accordion-container{
+.accordion-container {
   margin-top: 10px;
 }
 
-section h1.title{
+section h1.title {
   margin: 0;
   padding: 0;
   border-radius: min(8px, 0.5rem);
 }
 
-.accordion-selected{
+.accordion-selected {
   z-index: 10 !important;
 }
+
 .accordion {
-	--circle-x: 1.8rem;
-	--circle-y: 0;
-	--circle-r: 200%;
-	color: #000;
+  --circle-x: 1.8rem;
+  --circle-y: 0;
+  --circle-r: 200%;
+  color: #000;
   position: relative;
   z-index: 1;
   border: 0.5px solid black;
-	margin-bottom: 1rem;
-	border-radius: min(8px, 0.5rem);
-	transition-timing-function: var(--slide-ease);
-	transition-duration: 200ms, 200ms, var(--slide-duration);
-	transition-property: opacity, box-shadow, grid-template-rows;
-	transition-delay: 0ms, 0ms, var(--slide-delay);
-	box-shadow: 0 1px 0 2px rgba(0, 0, 0, 0.1);
-	opacity: 0.9;
+  margin-bottom: 1rem;
+  border-radius: min(8px, 0.5rem);
+  transition-timing-function: var(--slide-ease);
+  transition-duration: 200ms, 200ms, var(--slide-duration);
+  transition-property: opacity, box-shadow, grid-template-rows;
+  transition-delay: 0ms, 0ms, var(--slide-delay);
+  box-shadow: 0 1px 0 2px rgba(0, 0, 0, 0.1);
+  opacity: 0.9;
   overflow: hidden;
 }
 
-.accordion-header{
+.accordion-header {
   background-color: paleturquoise;
   display: flex;
   flex-wrap: nowrap;
@@ -613,30 +636,29 @@ section h1.title{
 }
 
 .accordion:not(:target):hover {
-	box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5);
 }
 
 .accordion:not(:target):active {
-	opacity: 1;
-	box-shadow: 0 4px 7px 0 rgba(0, 0, 0, 0.3);
+  opacity: 1;
+  box-shadow: 0 4px 7px 0 rgba(0, 0, 0, 0.3);
 }
 
-.accordion-header{
+.accordion-header {
   cursor: pointer;
 }
 
-.accordion-header h1{
+.accordion-header h1 {
   flex: 1;
 }
 
 .accordion:target {
-	--d: 90deg;
-	grid-template-rows: 0fr 1fr;
-	transition: grid-template-rows var(--slide-ease) var(--slide-duration)
-		var(--slide-delay);
+  --d: 90deg;
+  grid-template-rows: 0fr 1fr;
+  transition: grid-template-rows var(--slide-ease) var(--slide-duration) var(--slide-delay);
 }
 
-.accordion{
+.accordion {
   background: white;
 }
 
@@ -649,10 +671,72 @@ section h1.title{
 }
 
 
-.success{color: #8BC34A;}
+.success {
+  color: #8BC34A;
+}
 
-.failed{color: red;}
+.failed {
+  color: red;
+}
 
-.border-dot{
+.border-dot {
   border: 1.5px dotted;
+}
+
+.request-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 2.8rem;
+  border: 1px solid;
+  padding: 10px;
+  border-radius: 6px;
+  background: white;
+  margin-bottom: 10px;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+
+  /* Khi trạng thái là APPROVED */
+  &.request-approved {
+    border-color: green;
+    color: green;
+    background-color: #e8f5e9;
+  }
+
+  /* Khi trạng thái là REJECTED */
+  &.request-rejected {
+    border-color: red;
+    color: red;
+
+    background-color: #ffebee;
+  }
+
+  /* Khi trạng thái là PENDING */
+  &.request-pending {
+    border-color: orange;
+    color: orange;
+    background-color: #fff3e0;
+  }
+  &.request-canceled {
+    border-color: gray;
+    color: gray;
+    background-color: #f5f5f5; /* Màu nền xám nhạt */
+  }
+}
+
+.list-request {
+  margin-top: 20px;
+}
+
+.modal-action{
+  display: flex;
+  justify-content: center;
+  gap: 12px;
 }

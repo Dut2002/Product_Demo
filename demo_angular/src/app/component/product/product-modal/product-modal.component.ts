@@ -86,7 +86,7 @@ export class ProductModalComponent implements OnChanges {
     }
     this.isLoading = true;
     if (this.product.id) {
-      const endpoint = this.common.getPermission(PermissionName.UPDATE_PRODUCT)
+      const endpoint = this.common.getPermission(PermissionName.ProductManagement.UPDATE_PRODUCT)
       if (!endpoint) {
         this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
         return;
@@ -106,7 +106,7 @@ export class ProductModalComponent implements OnChanges {
           }
         });
     } else {
-      const endpoint = this.common.getPermission(PermissionName.ADD_PRODUCT)
+      const endpoint = this.common.getPermission(PermissionName.ProductManagement.ADD_PRODUCT)
       if (!endpoint) {
         this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
         return;

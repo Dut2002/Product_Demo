@@ -3,6 +3,8 @@ package com.example.demo_oracle_db.service.email;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,8 @@ public class EmailService {
     @Autowired
     private SpringTemplateEngine engine;
 
+    @Value("${spring.mail.from}")
+    private String fromEmail;
     public void sendSimpleMail(String toEmail, String header, String nameRec, String subject, String content, String link, int option) throws MessagingException {
         Context context = new Context();
         context.setVariable("header", header);
@@ -34,10 +38,12 @@ public class EmailService {
         };
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        helper.setFrom(fromEmail);
         helper.setTo(toEmail);
         helper.setSubject(subject);
         helper.setText(body, true);
-
+        ClassPathResource image = new ClassPathResource("static/images/logo.png");
+        helper.addInline("logo", image);
         mailSender.send(message);
     }
 

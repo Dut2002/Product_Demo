@@ -1,13 +1,35 @@
-<nav>
-  <div class="nav-bg"></div>
-  <ul>
-    <li><a [routerLink]="route.HOME">Home</a></li>
-    <li *ngIf="authService.hasFuntion(route.USER_ROLE)"><a [routerLink]="route.USER_ROLE">Role Permission</a></li>
-    <li *ngIf="authService.hasFuntion(route.FUNCTION_MANAGEMENT)"><a [routerLink]="route.FUNCTION_MANAGEMENT">Function Management</a></li>
-    <li *ngIf="authService.hasFuntion(route.PRODUCT_MANAGEMENT)"><a [routerLink]="route.PRODUCT_MANAGEMENT">Product Management</a></li>
-    <li><a (click)="logOut()" >Logout</a></li>
-  </ul>
-</nav>
-<div class="hero">
-  <h1>{{title}}</h1>
-</div>
+<header class="top-bar">
+  <div class="grid-container full">
+    <div class="grid-x align-middle">
+      <div class="cell small-11">
+        <a class="logo" href="#">
+          <i class="fas fa-weight-hanging"></i>
+          <span>ACME Inc.</span>
+        </a>
+      </div>
+      <div class="cell small-1 nav-menu">
+        <button class="hamburger" (click)="clickNav()" [ngClass]="{'is-open': isOpen}">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <nav class="navigation" [ngClass]="{'is-open': isOpen}" (click)="clickNav()">
+          <ul>
+            <li><a [routerLink]="route.HOME">Home</a></li>
+            <li *ngIf="authService.hasFuntion(route.USER_ROLE)"><a [routerLink]="route.USER_ROLE">Permissons For Role</a></li>
+            <li *ngIf="authService.hasFuntion(route.FUNCTION_MANAGEMENT)"><a [routerLink]="route.FUNCTION_MANAGEMENT">Functions And Permissions</a></li>
+            <li *ngIf="authService.hasFuntion(route.PRODUCT_MANAGEMENT)"><a [routerLink]="route.PRODUCT_MANAGEMENT">Product Management</a></li>
+            <li *ngIf="authService.hasFuntion(route.SUPPLIER_MANAGER)"><a [routerLink]="route.SUPPLIER_MANAGER">Supplier Manager</a></li>
+            <li *ngIf="authService.hasFuntion(route.MY_SUPPLIER)"><a [routerLink]="route.MY_SUPPLIER">My Supplier</a></li>
+            <li><a (click)="logOut()" >Logout</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <div class="hidden-modal" [ngClass]="{'is-open': isOpen}" (click)="clickNav()">
+  </div>
+</header>
+
+

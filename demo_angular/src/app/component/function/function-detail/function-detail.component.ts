@@ -20,7 +20,7 @@ export class FunctionDetailComponent {
   @ViewChild('actionTab', { static: false }) actionTab!: PermissionAddComponent
 
   loadData() {
-    const endpoint = this.common.getPermission(PermissionName.GET_PERMISSIONS)
+    const endpoint = this.common.getPermission(PermissionName.FunctionManagement.GET_PERMISSIONS)
     if (!endpoint) {
       this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
       return;

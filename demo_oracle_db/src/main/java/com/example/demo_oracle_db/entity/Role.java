@@ -21,7 +21,9 @@ public class Role {
     @Column(name = "NAME", unique = true)
     private String name;
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<RolePermission> rolePermission;
+    private List<RolePermission> rolePermissionList;
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<AccountRole> accountRoles;
+    private List<AccountRole> accountRoleList;
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<FunctionRole> functionRoleList;
 }

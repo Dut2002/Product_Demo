@@ -30,7 +30,7 @@ export class ProductVoucherComponent {
   ) { }
 
   addVoucherProduct() {
-    const endpoint = this.common.getPermission(PermissionName.ADD_VOUCHER_FOR_PRODUCT);
+    const endpoint = this.common.getPermission(PermissionName.ProductManagement.ADD_VOUCHER_FOR_PRODUCT);
     if (!endpoint) {
       this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
       return;
@@ -57,7 +57,7 @@ export class ProductVoucherComponent {
   }
 
   onDeleteVoucher() {
-    const endpoint = this.common.getPermission(PermissionName.DELETE_VOUCHER_OF_PRODUCT);
+    const endpoint = this.common.getPermission(PermissionName.ProductManagement.DELETE_VOUCHER_OF_PRODUCT);
     if (!endpoint) {
       this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
       return;
