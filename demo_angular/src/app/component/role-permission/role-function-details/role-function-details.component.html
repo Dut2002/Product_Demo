@@ -1,0 +1,36 @@
+<ul class="permission-list">
+  <li class="action-card">
+    <div (mouseenter)="showAdd = true" (mouseleave)="showAdd=false">
+      <div *ngIf="showAdd === true; else addForm">
+        <form (submit)="addPermission(permission)">
+          <ng-select #permission="ngModel" class="form-select" name="permissionId" [items]="permissionSearch"
+            bindLabel="name" bindValue="id" [(ngModel)]="permissionAddId" [ngModelOptions]="{ standalone: true }"
+            [searchable]="true" [required]="true" (open)="loadPermissionSearch()">
+          </ng-select>
+          <button class="btn add-btn" type="submit">Add</button>
+        </form>
+      </div>
+      <ng-template #addForm>
+        <div class="add-header">
+          Add permission
+        </div>
+      </ng-template>
+    </div>
+  </li>
+  <li *ngFor="let permission of permissions">
+    <div>
+      <div class="header-card">
+        <div>
+          <div><strong>{{permission.name}}</strong></div>
+          <div><strong>End Point:</strong> ~{{permission.beEndPoint}}</div>
+        </div>
+        <div class="header-action">
+          <button class="btn delete-btn btn-icon" (click)="ConfirmDelete(permission.id)"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>
+    </div>
+  </li>
+</ul>
+
+<app-confirm-modal #confirmModal [title]="'Do you want to delete that permission?'" (confirmEvent)="DeletePermission()">
+</app-confirm-modal>
