@@ -49,6 +49,11 @@ import { MySupplierComponent } from './component/my-supplier/container/my-suppli
 import { MySupplierHomeComponent } from './component/my-supplier/my-supplier-home/my-supplier-home.component';
 import { MySupplierRequestComponent } from './component/my-supplier/my-supplier-request/my-supplier-request.component';
 import { MySupplierRequestDetailComponent } from './component/my-supplier/my-supplier-request-detail/my-supplier-request-detail.component';
+import { SupplierManagerComponent } from './component/supplier/supplier-manager/supplier-manager.component';
+import { SupplierRequestListComponent } from './component/supplier/supplier-request-list/supplier-request-list.component';
+import { SupplierRequestDetailsComponent } from './component/supplier/supplier-request-details/supplier-request-details.component';
+import { HomeComponent } from './component/common/home/home.component';
+import { UserManagementComponent } from './component/user/user-management/user-management.component';
 
 @NgModule({
   declarations: [
@@ -88,6 +93,11 @@ import { MySupplierRequestDetailComponent } from './component/my-supplier/my-sup
     MySupplierHomeComponent,
     MySupplierRequestComponent,
     MySupplierRequestDetailComponent,
+    SupplierManagerComponent,
+    SupplierRequestListComponent,
+    SupplierRequestDetailsComponent,
+    HomeComponent,
+    UserManagementComponent,
   ],
   imports: [
     BrowserModule,

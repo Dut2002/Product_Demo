@@ -8,6 +8,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Repository
@@ -25,8 +26,15 @@ public interface ApprovalRepository extends CrudRepository<Approval, Long>, JpaS
     @Modifying
     @Transactional
     @Query(nativeQuery = true, value = "UPDATE cmd_approval " +
-            " set status = ?2, note = ?3, update_by = ?4, update_at = ?5 " +
+            " set status = ?2, update_by = ?3, update_at = ?4 " +
             " where id = ?1 ")
-    void processRequest(Long id, String status, String note, Long accountId, LocalDateTime updateAt);
+    void processRequest(Long id, String status, Long accountId, LocalDateTime updateAt);
+
+    @Modifying
+    @Transactional
+    @Query(nativeQuery = true, value = "UPDATE cmd_approval " +
+            " set note = ?2, update_by = ?3, update_at = ?4 " +
+            " where id = ?1 ")
+    void saveNote(Long id, String note, Long accountId, LocalDate now);
 }
 

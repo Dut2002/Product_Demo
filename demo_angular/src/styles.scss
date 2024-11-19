@@ -229,6 +229,7 @@ ng-dropdown-panel .scroll-host {
   /* Màu chữ mặc định */
   font-size: 14px;
   /* Kích thước chữ */
+  text-decoration: none;
 }
 
 .btn-disable {
@@ -375,7 +376,7 @@ ng-dropdown-panel .scroll-host {
 .modal,
 .confirmation-modal {
   position: fixed;
-  z-index: 9999;
+  z-index: 900;
   left: 0;
   top: 0;
   width: 100%;
@@ -494,7 +495,7 @@ ng-dropdown-panel .scroll-host {
   flex: attr(data-flex);
 }
 
-@for $i from 20 through 500 {
+@for $i from 1 through 500 {
   .flex-#{$i} {
     flex: #{$i};
   }
@@ -694,6 +695,13 @@ section h1.title {
   background: white;
   margin-bottom: 10px;
   cursor: pointer;
+  gap: 12px;
+
+  & .request-card-content {
+    text-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
   &:hover {
     opacity: 0.8;
@@ -724,10 +732,12 @@ section h1.title {
     color: orange;
     background-color: #fff3e0;
   }
+
   &.request-canceled {
     border-color: gray;
     color: gray;
-    background-color: #f5f5f5; /* Màu nền xám nhạt */
+    background-color: #f5f5f5;
+    /* Màu nền xám nhạt */
   }
 }
 
@@ -735,7 +745,7 @@ section h1.title {
   margin-top: 20px;
 }
 
-.modal-action{
+.modal-action {
   display: flex;
   justify-content: center;
   gap: 12px;

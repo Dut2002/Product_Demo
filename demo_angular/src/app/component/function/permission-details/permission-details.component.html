@@ -5,7 +5,7 @@
     <div class="form-input flex-full">
       <label class="form-label" for="name">Name:</label>
       <div class="form-input-enter">
-        <input type="text" #name="ngModel" [(ngModel)]="permission.name" name="name" [required]="true" [minlength]="2"
+        <input type="text" #name="ngModel" [disabled]="!common.hasPermission(common.permissionName.FunctionManagement.UPDATE_PERMISSION)" [(ngModel)]="permission.name" name="name" [required]="true" [minlength]="2"
           maxlength="255">
       </div>
       <div *ngIf="name.touched && !name.valid" class="validate-input">
@@ -16,7 +16,7 @@
     <div class="form-input flex-full">
       <label class="form-label" for="name">Back-end Endpoint:</label>
       <div class="form-input-enter">
-        <input type="text" #beEndPoint="ngModel" [(ngModel)]="permission.beEndPoint" name="beEndPoint" [required]="true"
+        <input type="text" #beEndPoint="ngModel" [disabled]="!common.hasPermission(common.permissionName.FunctionManagement.UPDATE_PERMISSION)" [(ngModel)]="permission.beEndPoint" name="beEndPoint" [required]="true"
           [pattern]="pattern">
       </div>
       <div *ngIf="beEndPoint.touched && !beEndPoint.valid" class="validate-input">
@@ -30,9 +30,9 @@
       <input type="checkbox" name="defaultPermission" [(ngModel)]="permission.defaultPermission">
     </div>
     <div class="form-input center flex-full flex-align-end">
-      <input type="submit" class="btn btn-small btn-blue" value="Update">
-      <input type="button" (click)="resetForm(functionForm)" class="btn btn-small btn-orange" value="Reset">
-      <input type="button" (click)="deleteConfirm()" class="btn btn-small btn-red" value="Delete">
+      <input type="submit" *ngIf="common.hasPermission(common.permissionName.FunctionManagement.UPDATE_PERMISSION)" class="btn btn-small btn-blue" value="Update">
+      <input type="button" *ngIf="common.hasPermission(common.permissionName.FunctionManagement.UPDATE_PERMISSION)" (click)="resetForm(functionForm)" class="btn btn-small btn-orange" value="Reset">
+      <input type="button" *ngIf="common.hasPermission(common.permissionName.FunctionManagement.DELETE_PERMISSION)" (click)="deleteConfirm()" class="btn btn-small btn-red" value="Delete">
     </div>
   </form>
 </div>

@@ -24,7 +24,7 @@ export class RolePermissionComponent implements OnInit {
   @ViewChild('actionModal') actionModal!: RoleModalComponent;
 
   constructor(
-    private common: CommonService,
+    public common: CommonService,
     private route: ActivatedRoute) {
   }
 

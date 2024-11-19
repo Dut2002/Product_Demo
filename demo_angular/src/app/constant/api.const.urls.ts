@@ -96,11 +96,15 @@ export class PermissionName {
     VIEW_ORDER: 'View Order Management',
   }
   public static readonly SupplierManagement = {
-    VIEW_ORDER: 'View Order Management',
+    VIEW_SUPPLIER: 'View Supplier Management',
+    ADD_SUPPLIER: 'Add Supplier',
+    UPDATE_SUPPLIER: 'Update Supplier',
+    DELETE_SUPPLIER: 'Delete Supplier',
   }
   public static readonly SupplierApproval = {
     VIEW_REQUEST: 'View Request',
-    PROCESS_REQUEST: 'Process Request'
+    PROCESS_REQUEST: 'Process Request',
+    SAVE_NOTE: 'Save Note',
   }
   public static readonly CustmomerManagement = {
     VIEW_ORDER: 'View Order Management',

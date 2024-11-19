@@ -1,0 +1,7 @@
+<div class="container">
+  <h1 class="title center">My Supplier</h1>
+  <app-my-supplier-home *ngIf="hasSupplier === true" [common]="common" [supplier]="supplier">
+  </app-my-supplier-home>
+  <app-my-supplier-request *ngIf="hasSupplier === false" [common]="common">
+  </app-my-supplier-request>
+</div>

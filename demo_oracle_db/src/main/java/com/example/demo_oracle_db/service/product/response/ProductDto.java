@@ -34,12 +34,18 @@ public class ProductDto {
     private String supplierName;
     private List<VoucherDto> vouchers;
 
-    public static Page<ProductDto> convertToProductDtoPage(Page<Product> productPage) {
-        List<ProductDto> productDtoList = productPage.getContent().stream()
-                .map(ProductDto::new)
-                .collect(Collectors.toList());
 
-        return new PageImpl<>(productDtoList, productPage.getPageable(), productPage.getTotalElements());
+    public ProductDto(Long id, String name, Long yearMaking, LocalDate expireDate, Integer quantity, Double price, Long categoryId, String categoryName, Long supplierId, String supplierName) {
+        this.id = id;
+        this.name = name;
+        this.yearMaking = yearMaking;
+        this.expireDate = expireDate;
+        this.quantity = quantity;
+        this.price = price;
+        this.categoryId = categoryId;
+        this.categoryName = categoryName;
+        this.supplierId = supplierId;
+        this.supplierName = supplierName;
     }
 
     public ProductDto(Product product) {

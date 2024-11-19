@@ -12,6 +12,9 @@ import { FileProgressComponent } from './example/file-progress/file-progress.com
 import { authGuard } from './guard/auth.guard';
 import { FunctionComponent } from './component/function/fuction-list/function.component';
 import { MySupplierComponent } from './component/my-supplier/container/my-supplier.component';
+import { SupplierManagerComponent } from './component/supplier/supplier-manager/supplier-manager.component';
+import { SupplierRequestListComponent } from './component/supplier/supplier-request-list/supplier-request-list.component';
+import { HomeComponent } from './component/common/home/home.component';
 
 export const routes: Routes = [
 
@@ -37,6 +40,14 @@ export const routes: Routes = [
     component: MySupplierComponent, canActivate: [authGuard]
   },
   {
+    path: RouterUrl.SUPPLIER_MANAGER,
+    component: SupplierManagerComponent, canActivate: [authGuard]
+  },
+  {
+    path: RouterUrl.SUPPLIER_APPROVAL,
+    component: SupplierRequestListComponent, canActivate: [authGuard]
+  },
+  {
     path: RouterUrl.FORBIDDEN,
     component: ForbiddenComponent
   },
@@ -53,13 +64,17 @@ export const routes: Routes = [
     component: FileProgressComponent
   },
   {
-    path: '',
-    redirectTo: RouterUrl.LOG_IN,
-    pathMatch: 'full'
-  }, // Redirect đến login
-  {
     path: RouterUrl.LOG_IN,
     component: LoginComponent
+  },
+  {
+    path: RouterUrl.HOME,
+    component: HomeComponent
+  }, // Redirect đến login
+  {
+    path: '',
+    redirectTo:RouterUrl.LOG_IN,
+    pathMatch: 'full'
   },
   {
     path: '**',

@@ -147,6 +147,6 @@ public class MySupplierServiceImpl implements MySupplierService {
         if (!approval.getStatus().equals(Constants.ApprovalStatus.PENDING)) {
             throw new DodException(MessageCode.REQUEST_COMPLETED);
         }
-        approvalRepository.processRequest(approval.getId(), Constants.ApprovalStatus.CANCELED.name(), note, accountId, LocalDateTime.now());
+        approvalRepository.processRequest(approval.getId(), Constants.ApprovalStatus.CANCELED.name(), accountId, LocalDateTime.now());
     }
 }

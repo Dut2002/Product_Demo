@@ -16,8 +16,7 @@ public class RequestDto {
     Constants.ApprovalType approvalType;
     Constants.ApprovalStatus status;
     Long requesterId;
-    String username;
-
+    String fullName;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     String note;

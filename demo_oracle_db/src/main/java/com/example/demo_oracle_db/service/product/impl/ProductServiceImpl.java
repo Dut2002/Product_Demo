@@ -14,13 +14,13 @@ import com.example.demo_oracle_db.service.product.request.AddVoucherRequest;
 import com.example.demo_oracle_db.service.product.request.ProductFilter;
 import com.example.demo_oracle_db.service.product.request.ProductRequest;
 import com.example.demo_oracle_db.service.product.response.ProductDto;
+import com.example.demo_oracle_db.service.product.response.VoucherDto;
 import com.example.demo_oracle_db.util.Constants;
 import com.example.demo_oracle_db.util.MessageCode;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.ParameterMode;
 import jakarta.persistence.StoredProcedureQuery;
-import jakarta.persistence.criteria.JoinType;
-import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.*;
 import org.apache.poi.ss.util.AreaReference;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellReference;
@@ -33,7 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -79,70 +78,126 @@ public class ProductServiceImpl implements ProductService {
         int page = productFilter.getPageNum() != null ? productFilter.getPageNum() : 1;
         int size = productFilter.getSizePage() != null ? productFilter.getSizePage() : 8;
 
-        Page<Product> products = productRepository.findAll((Specification<Product>) (root, query, criteriaBuilder) -> {
-            List<Predicate> predicates = new ArrayList<>();
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<ProductDto> query = criteriaBuilder.createQuery(ProductDto.class);
+        Root<Product> root = query.from(Product.class);
 
-            if (productFilter.getName() != null && !productFilter.getName().isBlank()) {
-                String keyword = productFilter.getName().toLowerCase().trim();
-                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + keyword + "%"));
+        List<Predicate> predicates = createPredicates(criteriaBuilder, root, productFilter);
+        if (productFilter.getOrderCol() != null && !productFilter.getOrderCol().isBlank()) {
+            if (productFilter.getSortDesc() != null ? productFilter.getSortDesc() : false) {
+                query.orderBy(criteriaBuilder.desc(root.get(productFilter.getOrderCol())));
+            } else {
+                query.orderBy(criteriaBuilder.asc(root.get(productFilter.getOrderCol())));
             }
-            if (productFilter.getYearMaking() != null) {
-                predicates.add(criteriaBuilder.equal(root.get("yearMaking"), productFilter.getYearMaking()));
-            }
-            if (productFilter.getStartExpireDate() != null) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("expireDate"), LocalDate.parse(productFilter.getStartExpireDate(), dateTimeFormat)));
-            }
-            if (productFilter.getEndExpireDate() != null) {
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("expireDate"), LocalDate.parse(productFilter.getEndExpireDate(), dateTimeFormat)));
-            }
-            if (productFilter.getMinQuantity() != null) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("quantity"), productFilter.getMinQuantity()));
-            }
-            if (productFilter.getMaxQuantity() != null) {
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("quantity"), productFilter.getMaxQuantity()));
-            }
-            if (productFilter.getMinPrice() != null) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("price"), productFilter.getMinPrice()));
-            }
-            if (productFilter.getMaxPrice() != null) {
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("price"), productFilter.getMaxPrice()));
-            }
+        }
+        query.where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
 
-            if (productFilter.getCategoryId() != null) {
-                predicates.add(criteriaBuilder.equal(root.join("category").get("id"), productFilter.getCategoryId()));
-            }
-            if (productFilter.getSupplierId() != null) {
-                predicates.add(criteriaBuilder.equal(root.join("supplier").get("id"), productFilter.getSupplierId()));
-            }
-            // Voucher code filtering
-            if (productFilter.getVoucherCode() != null && !productFilter.getVoucherCode().isBlank()) {
-                String keyword = productFilter.getVoucherCode().toLowerCase();
-                predicates.add(criteriaBuilder.like(criteriaBuilder
-                        .lower(root.join("productVouchers", JoinType.LEFT)
-                                .join("voucher", JoinType.LEFT)
-                                .get("code")), "%" + keyword + "%"));
-            }
+        query.multiselect(
+                root.get("id"),
+                root.get("name"),
+                root.get("yearMaking"),
+                root.get("expireDate"),
+                root.get("quantity"),
+                root.get("price"),
+                root.get("categoryId"),
+                root.join("category", JoinType.INNER).get("name"),
+                root.get("supplierId"),
+                root.join("supplier", JoinType.INNER).get("name")
+        );
 
-            if (productFilter.getCustomerId() != null) {
-                predicates.add(criteriaBuilder.
-                        equal(root.join("orderDetails", JoinType.LEFT)
-                                .join("order", JoinType.LEFT)
-                                .join("customer", JoinType.LEFT)
-                                .get("id"), productFilter.getCustomerId()));
-            }
 
-            if (productFilter.getOrderCol() != null && !productFilter.getOrderCol().isBlank()) {
-                assert query != null;
-                if (productFilter.getSortDesc() != null ? productFilter.getSortDesc() : false) {
-                    query.orderBy(criteriaBuilder.desc(root.get(productFilter.getOrderCol())));
-                } else {
-                    query.orderBy(criteriaBuilder.asc(root.get(productFilter.getOrderCol())));
-                }
-            }
+        List<ProductDto> list = entityManager.createQuery(query)
+                .setFirstResult((page - 1) * size)
+                .setMaxResults(size)
+                .getResultList();
+        for (ProductDto product : list
+        ) {
+            product.setVouchers(getVourchers(product.getId()));
+        }
 
-            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-        }, PageRequest.of(page - 1, size));
-        return ProductDto.convertToProductDtoPage(products);
+        CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
+        Root<Product> countRoot = countQuery.from(Product.class);
+        countQuery.select(criteriaBuilder.count(countRoot));
+        List<Predicate> countPredicates = createPredicates(criteriaBuilder, countRoot, productFilter);
+        countQuery.where(criteriaBuilder.and(countPredicates.toArray(new Predicate[0])));
+        Long totalRecords = entityManager.createQuery(countQuery).getSingleResult();
+
+        return new PageImpl<>(list, PageRequest.of(page - 1, size), totalRecords);
+    }
+
+    private List<Predicate> createPredicates(CriteriaBuilder criteriaBuilder, Root<Product> root, ProductFilter productFilter) {
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (productFilter.getName() != null && !productFilter.getName().isBlank()) {
+            String keyword = productFilter.getName().toLowerCase().trim();
+            predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + keyword + "%"));
+        }
+        if (productFilter.getYearMaking() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("yearMaking"), productFilter.getYearMaking()));
+        }
+        if (productFilter.getStartExpireDate() != null) {
+            predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("expireDate"), LocalDate.parse(productFilter.getStartExpireDate(), dateTimeFormat)));
+        }
+        if (productFilter.getEndExpireDate() != null) {
+            predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("expireDate"), LocalDate.parse(productFilter.getEndExpireDate(), dateTimeFormat)));
+        }
+        if (productFilter.getMinQuantity() != null) {
+            predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("quantity"), productFilter.getMinQuantity()));
+        }
+        if (productFilter.getMaxQuantity() != null) {
+            predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("quantity"), productFilter.getMaxQuantity()));
+        }
+        if (productFilter.getMinPrice() != null) {
+            predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("price"), productFilter.getMinPrice()));
+        }
+        if (productFilter.getMaxPrice() != null) {
+            predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("price"), productFilter.getMaxPrice()));
+        }
+
+        if (productFilter.getCategoryId() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("categoryId"), productFilter.getCategoryId()));
+        }
+        if (productFilter.getSupplierId() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("supplierId"), productFilter.getSupplierId()));
+        }
+        // Voucher code filtering
+        if (productFilter.getVoucherCode() != null && !productFilter.getVoucherCode().isBlank()) {
+            String keyword = productFilter.getVoucherCode().toLowerCase();
+            predicates.add(criteriaBuilder.like(criteriaBuilder
+                    .lower(root.join("productVouchers", JoinType.LEFT)
+                            .join("voucher", JoinType.LEFT)
+                            .get("code")), "%" + keyword + "%"));
+        }
+
+        if (productFilter.getCustomerId() != null) {
+            predicates.add(criteriaBuilder.
+                    equal(root.join("orderDetails", JoinType.LEFT)
+                            .join("order", JoinType.LEFT)
+                            .join("customer", JoinType.LEFT)
+                            .get("id"), productFilter.getCustomerId()));
+        }
+        return predicates;
+    }
+
+    private List<VoucherDto> getVourchers(Long id) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<VoucherDto> query = criteriaBuilder.createQuery(VoucherDto.class);
+        Root<Voucher> root = query.from(Voucher.class);
+
+        query.where(criteriaBuilder.equal(root.join("productVouchers", JoinType.INNER).get("productId"), id));
+
+        query.multiselect(
+                root.get("id"),
+                root.get("code"),
+                root.get("description"),
+                root.get("discountAmount"),
+                root.get("discountPercent"),
+                root.get("startDate"),
+                root.get("endDate"),
+                root.get("minimumOrderValue"),
+                root.get("maximumDiscount")
+        );
+        return entityManager.createQuery(query).getResultList();
     }
 
     @Override
@@ -371,35 +426,35 @@ public class ProductServiceImpl implements ProductService {
             sheet.createFreezePane(0, 1);
             sheet.setAutoFilter(new CellRangeAddress(0, products.size(), 1, columns.length - 1));
 
-
             AreaReference areaReference = new AreaReference(
-                    new CellReference(0, 0),
-                    new CellReference(products.size()+1, columns.length - 1),
+                    new CellReference(0, 0), // Bắt đầu từ ô đầu tiên (0,0)
+                    new CellReference(products.size(), columns.length-1), // Kết thúc tại hàng cuối và cột cuối
                     workbook.getSpreadsheetVersion()
             );
+
             XSSFTable table = sheet.createTable(areaReference);
+            table.setName("ProductTable"); // Tên bảng
+            table.setDisplayName("ProductTable"); // Tên hiển thị của bảng
 
             CTTable ctTable = table.getCTTable();
-            ctTable.setRef(areaReference.formatAsString());
-            ctTable.setDisplayName("MYTABLE");
-            ctTable.setName("Test");
-            ctTable.setId(1L);
+            ctTable.setRef(areaReference.formatAsString()); // Đảm bảo vùng tham chiếu đúng
+            ctTable.setId(1); // ID bảng phải là duy nhất
+            ctTable.setName("ProductTable");
+            ctTable.setDisplayName("ProductTable");
 
             CTTableStyleInfo tableStyleInfo = ctTable.addNewTableStyleInfo();
-            tableStyleInfo.setName("TableStyleLight1");
-            tableStyleInfo.setShowColumnStripes(false);
+            tableStyleInfo.setName("TableStyleMedium9"); // Chọn style (chẳng hạn "TableStyleMedium9")
             tableStyleInfo.setShowRowStripes(true);
-            tableStyleInfo.setShowLastColumn(false);
-
+            tableStyleInfo.setShowColumnStripes(false);
 
             CTTableColumns tableColumns = ctTable.addNewTableColumns();
-
             tableColumns.setCount(columns.length);
             for (int i = 0; i < columns.length; i++) {
                 CTTableColumn column = tableColumns.addNewTableColumn();
-                column.setName(columns[i]);
-                column.setId(i + 1);
+                column.setId(i + 1); // ID của mỗi cột (bắt đầu từ 1)
+                column.setName(columns[i]); // Tên cột
             }
+
 
             XSSFRow header = sheet.createRow(0);
             for (int col = 0; col < columns.length; col++) {

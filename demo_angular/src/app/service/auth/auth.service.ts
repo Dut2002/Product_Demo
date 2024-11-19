@@ -12,7 +12,7 @@ import { FunctionDto } from '../../model/dto/function-dto';
 export class AuthService {
 
   private refreshTokenTimer: Subscription | null = null;
-  private readonly refresheInterval = 5 * 60 * 1000;
+  private readonly refresheInterval = 10 * 60 * 1000;
 
   constructor(private loginService: LoginService, private errorHandelService: ErrorHandleService) { }
 
@@ -79,7 +79,7 @@ export class AuthService {
     return functions.find((func: any) => func.feRoute === feRoute)?.name;
   }
 
-  public hasFuntion(feRoute: string): boolean {
+  public hasFunction(feRoute: string): boolean {
     const token = this.getToken();
     if(!token) return false;
     const functions = this.decodeToken(token).functions;

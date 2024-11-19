@@ -1,6 +1,6 @@
 <ul class="permission-list">
   <li class="action-card">
-    <div (mouseenter)="showAdd = true" (mouseleave)="showAdd=false">
+    <div (mouseenter)="showAdd = true" (mouseleave)="showAdd=false" *ngIf="common.hasPermission(common.permissionName.UserPermisson.ADD_PERMISSION_FOR_USER)">
       <div *ngIf="showAdd === true; else addForm">
         <form (submit)="addPermission(permission)">
           <ng-select #permission="ngModel" class="form-select" name="permissionId" [items]="permissionSearch"
@@ -25,12 +25,11 @@
           <div><strong>End Point:</strong> ~{{permission.beEndPoint}}</div>
         </div>
         <div class="header-action">
-          <button class="btn delete-btn btn-icon" (click)="ConfirmDelete(permission.id)"><i class="fa-solid fa-trash"></i></button>
+          <button class="btn delete-btn btn-icon" *ngIf="common.hasPermission(common.permissionName.UserPermisson.DELETE_PERMISSION_OF_USER)" (click)="ConfirmDelete(permission.id)"><i class="fa-solid fa-trash"></i></button>
         </div>
       </div>
     </div>
   </li>
 </ul>
-
 <app-confirm-modal #confirmModal [title]="'Do you want to delete that permission?'" (confirmEvent)="DeletePermission()">
 </app-confirm-modal>

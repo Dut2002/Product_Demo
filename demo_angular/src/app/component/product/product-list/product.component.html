@@ -104,8 +104,8 @@
       </table>
       <div class=" e-pagerContainer">
         <div class="e-navigationStyle">
-          <a (click)="onPageChange(productFilter.pageNum-1)" class="btn"
-            [class.btn-disable]="productFilter.pageNum <= 1">Previous</a>
+          <a (click)="onPageChange(productFilter.pageNum-1)" class="btn btn-icon"
+            [class.btn-disable]="productFilter.pageNum <= 1"><i class="fa-solid fa-angle-left"></i></a>
         </div>
         <div>
           <span>Page </span>
@@ -116,7 +116,7 @@
         </div>
         <div class="e-navigationStyle">
           <a (click)="onPageChange(productFilter.pageNum+1)" class="btn"
-            [class.btn-disable]="productFilter.pageNum >= totalPages">Next</a>
+            [class.btn-disable]="productFilter.pageNum >= totalPages"><i class="fa-solid fa-angle-right"></i></a>
         </div>
       </div>
     </div>

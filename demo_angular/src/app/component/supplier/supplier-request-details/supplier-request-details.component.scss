@@ -1,0 +1,39 @@
+.supplier-info {
+  padding: 10px;
+
+  & a {
+    display: -webkit-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    width: 100%;
+    text-decoration: none;
+    color: darkturquoise;
+  }
+}
+
+.modal-section {
+  margin-top: 10px;
+
+  & label{
+    width: 70px;
+    display: inline-block;
+    margin-right: 10px;
+  }
+
+  & textarea{
+      width: 22rem;
+      height: 4rem;
+      padding: 5px;
+      overflow: auto;
+  }
+}
+
+.info-grid {
+  display: grid;
+  justify-items: start;
+  align-items: center;
+  grid-template-columns: 1fr 1fr;
+}
+
+

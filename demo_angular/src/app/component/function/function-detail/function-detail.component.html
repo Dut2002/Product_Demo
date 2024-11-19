@@ -8,7 +8,7 @@
   <div class="function-permission-title center">
     Permission List
   </div>
-  <app-permission-add [common]="common" [functionId]="func.id" (addEvent)="loadData()">
+  <app-permission-add *ngIf="common.hasPermission(common.permissionName.FunctionManagement.ADD_PERMISSION)" [common]="common" [functionId]="func.id" (addEvent)="loadData()">
   </app-permission-add>
   <div class="permission-card border-dot" *ngFor="let permission of func.permissions">
     <app-permission-details [common]="common" [permission]="permission"

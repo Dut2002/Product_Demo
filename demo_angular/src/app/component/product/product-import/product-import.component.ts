@@ -8,7 +8,6 @@ import { HeaderMapping, ImportType, ParseOptions, ParseResult } from '../../../m
 import { ValidationConfig } from '../../../model/import/validation-dto';
 import { CommonService } from '../../../service/common/common.service';
 import { ExcelParse } from '../../../service/excel-parse.service';
-import { Pattern } from '../../../constant/paterns.const';
 
 @Component({
   selector: 'app-product-import',
@@ -108,7 +107,6 @@ export class ProductImportComponent implements OnInit {
     name: {
       rules: [
         { type: 'maxLength', params: 100, message: 'Tên không được quá 100 ký tự' },
-        { type: 'pattern', params: Pattern.vietnamesePattern, message: 'Tên chỉ được chứa chữ cái và khoảng trắng' }
       ]
     },
     yearMaking: {
@@ -191,18 +189,26 @@ export class ProductImportComponent implements OnInit {
           this.listProduct = this.parseResult.listData as ProductImport[]
 
           if (this.parseResult.success) {
-            //validate file trên fe thành công gửi sang be validate
-            this.validateData(false);
+            if (this.typeImport === ImportType.DELETE) {
+              this.common.snackBar.show("Import Delete", "Bạn đang muốn thực hiện xóa dữ liệu. Nhấn Import để tiếp tục.", ApiStatus.NORMAL, 5000)
+              this.disableButton = false;
+              this.isLoading = false;
+              this.importButton.nativeElement.onclick = null;
+              this.importButton.nativeElement.addEventListener('click', () => this.validateData(false));
+            } else {
+              //validate file trên fe thành công gửi sang be validate
+              this.validateData(false);
+            }
           } else if (this.parseResult.globalErrors?.length === 0) {
             //validate file trên fe có 1 số data lỗi, cần xác nhận tiếp tục
-            this.common.snackBar.show(null, 'Một số dữ liệu bảng lỗi', ApiStatus.ERROR, 5000);
+            this.common.snackBar.show("Invalida data", 'Một số dữ liệu bảng lỗi. Nhấn Import để bỏ qua lỗi và tiếp tục', ApiStatus.ERROR, 5000);
             this.disableButton = false;
             this.isLoading = false;
             this.importButton.nativeElement.onclick = null;
             this.importButton.nativeElement.addEventListener('click', () => this.validateData(true));
           } else {
             // xử lý thông báo lỗi validate file trên fe
-            this.common.snackBar.show(null, 'Lỗi File Template', ApiStatus.ERROR, 5000);
+            this.common.snackBar.show("Invalid File", 'Lỗi File Template, không thể Import', ApiStatus.ERROR, 5000);
             this.isLoading = false;
           }
         }
@@ -244,13 +250,18 @@ export class ProductImportComponent implements OnInit {
     });
 
     this.common.base.uploadFile(endpoint, formData)
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+        })
+      )
       .subscribe({
         next: res => {
           this.parseResult = res;
           this.listProduct = res.listData as ProductImport[];
           if (this.parseResult?.success === true) {
-            this.common.snackBar.show(null, 'Import Product Successfull!', ApiStatus.SUCCESS, 5000);
-            this.isLoading = false;
+            this.common.snackBar.show("null", 'Import Product Successfull!', ApiStatus.SUCCESS, 5000);
+            this.importButton.nativeElement.onclick = null;
             this.successEvent.emit();
           }
           else if (this.parseResult?.globalErrors?.length === 0) {
@@ -258,17 +269,14 @@ export class ProductImportComponent implements OnInit {
               this.importData();
             } else {
               //một số data lỗi, cần xác nhận tiếp tục gọi be xử lý
-              this.common.snackBar.show(null, 'Một số dữ liệu bảng bị lỗi trên Server', ApiStatus.ERROR, 5000);
+              this.common.snackBar.show("Invalid Data", 'Một số dữ liệu bảng bị lỗi trên Server. Nhấn Import để bỏ qua lỗi và tiếp tục', ApiStatus.ERROR, 5000);
               this.disableButton = false;
-              this.isLoading = false;
               this.importButton.nativeElement.onclick = null;
               this.importButton.nativeElement.addEventListener('click', () => this.importData());
             }
           } else {
-            this.common.snackBar.show(null, 'Lỗi validate File trên Server', ApiStatus.ERROR, 5000);
-            this.isLoading = false;
+            this.common.snackBar.show("Import Error", 'Lỗi Import trên Server', ApiStatus.ERROR, 5000);
           }
-
         },
         error: err => this.common.errorHandle.handle(err)
       })
@@ -295,9 +303,10 @@ export class ProductImportComponent implements OnInit {
           this.listProduct = res.listData as ProductImport[];
           if (this.parseResult?.success) {
             this.common.snackBar.show(null, 'Import Product Successfull!', ApiStatus.SUCCESS, 5000);
+            this.importButton.nativeElement.onclick = null;
             this.successEvent.emit();
           } else {
-            this.common.snackBar.show(null, 'Import Product Failed!', ApiStatus.ERROR, 5000);
+            this.common.snackBar.show("Import Error", 'Import Product Failed!', ApiStatus.ERROR, 5000);
           }
         },
         error: err => this.common.errorHandle.handle(err)
@@ -307,6 +316,7 @@ export class ProductImportComponent implements OnInit {
 
   onClose() {
     this.showModal = false;
+    this.disableButton = true;
   }
 
   isValid() {

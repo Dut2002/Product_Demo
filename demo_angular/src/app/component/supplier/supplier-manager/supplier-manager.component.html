@@ -1,0 +1,89 @@
+<div class="container">
+  <h1 class="title center">Supplier Management</h1>
+  <div class="table-actions">
+    <button class="btn add-btn btn-medium"
+      *ngIf="common.hasPermission(common.permissionName.SupplierManagement.ADD_SUPPLIER)" (click)="openAddModal()">Add
+      Suppler</button>
+    <a class="btn export-btn btn-medium " *ngIf="common.hasFunction(common.routerLinks.SUPPLIER_APPROVAL)"
+      [href]="common.routerLinks.SUPPLIER_APPROVAL">
+      Request
+    </a>
+  </div>
+
+  <!-- <app-product-filter [filter]="productFilter" (applyEvent)="applyFilter($event)" (resetEvent)="resetFilter()">
+
+  </app-product-filter> -->
+
+  <ng-container *ngIf="suppliers.length > 0; else noData">
+    <div class="table-container">
+      <table class="table product-table">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Name</th>
+            <th>Contact</th>
+            <th>Address</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Website</th>
+            <th
+              *ngIf="common.hasPermission(common.permissionName.SupplierManagement.UPDATE_SUPPLIER) || common.hasPermission(common.permissionName.SupplierManagement.DELETE_SUPPLIER)">
+              >
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let supplier of suppliers; let i = index">
+            <td class="col-20">{{ i + 1 }}</td>
+            <td class="col-100">{{ supplier.name }}</td>
+            <td class="col-70">{{ supplier.contact }}</td>
+            <td class="col-120">{{ supplier.address}}</td>
+            <td class="col-60">{{ supplier.phone }}</td>
+            <td class="col-100">{{ supplier.email}}</td>
+            <td class="col-120">{{ supplier.website }}</td>
+            <td class="col-75"
+              *ngIf="common.hasPermission(common.permissionName.SupplierManagement.UPDATE_SUPPLIER) || common.hasPermission(common.permissionName.SupplierManagement.DELETE_SUPPLIER)">
+
+              <button class="btn update-btn btn-icon" (click)="openUpdateModal(supplier)"
+                *ngIf="common.hasPermission(common.permissionName.SupplierManagement.UPDATE_SUPPLIER)">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button class="btn delete-btn btn-icon" (click)="openDeleteConfirm(supplier)"
+                *ngIf="common.hasPermission(common.permissionName.SupplierManagement.DELETE_SUPPLIER)">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class=" e-pagerContainer">
+        <div class="e-navigationStyle">
+          <a (click)="onPageChange(supplierFilter.pageNum-1)" class="btn"
+            [class.btn-disable]="supplierFilter.pageNum <= 1"><i class="fa-solid fa-angle-left"></i></a>
+        </div>
+        <div>
+          <span>Page </span>
+          <input type="number" [(ngModel)]="supplierFilter.pageNum" min="1" [max]="totalPages"
+            [ngModel]="supplierFilter.pageNum" (ngModelChange)="loadSuppliers()" class="page-input"
+            style="width: 40px; text-align: center;">
+          <span> of <b>{{totalPages}}</b></span>
+        </div>
+        <div class="e-navigationStyle">
+          <a (click)="onPageChange(supplierFilter.pageNum+1)" class="btn"
+            [class.btn-disable]="supplierFilter.pageNum >= totalPages"><i class="fa-solid fa-angle-right"></i></a>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+  <ng-template #noData>
+    <h1 class="title center">No data available</h1>
+  </ng-template>
+
+  <!-- <app-product-modal #productModal [common]="common" [product]="currentProduct" (successEvent)="saveSuccess()">
+  </app-product-modal> -->
+
+  <app-confirm-modal #modalConfirm [title]="'Do you want to delete this Supplier?'" (confirmEvent)="deleteSupplier()">
+  </app-confirm-modal>
+
+</div>

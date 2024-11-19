@@ -1,7 +1,7 @@
 <div class="container">
   <h1 class="title center">Function Management</h1>
   <div class="table-actions">
-    <button class="btn add-btn btn-medium" (click)="openAddModal()">Add Function</button>
+    <button class="btn add-btn btn-medium" (click)="openAddModal()" *ngIf="common.hasPermission(common.permissionName.FunctionManagement.ADD_FUNCTION)">Add Function</button>
     <button class="btn add-btn btn-medium" (click)="loadList()">Refresh</button>
   </div>
   <div class="accordion-container">
@@ -9,9 +9,9 @@
       <div class="accordion-header">
         <h1 class="title"><a [routerLink]="[]" fragment="{{func.id}}" (click)="toggle(func)">{{func.name}}</a></h1>
         <div class="accordion-action">
-          <button class="btn btn-icon btn-orange" (click)="openUpdateModal(func)"><i
+          <button class="btn btn-icon btn-orange" *ngIf="common.hasPermission(common.permissionName.FunctionManagement.UPDATE_FUNCTION)" (click)="openUpdateModal(func)"><i
               class="fa-solid fa-pen-to-square"></i></button>
-          <button class="btn btn-icon btn-red" (click)="confirmDelete(func)"><i class="fa-solid fa-trash"></i></button>
+          <button class="btn btn-icon btn-red" *ngIf="common.hasPermission(common.permissionName.FunctionManagement.DELETE_FUNCTION)" (click)="confirmDelete(func)"><i class="fa-solid fa-trash"></i></button>
         </div>
       </div>
       <div class="content hidden" [ngClass]="{'hidden': openSectionId !== func.id}">

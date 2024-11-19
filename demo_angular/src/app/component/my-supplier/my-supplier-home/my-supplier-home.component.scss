@@ -1,0 +1,28 @@
+.company-cover-inner{
+  border: 3px dotted grey;
+  border-radius: 12px;
+  padding: 12px 40px;
+  display: flex;
+  gap: 40px;
+  align-items: center;
+}
+
+.company-detail-name{
+  text-wrap: wrap;
+  width: 20%;
+  align-content: center;
+}
+
+.box-detail{
+  padding-left: 20px;
+  border-left: 0.5px solid grey;
+}
+
+.box-caption{
+  font-weight: bold;
+}
+
+.box-caption span, .desc{
+  margin-left: 20px;
+}
+

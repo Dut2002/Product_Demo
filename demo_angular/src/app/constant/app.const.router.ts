@@ -12,7 +12,7 @@ export class RouterUrl {
   static readonly SHOPPING = 'shopping/view-products';
   static readonly PRODUCT_MANAGEMENT = 'product/view-products';
   static readonly FUNCTION_MANAGEMENT = 'function/view-functions';
-  static readonly SUPPLIER_MANAGER = 'supplier-approval/view-request';
+  static readonly SUPPLIER_MANAGER = 'supplier/view-supplier';
   static readonly SUPPLIER_APPROVAL = 'supplier-approval/view-request'
   static readonly MY_SUPPLIER = 'supplier-info/view-supplier-info';
 }

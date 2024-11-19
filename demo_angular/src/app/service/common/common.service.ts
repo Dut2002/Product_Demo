@@ -42,6 +42,10 @@ export class CommonService {
     return this.auth.hasPermission(this.functionName!, permissionName)
   }
 
+  hasFunction(feRoute: string): boolean{
+    return this.auth.hasFunction(feRoute);
+  }
+
 
 
 }

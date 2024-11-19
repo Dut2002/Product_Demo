@@ -1,0 +1,60 @@
+<div class="modal" *ngIf="isShow">
+  <div class="modal-content">
+    <h2>Request Details</h2>
+    <div class="modal-section">
+      <label for="supplierInfo">Info:</label>
+      <div class="supplier-info">
+        <div><strong>Name:</strong><div> {{ openSupplierReq?.name }}</div></div>
+        <div><strong>Contact:</strong> <div>{{ openSupplierReq?.contact }}</div></div>
+        <div><strong>Address:</strong> <div>{{ openSupplierReq?.address }}</div></div>
+        <div><strong>Phone:</strong> <div>{{ openSupplierReq?.phone }}</div></div>
+        <div><strong>Email:</strong>
+          <div>
+            <a href="mailto:{{openSupplierReq?.email }}">{{openSupplierReq?.email }}</a>
+          </div>
+        </div>
+        <div><strong>Website:</strong>
+          <div> <a [href]="openSupplierReq?.website" >{{ openSupplierReq?.website }}</a></div></div>
+      </div>
+    </div>
+
+    <div class="modal-section info-grid">
+      <div>
+        <label for="status">Status:</label>
+        <span [ngStyle]="{
+            'color': request.status === ApprovalStatus.APPROVED ? 'green' :
+                     request.status === ApprovalStatus.REJECTED ? 'red' :
+                     request.status === ApprovalStatus.PENDING ? 'orange' :
+                     request.status === ApprovalStatus.CANCELED ? 'grey' : 'black'
+          }">{{ request.status }}</span>
+      </div>
+      <div>
+        <div>
+          <label for="createdAt">Created:</label>
+          <span>{{ request.createdAt | date }}</span>
+        </div>
+        <div>
+          <label for="updatedAt">Updated:</label>
+          <span>{{ request.updatedAt ? (request.updatedAt | date) : 'N/A' }}</span>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <label for="note">Note:</label>
+      <textarea [disabled]="true" [value]="request.note || 'No note available'"></textarea>
+    </div>
+
+    <!-- Close button -->
+    <div class="modal-action">
+      <button class="btn btn-medium btn-orange" (click)="confirmCancelRequest()"
+        [ngClass]="{'btn-disable': request.status !== ApprovalStatus.PENDING}">Cancel</button>
+      <button class="btn btn-medium" (click)="closeModal()">Close</button>
+    </div>
+  </div>
+
+</div>
+
+<app-confirm-modal #confirmModal [title]="'Do you watn cancel that request?'"
+  (confirmEvent)="cancelRequest()"></app-confirm-modal>

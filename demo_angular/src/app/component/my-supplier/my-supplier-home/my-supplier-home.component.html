@@ -1,0 +1,54 @@
+<div class="company-cover-inner">
+  <h1 class="company-detail-name text-highlight">
+    {{supplier.name}}
+  </h1>
+  <div class="box-detail">
+    <div class="item">
+      <div class="box-caption">
+        <i class="fa-solid fa-user"></i>
+        <span>Contact</span>
+      </div>
+      <div class="desc">
+        {{supplier.contact}}
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="box-caption">
+        <i class="fa-solid fa-globe"></i>
+        <span>Website</span>
+      </div>
+      <div class="desc">
+        <a [href]="supplier.website" target="_blank" class="company-subdetail-info-text">{{supplier.website}}</a>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="box-caption">
+        <i class="fa-solid fa-envelope"></i>
+        <span>Mail</span>
+      </div>
+      <div class="desc">
+        {{supplier.email}}
+      </div>
+    </div>
+    <div class="item">
+      <div class="box-caption">
+        <i class="fa-solid fa-location-dot"></i>
+        <span>Địa chỉ</span>
+      </div>
+      <div class="desc">
+        {{supplier.address}}
+      </div>
+    </div>
+    <div class="item">
+      <div class="box-caption">
+        <i class="fa-solid fa-phone"></i>
+        <span>Số điện thoại</span>
+      </div>
+      <div class="desc">
+        {{supplier.phone}}
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,108 @@
+<div class="my-supplier-request-conttainer">
+  <div class="supplier-request">
+    <div class="request-limit" *ngIf="disableRequest(); else formRequest">
+      Không thể gửi thêm yêu cầu!
+    </div>
+    <ng-template #formRequest>
+      <h2 class="">Supplier Request</h2>
+      <form class="flex" #requestForm="ngForm" (ngSubmit)="sendRequest(requestForm)">
+        <div class="form-input flex-half">
+          <label class="form-label" for="name">Supplier Name</label>
+          <div class="form-input-enter">
+            <input type="text" [(ngModel)]="currentRequest.name" #name="ngModel" name="name" placeholder="Supplier Name"
+              [minlength]="2" [maxlength]="100" [required]="true">
+          </div>
+          <div *ngIf="name.touched && !name.valid" class="validate-input">
+            <span *ngIf="name.errors?.['required']">Name is required</span>
+            <span *ngIf="name.errors?.['minlength'] || name.errors?.['maxlength']">Length from 2 to 100
+              characters</span>
+          </div>
+        </div>
+        <div class="form-input flex-half">
+          <label class="form-label" for="contact">Contact</label>
+          <div class="form-input-enter">
+            <input type="text" [(ngModel)]="currentRequest.contact" #contact="ngModel" name="contact"
+              placeholder="Contact" [minlength]="2" [maxlength]="100" [required]="true">
+          </div>
+          <div *ngIf="contact.touched && !contact.valid" class="validate-input">
+            <span *ngIf="contact.errors?.['required']">Contact is required</span>
+            <span *ngIf="contact.errors?.['minlength'] || contact.errors?.['maxlength']">Length from 2 to 100
+              characters</span>
+          </div>
+        </div>
+        <div class="form-input flex-half">
+          <label class="form-label" for="email">Email</label>
+          <div class="form-input-enter">
+            <input type="email" [(ngModel)]="currentRequest.email" #email="ngModel" name="email" placeholder="Email"
+              [email]="true" [required]="true">
+          </div>
+          <div *ngIf="email.touched && !email.valid" class="validate-input">
+            <span *ngIf="email.errors?.['required']">Email is required</span>
+            <span *ngIf="email.errors?.['email']">Wrong format email</span>
+          </div>
+        </div>
+        <div class="form-input flex-half">
+          <label class="form-label" for="address">Address</label>
+          <div class="form-input-enter">
+            <input type="text" [(ngModel)]="currentRequest.address" #address="ngModel" name="address"
+              placeholder="Address" [minlength]="2" [maxlength]="500" [required]="true">
+          </div>
+          <div *ngIf="address.touched && !address.valid" class="validate-input">
+            <span *ngIf="address.errors?.['required']">Address is required</span>
+            <span *ngIf="address.errors?.['minlength'] || address.errors?.['maxlength']">Length from 2 to 500
+              characters</span>
+          </div>
+        </div>
+        <div class="form-input flex-half">
+          <label class="form-label" for="phone">Phone</label>
+          <div class="form-input-enter">
+            <input type="tel" [(ngModel)]="currentRequest.phone" #phone="ngModel" name="phone" placeholder="Phone"
+              [pattern]="pattern.phonePattern" [required]="true" (keypress)="onPhoneKeyPress($event)">
+          </div>
+          <div *ngIf="phone.touched && !phone.valid" class="validate-input">
+            <span *ngIf="phone.errors?.['required']">Phone is required</span>
+            <span *ngIf="phone.errors?.['pattern']">Wrong format of phone number</span>
+          </div>
+        </div>
+
+        <div class="form-input flex-half">
+          <label class="form-label" for="website">Website</label>
+          <div class="form-input-enter">
+            <input type="text" [(ngModel)]="currentRequest.website" #website="ngModel" name="website"
+              placeholder="Website" [pattern]="pattern.websitePattern" [required]="true">
+          </div>
+          <div *ngIf="website.touched && !website.valid" class="validate-input">
+            <span *ngIf="website.errors?.['required']">Website is required</span>
+            <span *ngIf="website.errors?.['pattern']">Wrong format of website address</span>
+          </div>
+        </div>
+        <div class="center">
+          <button [ngClass]="{'btn-disable': isLoading}" type="submit" class="btn btn-small btn-green">Save</button>
+          <button [ngClass]="{'btn-disable': isLoading}" type="reset" class="btn btn-small btn-orange"
+            (click)="onReset(requestForm)">Refresh
+          </button>
+        </div>
+      </form>
+    </ng-template>
+  </div>
+  <div class="supplier-request-list">
+    <h2 class="">My Request</h2>
+    <div class="list-request">
+      <div class="request-card-containner" *ngFor="let request of requests">
+        <div *ngIf="!disableRequest()" (click)="getRequest(request)" ><i class="fa-solid fa-left-long"></i></div>
+        <div class="request-card" [ngClass]="{'request-approved': request.status === ApprovalStatus.APPROVED,
+        'request-rejected': request.status === ApprovalStatus.REJECTED,
+        'request-pending': request.status === ApprovalStatus.PENDING,
+        'request-cancel': request.status === ApprovalStatus.CANCELED}" (click)="openDetail(request)">
+          <div>{{request.createdAt | date}}</div>
+          <div>{{request.status}}</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<app-my-supplier-request-detail [common]="common" #requestDetail (successEvent)="loadData()">
+
+</app-my-supplier-request-detail>

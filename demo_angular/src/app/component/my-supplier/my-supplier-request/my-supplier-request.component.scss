@@ -1,0 +1,45 @@
+.my-supplier-request-conttainer{
+  display: flex;
+  gap: 30px
+}
+
+.supplier-request{
+  flex: 2;
+
+}
+
+.supplier-request-list{
+  flex: 1;
+}
+
+.request-limit{
+  width: 100%;
+  height: 380px;
+  background: white;
+  border: 1px solid;
+  padding: 19px;
+  border-radius: 30px;
+  text-align: center;
+  font-size: x-large;
+  display: grid;
+  align-content: center;
+}
+
+.request-card-containner{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+
+  &:last-of-type{
+    margin-bottom: 0px;
+  }
+
+  & div{
+    cursor: pointer;
+  }
+
+  & .request-card{
+    flex: 1;
+  }
+}

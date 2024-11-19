@@ -1,0 +1,12 @@
+.banner-img{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.banner-container{
+  height: calc(100vh - 60px);
+  width: 100%;
+  background: #99dfff;
+  margin-top: 30px;
+}

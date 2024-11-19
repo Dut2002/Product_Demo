@@ -25,7 +25,7 @@ export class HeaderComponent {
   }
 
   public hasFuntions(functionRoute: string): boolean {
-    return this.authService.hasFuntion(functionRoute);
+    return this.authService.hasFunction(functionRoute);
   }
 
   @Input() title = 'Title';

@@ -12,7 +12,6 @@ public class ProcessRequest {
     Long id;
     @NotNull
     Constants.ApprovalStatus status;
-    String note;
     @NotNull
     Constants.ApprovalType approvalType;
 }

@@ -1,0 +1,88 @@
+<div class="modal" *ngIf="isShow">
+  <div class="modal-content">
+    <h2>Request Details</h2>
+    <div class="modal-section">
+      <label for="supplierInfo">Info:</label>
+      <div class="supplier-info">
+        <div><strong>Name:</strong>
+          <div> {{ request.data.name }}</div>
+        </div>
+        <div><strong>Contact:</strong>
+          <div>{{ request.data.contact }}</div>
+        </div>
+        <div><strong>Address:</strong>
+          <div>{{ request.data.address }}</div>
+        </div>
+        <div><strong>Phone:</strong>
+          <div>{{ request.data.phone }}</div>
+        </div>
+        <div><strong>Email:</strong>
+          <div>
+            <a href="mailto:{{request.data.email }}">{{request.data.email }}</a>
+          </div>
+        </div>
+        <div><strong>Website:</strong>
+          <div> <a [href]="request.data.website">{{ request.data.website }}</a></div>
+        </div>
+        <div><strong>Requester:</strong>
+          <div> {{request.fullName}}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-section info-grid">
+      <div>
+        <label for="status">Status:</label>
+        <span [ngStyle]="{
+            'color': request.status === ApprovalStatus.APPROVED ? 'green' :
+                     request.status === ApprovalStatus.REJECTED ? 'red' :
+                     request.status === ApprovalStatus.PENDING ? 'orange' :
+                     request.status === ApprovalStatus.CANCELED ? 'grey' : 'black'
+          }">{{ request.status }}</span>
+      </div>
+      <div>
+        <div>
+          <label for="createdAt">Created:</label>
+          <span>{{ request.createdAt | date }}</span>
+        </div>
+        <div>
+          <label for="updatedAt">Updated:</label>
+          <span>{{ request.updatedAt ? (request.updatedAt | date) : 'N/A' }}</span>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <label for="note">Note:</label>
+      <textarea #noteInput placeholder="No note available" [value]="request.note"></textarea>
+    </div>
+
+    <!-- Close button -->
+    <div class="modal-action">
+
+      <div class="flex-2 request-card-content">
+        <div>
+          <button
+            *ngIf="request.status === ApprovalStatus.PENDING && common.hasPermission(common.permissionName.SupplierApproval.PROCESS_REQUEST)"
+            class="btn btn-icon btn-green" (click)="confirmProcesslRequest(true)">
+            <i class="fa-solid fa-check"></i>
+          </button>
+          <button
+            *ngIf="request.status === ApprovalStatus.PENDING && common.hasPermission(common.permissionName.SupplierApproval.PROCESS_REQUEST)"
+            class="btn btn-icon btn-red" (click)="confirmProcesslRequest(false)">
+            <i class="fa-solid fa-x"></i>
+          </button>
+          <button *ngIf="common.hasPermission(common.permissionName.SupplierApproval.SAVE_NOTE)"
+            class="btn btn-icon btn-orange" (click)="saveNote(noteInput)">
+            <i class="fa-solid fa-pen-to-square"></i>
+          </button>
+        </div>
+      </div>
+      <button class="btn btn-medium" (click)="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<app-confirm-modal #confirmModal [title]="'Do you watn process that request?'"
+  (confirmEvent)="processRequest()"></app-confirm-modal>

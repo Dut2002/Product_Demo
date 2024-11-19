@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ApiStatus } from '../../constant/api.const.urls';
 import { RouterUrl } from '../../constant/app.const.router';
 import { SnackBarService } from '../snack-bar/snack-bar.service';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ import { SnackBarService } from '../snack-bar/snack-bar.service';
 export class ErrorHandleService {
 
   constructor(private snackBarService: SnackBarService,
-    public router: Router
+    private router: Router,
   ) { }
 
   handle(error: any): void {
@@ -29,6 +30,6 @@ export class ErrorHandleService {
   }
 
   show(tilte: string | null, message: string): void {
-    this.snackBarService.show(tilte, message, ApiStatus.ERROR, 5000);
+    this.snackBarService.show(tilte, message, ApiStatus.ERROR, 5000000000000);
   }
 }
