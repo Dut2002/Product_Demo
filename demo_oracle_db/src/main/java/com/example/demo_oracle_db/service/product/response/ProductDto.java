@@ -1,11 +1,10 @@
 package com.example.demo_oracle_db.service.product.response;
 
-import com.example.demo_oracle_db.entity.*;
+import com.example.demo_oracle_db.entity.Product;
+import com.example.demo_oracle_db.entity.ProductVoucher;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 
 import java.time.LocalDate;
 import java.util.List;
