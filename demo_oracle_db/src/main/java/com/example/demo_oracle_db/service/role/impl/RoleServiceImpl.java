@@ -9,7 +9,6 @@ import com.example.demo_oracle_db.service.role.request.RoleReq;
 import com.example.demo_oracle_db.service.role.response.RoleRes;
 import com.example.demo_oracle_db.util.MessageCode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

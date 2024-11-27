@@ -20,8 +20,6 @@ public interface FunctionRepository extends CrudRepository<Function, Long>, JpaS
 
     boolean existsByNameAndIdNot(String name, Long id);
 
-    boolean existsByFeRoute(String feRoute);
-
     @Modifying
     @Transactional
     @Query(value = "INSERT INTO CMD_FUNCTION (FUNCTION_NAME, FE_ROUTE, priority) VALUES (?1, ?2, ?3)", nativeQuery = true)

@@ -23,7 +23,7 @@ public class Function {
     @Column(name = "FE_ROUTE")
     private String feRoute;
     @Basic
-    @Column(name = "PRIORITY", nullable = false, precision = 0)
+    @Column(name = "PRIORITY", nullable = false)
     private Integer priority;
     @JsonIgnore
     @OneToMany(mappedBy = "function", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)

@@ -1,6 +1,5 @@
 package com.example.demo_oracle_db.service.user.impl;
 
-import com.example.demo_oracle_db.config.authen.dto.UserPrincipal;
 import com.example.demo_oracle_db.entity.Account;
 import com.example.demo_oracle_db.entity.AccountRole;
 import com.example.demo_oracle_db.entity.Role;
@@ -23,8 +22,6 @@ import jakarta.persistence.criteria.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

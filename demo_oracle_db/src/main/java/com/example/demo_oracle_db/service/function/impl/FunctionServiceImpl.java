@@ -1,6 +1,5 @@
 package com.example.demo_oracle_db.service.function.impl;
 
-import com.example.demo_oracle_db.config.authen.dto.UserPrincipal;
 import com.example.demo_oracle_db.entity.Function;
 import com.example.demo_oracle_db.entity.Permission;
 import com.example.demo_oracle_db.exception.DodException;
@@ -18,8 +17,6 @@ import com.example.demo_oracle_db.service.role.response.FunctionDto;
 import com.example.demo_oracle_db.service.role.response.PermissionDto;
 import com.example.demo_oracle_db.util.MessageCode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

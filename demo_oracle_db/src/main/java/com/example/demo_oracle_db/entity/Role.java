@@ -21,7 +21,7 @@ public class Role {
     @Column(name = "NAME", unique = true)
     private String name;
     @Basic
-    @Column(name = "PRIORITY", nullable = false, precision = 0)
+    @Column(name = "PRIORITY", nullable = false)
     private Integer priority;
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<RolePermission> rolePermissionList;
