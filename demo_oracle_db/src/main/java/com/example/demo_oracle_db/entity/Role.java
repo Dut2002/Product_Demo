@@ -20,6 +20,9 @@ public class Role {
     @Size(max = 255)
     @Column(name = "NAME", unique = true)
     private String name;
+    @Basic
+    @Column(name = "PRIORITY", nullable = false, precision = 0)
+    private Integer priority;
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<RolePermission> rolePermissionList;
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

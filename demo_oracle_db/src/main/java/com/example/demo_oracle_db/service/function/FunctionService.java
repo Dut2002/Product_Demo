@@ -24,7 +24,7 @@ public interface FunctionService {
 
     DeletePermissionRes deletePermission(Long id) throws DodException;
 
-    List<FunctionDto> viewAll();
+    List<FunctionDto> viewAll() throws DodException;
 
     String checkDeletePermission(Long permissionId) throws DodException;
 

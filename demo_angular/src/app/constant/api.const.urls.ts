@@ -38,6 +38,20 @@ export class ApiUrls {
 }
 
 export class PermissionName {
+
+  public static readonly FixSystem = {
+    VIEW_SUPER_ADMIN_FUNCTION: 'View Supper Admin Function',
+    ADD_FUNCTION: 'Add Function',
+    DELETE_FUNCTION: 'Delete Function',
+    ADD_PERMISSION: 'Add Permission',
+    DELETE_PERMISSION: 'Delete Permission',
+    GET_FUNCTION_SEARCH: 'Get Function Search',
+    GET_PERMISSION_SEARCH: 'Get Permission Search',
+    GET_FUNCTION_PERMISSION: 'Get Function Permission',
+    ADD_NEW_FUNCTION: 'Add New Function',
+    ADD_NEW_PERMISSION: 'Add New Permission'
+  }
+
   public static readonly UserPermisson = {
     VIEW_USER_PERMISSION: 'View User Permission',
     ADD_FUNCTION_FOR_USER: 'Add Function For User',
@@ -49,12 +63,16 @@ export class PermissionName {
     GET_PERMISSION_SEARCH: 'Get Permission Search',
     VIEW_USER_FUNCTION_PERMISSION: 'View User Function Permission',
   }
+
   public static readonly UserManagement = {
     VIEW_USERS: 'View Users',
     ADD_USER: 'Add User',
     EDIT_USER: 'Edit User',
     DELETE_USER: 'Delete User',
     CHANGE_USER_STATUS: 'Change User Status',
+    GET_ROLE_SEARCH: 'Get Role Search',
+    ADD_ROLE_USER: 'Add Role User',
+    DELETE_ROLE_USER: 'Delete Role User',
   }
   public static readonly UserRole = {
     VIEW_ROLES: 'View Roles',

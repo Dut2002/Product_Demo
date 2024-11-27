@@ -1,11 +1,9 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Pattern } from '../../../constant/paterns.const';
 import { AddPermissionDto } from '../../../model/dto/add-permission-dto';
 import { Permission } from '../../../model/permission';
-import { Pattern } from '../../../constant/paterns.const';
 import { CommonService } from '../../../service/common/common.service';
-import { ApiStatus, PermissionName } from '../../../constant/api.const.urls';
-import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-permission-add',
@@ -22,40 +20,21 @@ export class PermissionAddComponent {
   isLoading = false;
   isShow = false;
 
-  @Output() addEvent = new EventEmitter();
+  @Output() addEvent = new EventEmitter<AddPermissionDto>();
 
   permission: Permission = {} as Permission;
 
   addPermission(form: NgForm) {
     if (form.valid) {
       this.isLoading = true;
-
-      const endpoint = this.common.getPermission(PermissionName.FunctionManagement.ADD_PERMISSION)
-      if (!endpoint) {
-        this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
-        this.isLoading = false;
-        return;
-      }
       let permissionDto: AddPermissionDto = {
         functionId: this.functionId,
         name: this.permission.name,
         beEndPoint: this.permission.beEndPoint,
         defaultPermission: this.permission.defaultPermission,
       }
-      this.common.base.post(endpoint, permissionDto)
-        .pipe(finalize(() => {
-          this.isLoading = false;
-        }))
-        .subscribe({
-          next: (res) => {
-            this.common.snackBar.show(null, res.content, ApiStatus.SUCCESS, 5000)
-            this.addEvent.emit()
-            this.onClose()
-          },
-          error: (err) => {
-            this.common.errorHandle.handle(err);
-          }
-        });
+      this.addEvent.emit(permissionDto);
+
     } else {
       form.control.markAllAsTouched();
     }
@@ -64,8 +43,6 @@ export class PermissionAddComponent {
   onReset(form: NgForm) {
     form.control.markAsUntouched();
   }
-
-
 
   onClose() {
     this.isShow = false;

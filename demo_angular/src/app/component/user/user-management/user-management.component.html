@@ -1,0 +1,82 @@
+<div class="container">
+  <div class="table-title">
+    <div class="row">
+      <div class="title-page">
+        <h2 class="title center">User Management</h2>
+      </div>
+      <div class="action-page">
+        <a (click)="OpenAddModal()" class="btn action-btn">
+          <i class="material-icons">&#xE147;</i> <span>Add New User</span>
+        </a>
+        <a href="#" class="btn action-btn">
+          <i class="material-icons">&#xE24D;</i> <span>Export to Excel</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <app-user-filter [common]="common" [filter]="accountFilter" (applyEvent)="applyFilter($event)" (resetEvent)="resetFilter()">
+
+  </app-user-filter>
+
+  <ng-container *ngIf="accounts.length > 0; else noData">
+    <div class="table-container">
+      <table class="table product-table">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Full Name </th>
+            <th>Email</th>
+            <th>Roles </th>
+            <th>Status </th>
+            <th>
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let acc of accounts; let i = index">
+            <td class="col-20">{{ i + 1 }}</td>
+            <td class="col-120">{{ acc.fullName }}</td>
+            <td class="col-120">{{ acc.email }}</td>
+            <td class="col-120">
+              <app-user-role [common]="common" [roles]="acc.roles" [accountId]="acc.id">
+              </app-user-role>
+            </td>
+            <td class="col-70">{{ acc.status }}</td>
+            <td class="col-70">
+              <button class="btn update-btn btn-icon">
+                <i class="fa-solid fa-gear"></i>
+              </button>
+              <button class="btn delete-btn btn-icon">
+                <i class="fa-solid fa-x"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class=" e-pagerContainer">
+      <div class="e-navigationStyle">
+        <a (click)="onPageChange(accountFilter.pageNum-1)" class="btn"
+          [class.btn-disable]="accountFilter.pageNum <= 1"><i class="fa-solid fa-angle-left"></i></a>
+      </div>
+      <div>
+        <span>Page </span>
+        <input type="number" [(ngModel)]="accountFilter.pageNum" min="1" [max]="totalPages"
+          [ngModel]="accountFilter.pageNum" (ngModelChange)="loadAccounts()" class="page-input"
+          style="width: 40px; text-align: center;">
+        <span> of <b>{{totalPages}}</b></span>
+      </div>
+      <div class="e-navigationStyle">
+        <a (click)="onPageChange(accountFilter.pageNum+1)" class="btn"
+          [class.btn-disable]="accountFilter.pageNum >= totalPages"><i class="fa-solid fa-angle-right"></i></a>
+      </div>
+    </div>
+  </ng-container>
+  <ng-template #noData>
+    <h1 class="title center">No data available</h1>
+  </ng-template>
+</div>
+
+<app-add-user-modal #addUserModal [common]="common" (addEvent)="loadAccounts()"></app-add-user-modal>

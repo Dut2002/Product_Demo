@@ -6,7 +6,7 @@
     <button class="btn btn-medium btn-blue" (click)="loadData()">Refresh</button>
   </div>
   <div class="accordion-container">
-    <section class="accordion" *ngFor="let role of roleList">
+    <section class="accordion" *ngFor="let role of roleList; trackBy: trackByRoleId" [@listMoveUp]>
       <div class="accordion-header">
         <h1 class="title">
           <a [routerLink]="[]" *ngIf="common.hasFunction(common.routerLinks.USER_PERMISION); else card" fragment="{{role.id}}"

@@ -22,7 +22,9 @@ public class Function {
     @Basic
     @Column(name = "FE_ROUTE")
     private String feRoute;
-
+    @Basic
+    @Column(name = "PRIORITY", nullable = false, precision = 0)
+    private Integer priority;
     @JsonIgnore
     @OneToMany(mappedBy = "function", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Permission> permissions;

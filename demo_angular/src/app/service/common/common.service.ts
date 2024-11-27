@@ -46,6 +46,9 @@ export class CommonService {
     return this.auth.hasFunction(feRoute);
   }
 
+  hasRole(roleName: string){
+    return this.auth.hasRole(roleName);
+  }
 
 
 }

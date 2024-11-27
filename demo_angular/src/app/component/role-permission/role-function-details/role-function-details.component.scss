@@ -11,6 +11,9 @@
   padding: 8px;
   border-left: 40px solid;
   font-size: 12px;
+  &.permission-default{
+    border-color: #0bad02;
+  }
 }
 
 .header-card {

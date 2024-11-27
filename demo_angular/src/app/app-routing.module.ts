@@ -15,6 +15,8 @@ import { MySupplierComponent } from './component/my-supplier/container/my-suppli
 import { SupplierManagerComponent } from './component/supplier/supplier-manager/supplier-manager.component';
 import { SupplierRequestListComponent } from './component/supplier/supplier-request-list/supplier-request-list.component';
 import { HomeComponent } from './component/common/home/home.component';
+import { UserManagementComponent } from './component/user/user-management/user-management.component';
+import { FixSystemComponent } from './component/fix-system/fix-system.component';
 
 export const routes: Routes = [
 
@@ -46,6 +48,14 @@ export const routes: Routes = [
   {
     path: RouterUrl.SUPPLIER_APPROVAL,
     component: SupplierRequestListComponent, canActivate: [authGuard]
+  },
+  {
+    path: RouterUrl.USER_MANAGEMENT,
+    component: UserManagementComponent, canActivate: [authGuard]
+  },
+  {
+    path: RouterUrl.FIX_SYSTEM,
+    component: FixSystemComponent, canActivate: [authGuard]
   },
   {
     path: RouterUrl.FORBIDDEN,

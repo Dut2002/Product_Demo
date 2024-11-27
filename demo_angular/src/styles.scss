@@ -606,22 +606,27 @@ section h1.title {
 }
 
 .accordion {
-  --circle-x: 1.8rem;
-  --circle-y: 0;
-  --circle-r: 200%;
   color: #000;
   position: relative;
   z-index: 1;
   border: 0.5px solid black;
   margin-bottom: 1rem;
   border-radius: min(8px, 0.5rem);
-  transition-timing-function: var(--slide-ease);
-  transition-duration: 200ms, 200ms, var(--slide-duration);
-  transition-property: opacity, box-shadow, grid-template-rows;
-  transition-delay: 0ms, 0ms, var(--slide-delay);
   box-shadow: 0 1px 0 2px rgba(0, 0, 0, 0.1);
   opacity: 0.9;
   overflow: hidden;
+  width: 0;
+  animation: expandWidth 0.5s ease-out forwards;
+}
+
+/* Keyframes cho animation mở rộng */
+@keyframes expandWidth {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100%; /* Kích thước đầy đủ */
+  }
 }
 
 .accordion-header {
@@ -633,7 +638,7 @@ section h1.title {
   height: fit-content;
   padding-right: 1rem;
   border-bottom: 0.5px solid black;
-
+  text-wrap: nowrap;
 }
 
 .accordion:not(:target):hover {

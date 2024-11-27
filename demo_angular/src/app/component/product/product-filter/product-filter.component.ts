@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ProductFilter } from '../../../model/dto/product-filter';
+import { ProductFilter } from '../../../model/filter/search-filter';
 import { SearchBoxDto } from '../../../model/dto/search-box-dto';
 import { ErrorHandleService } from '../../../service/error-handle/error-handle.service';
 import { ProductService } from '../../../service/product/product.service';

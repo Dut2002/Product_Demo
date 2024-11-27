@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { jwtDecode } from 'jwt-decode';
+import { catchError, of, Subscription, switchMap, timer } from 'rxjs';
 import { ApiHeaders } from '../../constant/api.const.urls';
-import { LoginService } from '../login/login.service';
-import { catchError, Observable, of, Subscription, switchMap, timer } from 'rxjs';
 import { ErrorHandleService } from '../error-handle/error-handle.service';
-import { FunctionDto } from '../../model/dto/function-dto';
+import { LoginService } from '../login/login.service';
 
 @Injectable({
   providedIn: 'root'
@@ -81,7 +80,7 @@ export class AuthService {
 
   public hasFunction(feRoute: string): boolean {
     const token = this.getToken();
-    if(!token) return false;
+    if (!token) return false;
     const functions = this.decodeToken(token).functions;
     return functions.some((func: any) => func.feRoute === feRoute);
   }
@@ -102,9 +101,21 @@ export class AuthService {
     const token = this.getToken();
     if (!token) return false;
     const decodedToken = this.decodeToken(token);
+
     const functionInfo = decodedToken.functions.find((f: any) => f.name === functionName);
     if (!functionInfo) return false;
-    return functionInfo.permissions.some((p: any) => p.name === permissionName);;
+    return functionInfo.permissions.some((p: any) => p.name === permissionName);
+  }
+
+  public hasRole(roleName: string): boolean {
+    const token = this.getToken();
+    if (!token) return false;
+    const decodedToken = this.decodeToken(token);
+    console.log('Decoded Token:', decodedToken); // Kiểm tra dữ liệu
+    console.log('Roles:', decodedToken.roles);
+    console.log('Role:', roleName);
+
+    return decodedToken.roles?.some((r: string) => r === roleName) || false;
   }
 
   public isTokenExpired(): boolean {

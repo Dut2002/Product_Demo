@@ -1,0 +1,43 @@
+<ul class="permission-list">
+  <li class="action-card">
+    <div (mouseleave)="showAdd=false" *ngIf="common.hasPermission(common.permissionName.FixSystem.ADD_PERMISSION)">
+      <div *ngIf="showAdd === true; else addForm">
+        <form (submit)="addPermission(permission)">
+          <ng-select #permission="ngModel" class="form-select" name="permissionId" [items]="permissionSearch"
+            bindLabel="name" bindValue="id" [(ngModel)]="permissionAddId" [ngModelOptions]="{ standalone: true }"
+            [searchable]="true" [required]="true" (open)="loadPermissionSearch()">
+          </ng-select>
+          <button class="btn add-btn" type="submit">Add</button>
+        </form>
+      </div>
+      <ng-template #addForm>
+        <div class="add-permission">
+          <div class="add-new-permission" (click)="openAddModal()">New Permission</div>
+          <div (mouseenter)="showAdd = true" class="add-header">
+            Add permission
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </li>
+  <li *ngFor="let permission of permissions"  [ngClass]="{'permission-default': permission.defaultPermission}">
+    <div>
+      <div class="header-card">
+        <div>
+          <div><strong>{{permission.name}}</strong></div>
+          <div><strong>End Point:</strong> ~{{permission.beEndPoint}}</div>
+        </div>
+        <div class="header-action">
+          <button class="btn delete-btn btn-icon"
+            *ngIf="common.hasPermission(common.permissionName.FixSystem.DELETE_PERMISSION)"
+            (click)="ConfirmDelete(permission.id)"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>
+    </div>
+  </li>
+</ul>
+<app-confirm-modal #confirmModal [title]="'Do you want to delete that permission?'" (confirmEvent)="DeletePermission()">
+</app-confirm-modal>
+
+<app-permission-modal #permissionAdd *ngIf="common.hasPermission(common.permissionName.FixSystem.ADD_NEW_PERMISSION)" [common]="common" [functionId]="funcId" (addEvent)="addNewPermission($event)">
+</app-permission-modal>

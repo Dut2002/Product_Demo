@@ -87,7 +87,7 @@
   </div>
   <div class="supplier-request-list">
     <h2 class="">My Request</h2>
-    <div class="list-request">
+    <div class="list-request" *ngIf="requests.length>0 ;else nodata">
       <div class="request-card-containner" *ngFor="let request of requests">
         <div *ngIf="!disableRequest()" (click)="getRequest(request)" ><i class="fa-solid fa-left-long"></i></div>
         <div class="request-card" [ngClass]="{'request-approved': request.status === ApprovalStatus.APPROVED,
@@ -98,8 +98,10 @@
           <div>{{request.status}}</div>
         </div>
       </div>
-
     </div>
+    <ng-template #nodata>
+      <div style="text-align: center; margin-top: 20px;">No data</div>
+    </ng-template>
   </div>
 </div>
 

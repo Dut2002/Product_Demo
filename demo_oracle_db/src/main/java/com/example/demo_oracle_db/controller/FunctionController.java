@@ -17,7 +17,7 @@ public class FunctionController {
     FunctionService functionService;
 
     @GetMapping("view-functions")
-    public ResponseEntity<?> viewFunctions() {
+    public ResponseEntity<?> viewFunctions() throws DodException {
         return ResponseEntity.ok(functionService.viewAll());
     }
 

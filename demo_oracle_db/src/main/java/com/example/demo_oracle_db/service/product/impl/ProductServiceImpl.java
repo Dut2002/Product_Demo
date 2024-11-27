@@ -328,7 +328,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<Product> getProductsProcedure(ProductFilter filter) {
-        StoredProcedureQuery query = entityManager.createStoredProcedureQuery("GETPRODUCTLIST")
+        StoredProcedureQuery query = entityManager.createStoredProcedureQuery("GETPRODUCTLIST", Product.class)
                 .registerStoredProcedureParameter("pro_name", String.class, ParameterMode.IN)
                 .registerStoredProcedureParameter("year_making", Integer.class, ParameterMode.IN)
                 .registerStoredProcedureParameter("start_expri_date", String.class, ParameterMode.IN)
@@ -357,7 +357,7 @@ public class ProductServiceImpl implements ProductService {
         List<Product> result = query.getResultList();
 
         // Tính toán tổng số trang
-        long totalElements = result.size();// Lấy tổng số sản phẩm từ cơ sở dữ liệu (có thể viết một query riêng cho việc này)
+        long totalElements = result.size();
         int page = filter.getPageNum() != null ? filter.getPageNum() : 1;
         int size = filter.getSizePage() != null ? filter.getSizePage() : 8;
         int start = Math.toIntExact((long) (page - 1) * size);
@@ -405,7 +405,23 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ByteArrayInputStream productListReport() throws IOException {
-        List<ProductDto> products = ((List<Product>) productRepository.findAll()).stream().map(ProductDto::new).toList();
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<ProductDto> query = criteriaBuilder.createQuery(ProductDto.class);
+        Root<Product> root = query.from(Product.class);
+        query.multiselect(
+                root.get("id"),
+                root.get("name"),
+                root.get("yearMaking"),
+                root.get("expireDate"),
+                root.get("quantity"),
+                root.get("price"),
+                root.get("categoryId"),
+                root.join("category", JoinType.INNER).get("name"),
+                root.get("supplierId"),
+                root.join("supplier", JoinType.INNER).get("name")
+        );
+
+        List<ProductDto> products = entityManager.createQuery(query).getResultList();
 
         String[] columns = {"No", "Id","Name", "Year Making", "Price", "Quantity", "Expire Date", "Category", "Supplier"};
         try (XSSFWorkbook workbook = new XSSFWorkbook();

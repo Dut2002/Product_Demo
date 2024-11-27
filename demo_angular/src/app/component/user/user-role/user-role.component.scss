@@ -1,0 +1,91 @@
+::ng-deep .user-role-select .ng-select-container {
+  border: 0.25px solid #ccc;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  padding: 5px;
+  min-height: 3.2rem;
+  /* Chiều cao tối thiểu */
+  min-width: 5rem;
+  /* Chiều rộng tối thiểu */
+}
+
+::ng-deep .user-role-select .ng-dropdown-panel {
+  background-color: white;
+  border: 1px solid #ccc;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+::ng-deep .user-role-select .ng-option {
+
+  padding: 10px;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  transition: background-color 0.5s ease;
+  /* Thêm hiệu ứng chuyển màu nền */
+
+  &:hover {
+    background-color: #ccc;
+  }
+}
+
+::ng-deep .user-role-select .ng-value {
+  margin-right: 5px;
+  font-size: 12px;
+}
+
+.user-role-select {
+  flex: 1;
+}
+
+.user-role-input {
+  display: flex;
+}
+
+.btn-add {
+  margin: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.list-role {
+  display: flex;
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.role-item {
+  border: 0.25px solid;
+  padding: 5px 8px;
+  border-radius: 20px;
+  width: 8rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  background: #007bff;
+  color: white;
+}
+
+.role-item-label {
+  text-wrap: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.add-btn {
+  border-radius: 50%;
+  background: #4CAF50;
+  color: white;
+  height: 100%; /* Chiều cao tự động bằng chiều cao của phần tử chứa */
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  aspect-ratio: 1; /* Đảm bảo tỷ lệ khung hình 1:1 để tạo hình tròn */
+  max-height: none; /* Không giới hạn chiều cao */
+}
+
+

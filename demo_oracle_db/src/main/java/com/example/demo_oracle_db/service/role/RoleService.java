@@ -7,7 +7,7 @@ import com.example.demo_oracle_db.service.role.response.RoleRes;
 import java.util.List;
 
 public interface RoleService {
-    List<RoleRes> getAll();
+    List<RoleRes> getAll() throws DodException;
 
     void addRole(RoleReq role) throws DodException;
 

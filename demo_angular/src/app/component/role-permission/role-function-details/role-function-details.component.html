@@ -17,7 +17,7 @@
       </ng-template>
     </div>
   </li>
-  <li *ngFor="let permission of permissions">
+  <li *ngFor="let permission of permissions"  [ngClass]="{'permission-default': permission.defaultPermission}">
     <div>
       <div class="header-card">
         <div>

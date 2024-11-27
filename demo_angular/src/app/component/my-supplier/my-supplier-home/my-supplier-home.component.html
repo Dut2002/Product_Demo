@@ -1,4 +1,4 @@
-<div class="company-cover-inner">
+<div class="company-cover-inner" *ngIf="common.hasRole(role); else noPermission">
   <h1 class="company-detail-name text-highlight">
     {{supplier.name}}
   </h1>
@@ -52,3 +52,9 @@
     </div>
   </div>
 </div>
+
+<ng-template #noPermission>
+  <div style="height: 100%;text-align: center;color: red;">
+    Your permission has been locked
+  </div>
+</ng-template>

@@ -17,7 +17,7 @@ public class AccountController {
     AccountService accountService;
 
     @PostMapping("view-users")
-    private ResponseEntity<?> viewUsers(@RequestBody UserFilter request) {
+    private ResponseEntity<?> viewUsers(@RequestBody UserFilter request) throws DodException {
         return ResponseEntity.ok(accountService.viewUsers(request));
     }
 
@@ -58,8 +58,13 @@ public class AccountController {
     }
 
     @DeleteMapping("delete-role")
-    private ResponseEntity<?> deleteRole(@RequestParam ChangeRoleUserReq req) throws DodException {
+    private ResponseEntity<?> deleteRole(@RequestBody DeleteRoleUserReq req) throws DodException {
         accountService.deleteRole(req);
         return ResponseEntity.ok(new Res().resOk("Delete role of account successfully!"));
+    }
+
+    @GetMapping("get-role-search")
+    private ResponseEntity<?> viewUsers(@RequestParam(required = false) Long id) throws DodException {
+        return ResponseEntity.ok(accountService.getRoleSearch(id));
     }
 }

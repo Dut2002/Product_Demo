@@ -1,0 +1,58 @@
+<div class="modal" *ngIf="showModal">
+  <div class="modal-content">
+    <h2 class="modal-title">Add new User</h2>
+    <form class="flex" #userForm="ngForm" (ngSubmit)="saveUser()">
+      <div class="form-input flex-half">
+        <label class="form-label" for="username">Username</label>
+        <div class="form-input-enter">
+          <input type="text" [(ngModel)]="addUser.username" #username="ngModel" name="username" placeholder="Username"
+            [minlength]="2" [maxlength]="100" [required]="true">
+        </div>
+        <div *ngIf="username.touched && !username.valid" class="validate-input">
+          <span *ngIf="username.errors?.['required']">Username is required</span>
+          <span *ngIf="username.errors?.['minlength'] || username.errors?.['maxlength']">Length from 2 to 100 characters</span>
+        </div>
+      </div>
+      <div class="form-input flex-half">
+        <label class="form-label" for="fullName">Full Name</label>
+        <div class="form-input-enter">
+          <input type="text" [(ngModel)]="addUser.fullName" #fullName="ngModel" name="fullName" placeholder="Full Name"
+            [minlength]="2" [maxlength]="100" [required]="true">
+        </div>
+        <div *ngIf="fullName.touched && !fullName.valid" class="validate-input">
+          <span *ngIf="fullName.errors?.['required']">Full Name is required</span>
+          <span *ngIf="fullName.errors?.['minlength'] || fullName.errors?.['maxlength']">Length from 2 to 100 characters</span>
+        </div>
+      </div>
+      <div class="form-input flex-full">
+        <label class="form-label" for="email">Email</label>
+        <div class="form-input-enter">
+          <input type="text" [(ngModel)]="addUser.email" #email="ngModel" name="email" placeholder="Email"
+          [email]="true" [required]="true">
+        </div>
+        <div *ngIf="email.touched && !email.valid" class="validate-input">
+          <span *ngIf="email.errors?.['required']">Email is required</span>
+          <span *ngIf="email.errors?.['email']">Email invalid</span>
+        </div>
+      </div>
+      <div class="form-input flex-full roles-selected">
+        <label class="form-label" for="roles">Role</label>
+        <div class="form-input-enter">
+          <ng-select [items]="roleSearchBox" bindLabel="name" bindValue="id"
+            [(ngModel)]="addUser.roles" name="roles"
+            [ngModelOptions]="{ standalone: true }" [multiple]="true" [hideSelected]="true" [searchable]="true" [required]="true" #rolesSelect="ngModel">
+          </ng-select>
+        </div>
+        <div *ngIf="rolesSelect.touched && !rolesSelect.valid" class="validate-input">
+          <span *ngIf="rolesSelect.errors?.['required']">Role is required</span>
+        </div>
+      </div>
+      <div class="center">
+        <button [ngClass]="{'btn-disable': isLoading}" type="submit" class="btn btn-small btn-green">Save</button>
+        <button [ngClass]="{'btn-disable': isLoading}" type="button" class="btn btn-small btn-orange" (click)="onReset()">Refresh</button>
+        <button [ngClass]="{'btn-disable': isLoading}" type="button" class="btn btn-small btn-gray" (click)="onClose()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+

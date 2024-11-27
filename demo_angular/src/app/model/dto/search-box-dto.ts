@@ -1,4 +1,4 @@
 export interface SearchBoxDto{
-  id: number|null;
+  id: number;
   name: string;
 }

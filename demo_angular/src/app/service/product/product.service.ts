@@ -4,7 +4,7 @@ import { BaseService } from '../base/base.service';
 import { HttpEvent, HttpParams, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Product } from '../../model/product';
-import { ProductFilter } from '../../model/dto/product-filter';
+import { ProductFilter } from '../../model/filter/search-filter';
 import { AddVoucherRequet } from '../../model/dto/add-voucher-request';
 
 @Injectable({

@@ -19,7 +19,7 @@ public class RoleController {
     private RoleService roleService;
 
     @GetMapping("view-roles")
-    public ResponseEntity<?> getRoles() {
+    public ResponseEntity<?> getRoles() throws DodException {
         return ResponseEntity.ok(roleService.getAll());
     }
 

@@ -30,6 +30,6 @@ export class ErrorHandleService {
   }
 
   show(tilte: string | null, message: string): void {
-    this.snackBarService.show(tilte, message, ApiStatus.ERROR, 5000000000000);
+    this.snackBarService.show(tilte, message, ApiStatus.ERROR, 5000);
   }
 }

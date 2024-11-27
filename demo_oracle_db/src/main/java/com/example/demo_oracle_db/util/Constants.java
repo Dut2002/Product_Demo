@@ -10,19 +10,13 @@ public class Constants {
         String FAILED = "FAILED";
     }
 
-    public enum Status {
-        Active, //đang hoạt động
-        Inactive,//không hoạt động
-        Pending, // chờ duyệt
-        Blocked, // bị chăặn
-        Deleted, // bị xóa
-        Banned // bị cấm, không thể khôi phục
-    }
+
     public interface Role {
         String ADMIN = "ROLE_ADMIN";
         String SYS_ADMIN = "ROLE_STAFF";
         String CUSTOMER = "ROLE_CUSTOMER";
         String SUPPLIER = "ROLE_SUPPLIER";
+        String SUPER_ADMIN = "ROLE_SUPER_ADMIN";
     }
 
     public interface TypeImport {
@@ -61,5 +55,14 @@ public class Constants {
         REJECTED("Rejected"),
         CANCELED("Canceled");
         private final String status;
+    }
+
+    public enum Status {
+        Active,
+        Inactive,
+        Pending,
+        Blocked,
+        Deleted,
+        Banned
     }
 }

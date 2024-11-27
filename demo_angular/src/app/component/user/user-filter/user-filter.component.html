@@ -1,0 +1,46 @@
+<div class="table-filters">
+  <form class="form">
+    <div class="form-input flex-third">
+      <label class="form-label" for="Name">Name</label>
+      <div class="form-input-enter">
+        <input type="text" [(ngModel)]="filter.fullName" name="fullName" placeholder="Search name...">
+      </div>
+    </div>
+    <div class="form-input flex-third">
+      <label class="form-label" for="username">Username</label>
+      <div class="form-input-enter">
+        <input type="text" [(ngModel)]="filter.username" name="username"
+          placeholder="Search username..">
+      </div>
+    </div>
+    <div class="form-input flex-third">
+      <label class="form-label" for="quality-range">Email</label>
+      <div class="form-input-enter">
+        <input type="text" [(ngModel)]="filter.email" name="email"
+          placeholder="Search email..">
+      </div>
+    </div>
+    <div class="form-input flex-third">
+      <label class="form-label" for="customer">Role</label>
+      <div class="form-input-enter">
+        <ng-select class="form-select" [items]="roleSearchBox" bindLabel="name" bindValue="id"
+          [(ngModel)]="filter.roleId" [ngModelOptions]="{ standalone: true }" [searchable]="true">
+        </ng-select>
+      </div>
+
+
+    </div>
+    <div class="form-input flex-third">
+      <label class="form-label" for="customer">Status</label>
+      <div class="form-input-enter">
+        <ng-select class="form-select" [items]="statusSearchBox" bindLabel="key" bindValue="value"
+          [(ngModel)]="filter.status" [ngModelOptions]="{ standalone: true }" [searchable]="true">
+        </ng-select>
+      </div>
+    </div>
+    <div class="form-input flex-full center">
+      <button class="btn submit-btn btn-small" (click)="onApply()">Apply</button>
+      <input type="reset" class="btn reset-btn btn-small" value="Reset" (click)="onReset()">
+    </div>
+  </form>
+</div>

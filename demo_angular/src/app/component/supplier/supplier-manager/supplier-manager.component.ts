@@ -1,10 +1,10 @@
 import { Component, ViewChild } from '@angular/core';
-import { ConfirmModalComponent } from '../../common/confirm-modal/confirm-modal.component';
-import { CommonService } from '../../../service/common/common.service';
 import { ActivatedRoute } from '@angular/router';
-import { SupplierFilter, SupplierInfor } from '../../../model/supplier/supplier-info';
 import { PermissionName } from '../../../constant/api.const.urls';
-import { filter } from 'rxjs';
+import { SupplierInfor } from '../../../model/supplier/supplier-info';
+import { CommonService } from '../../../service/common/common.service';
+import { ConfirmModalComponent } from '../../common/confirm-modal/confirm-modal.component';
+import { SupplierFilter } from '../../../model/filter/search-filter';
 
 @Component({
   selector: 'app-supplier-manager',
@@ -18,17 +18,13 @@ export class SupplierManagerComponent {
   suppliers: SupplierInfor[] = [];
   currentSupplier!: SupplierInfor
 
-  supplierFilter: SupplierFilter =
-  {
-    pageNum: 1,
-    pageSize: 8
-  } as SupplierFilter;
+  supplierFilter: SupplierFilter = new SupplierFilter;
 
   totalPages: number = 0;
 
   constructor(public common: CommonService,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.common.setFunctionName(this.route)
@@ -53,15 +49,15 @@ export class SupplierManagerComponent {
     });
   }
 
-  openAddModal(){
+  openAddModal() {
 
   }
 
-  openUpdateModal(supplier: any){
+  openUpdateModal(supplier: any) {
 
   }
 
-  openDeleteConfirm(supplier: any){
+  openDeleteConfirm(supplier: any) {
 
   }
 
@@ -70,7 +66,7 @@ export class SupplierManagerComponent {
     this.loadSuppliers();
   }
 
-  deleteSupplier(){
+  deleteSupplier() {
 
   }
 }

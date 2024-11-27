@@ -1,3 +1,4 @@
+import { animate, style, transition, trigger } from '@angular/animations';
 import { HttpParams } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
@@ -13,7 +14,27 @@ import { RoleModalComponent } from '../role-modal/role-modal.component';
 @Component({
   selector: 'app-role-permission',
   templateUrl: './role-permission.component.html',
-  styleUrl: './role-permission.component.scss'
+  styleUrl: './role-permission.component.scss',
+  animations: [
+    // Animation cho danh sách khi một phần tử bị xóa
+    trigger('listAnimation', [
+      transition(':leave', [
+        style({ opacity: 1, transform: 'translateY(0)' }),
+        animate('0.3s ease-out', style({ opacity: 0, transform: 'translateY(-100%)' })),
+      ]),
+    ]),
+    // Animation cho các phần tử còn lại khi có phần tử bị xóa
+    trigger('listMoveUp', [
+      transition(':enter', [
+        style({ transform: 'translateY(30px)', opacity: 0 }), // Khởi tạo phần tử ở dưới
+        animate('0.3s ease-out', style({ transform: 'translateY(0)', opacity: 1 })) // Di chuyển lên và xuất hiện
+      ]),
+      transition(':leave', [
+        style({ transform: 'translateY(0)', opacity: 1 }),
+        animate('0.3s ease-out', style({ transform: 'translateY(-10px)', opacity: 0 })) // Di chuyển lên và mờ dần
+      ])
+    ])
+  ],
 })
 export class RolePermissionComponent implements OnInit {
   currentRole!: Role
@@ -74,7 +95,12 @@ export class RolePermissionComponent implements OnInit {
       .subscribe({
         next: res => {
           this.common.snackBar.show(null, res.content, ApiStatus.SUCCESS, 5000);
-          this.roleList = this.roleList.filter(r => r.id !== this.currentRole.id);
+          // this.roleList = this.roleList.filter(r => r.id !== this.currentRole.id);
+          const index = this.roleList.findIndex(r => r.id === this.currentRole.id);
+          if (index !== -1) {
+            this.roleList.splice(index, 1);
+          }
+
         },
         error: err => this.common.errorHandle.handle(err)
       })
@@ -82,7 +108,7 @@ export class RolePermissionComponent implements OnInit {
   }
 
   viewPermission(roleId: number) {
-    this.common.router.navigate([RouterUrl.USER_PERMISION],{
+    this.common.router.navigate([RouterUrl.USER_PERMISION], {
       queryParams: {
         roleId: roleId
       }
@@ -134,13 +160,18 @@ export class RolePermissionComponent implements OnInit {
       .subscribe({
         next: res => {
           this.common.snackBar.show(null, res.content, ApiStatus.SUCCESS, 5000);
-          const roleIndex = this.roleList.findIndex(r => r.id == role.id);
-          if (roleIndex !== -1) {
-            this.roleList[roleIndex].name = role.name;
+          const index = this.roleList.findIndex(role => role.id === this.currentRole.id);
+          if (index !== -1) {
+            // Cập nhật lại danh sách sau khi xóa
+            this.roleList = [...this.roleList.slice(0, index), ...this.roleList.slice(index + 1)];
           }
           this.actionModal.closeModal();
         },
         error: err => this.common.errorHandle.handle(err),
       })
+  }
+
+  trackByRoleId(index: number, role: any) {
+    return role.id;
   }
 }

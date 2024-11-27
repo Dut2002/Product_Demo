@@ -15,7 +15,7 @@ import { MySupplierRequestDetailComponent } from '../my-supplier-request-detail/
 export class MySupplierRequestComponent implements OnInit {
   @Input() common!: CommonService;
   ApprovalStatus = ApprovalStatus
-  requests?: MyRequest[];
+  requests: MyRequest[] = [];
   currentRequest: OpenSupplierReq = {} as OpenSupplierReq;
   openRequest!: MyRequest
   pattern = Pattern

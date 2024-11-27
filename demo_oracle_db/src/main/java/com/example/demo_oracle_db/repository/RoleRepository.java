@@ -32,8 +32,8 @@ public interface RoleRepository extends CrudRepository<Role, Long>, JpaSpecifica
 
     @Modifying
     @Transactional
-    @Query(nativeQuery = true, value = "INSERT INTO cmd_role (NAME) values (?1)")
-    void addRole(String name);
+    @Query(nativeQuery = true, value = "INSERT INTO cmd_role (NAME, priority) values (?1, ?2)")
+    void addRole(String name, Integer priority);
     @Query(value = "SELECT LAST_INSERT_ID()", nativeQuery = true)
     Long getLastInsertedId();
     @Modifying
@@ -43,4 +43,7 @@ public interface RoleRepository extends CrudRepository<Role, Long>, JpaSpecifica
 
     @Query(nativeQuery = true, value = "select NAME from cmd_role WHERE ID = ?1")
     Optional<String> findNameById(Long roleId);
+
+    @Query(value = "SELECT priority from cmd_role where ID = ?1", nativeQuery = true)
+    Optional<Integer> findPriorityById(Long id);
 }

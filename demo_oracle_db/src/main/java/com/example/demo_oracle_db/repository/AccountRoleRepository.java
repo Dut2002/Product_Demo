@@ -8,6 +8,8 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Repository
 public interface AccountRoleRepository extends CrudRepository<AccountRole,Long>, JpaSpecificationExecutor<Long> {
     boolean existsByAccountIdAndRoleId(Long accountId, Long roleId);
@@ -22,4 +24,13 @@ public interface AccountRoleRepository extends CrudRepository<AccountRole,Long>,
     void addAccountRole(Long accountId, Long roleId);
     @Query(value = "SELECT LAST_INSERT_ID()", nativeQuery = true)
     Long getLastInsertedId();
+
+    boolean existsByRoleId(Long id);
+
+    @Query(value = "select count(1) from cmd_account_role where ACCOUNT_ID = ?1",nativeQuery = true)
+    Long countUserRole(Long accountId);
+
+    @Query(value = "select min(priority) from cmd_account_role " +
+            " inner join demo.cmd_role cr on ACCOUNT_ID = ?1 AND cmd_account_role.ROLE_ID = cr.ID ", nativeQuery = true)
+    Optional<Integer> getAccountPriority(Long accountId);
 }

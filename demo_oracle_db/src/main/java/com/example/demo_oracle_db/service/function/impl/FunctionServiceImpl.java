@@ -1,5 +1,6 @@
 package com.example.demo_oracle_db.service.function.impl;
 
+import com.example.demo_oracle_db.config.authen.dto.UserPrincipal;
 import com.example.demo_oracle_db.entity.Function;
 import com.example.demo_oracle_db.entity.Permission;
 import com.example.demo_oracle_db.exception.DodException;
@@ -11,11 +12,14 @@ import com.example.demo_oracle_db.service.function.request.AddFunctionRequest;
 import com.example.demo_oracle_db.service.function.request.AddPermissionRequest;
 import com.example.demo_oracle_db.service.function.request.UpdateFunctionRequest;
 import com.example.demo_oracle_db.service.function.request.UpdatePermissionRequest;
+import com.example.demo_oracle_db.service.priority.PriorityService;
 import com.example.demo_oracle_db.service.role.response.DeletePermissionRes;
 import com.example.demo_oracle_db.service.role.response.FunctionDto;
 import com.example.demo_oracle_db.service.role.response.PermissionDto;
 import com.example.demo_oracle_db.util.MessageCode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,10 +33,15 @@ class FunctionServiceImpl implements FunctionService {
     PermissionRepository permissionRepository;
     @Autowired
     RolePermissionRepository rolePermissionRepository;
+    @Autowired
+    PriorityService priorityService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addFunction(AddFunctionRequest request) throws DodException {
+        Integer priority = priorityService.getCurrentUserPriority();
+        if (priority == null) throw new DodException(MessageCode.ROLE_PRIORITY_NOT_FOUND);
+
         if (functionRepository.existsByName(request.getName())) {
             throw new DodException(MessageCode.FUNCTION_NAME_EXISTS, request.getName());
         }
@@ -41,18 +50,17 @@ class FunctionServiceImpl implements FunctionService {
         }
         functionRepository.addFunction(
                 request.getName(),
-                request.getFeRoute());
-        Long functionId = functionRepository.getLastInsertedId();
-        permissionRepository.addPermission(
-                "View " + request.getName(),
-                "/api/" + request.getFeRoute(),
-                functionId,
-                1);
+                request.getFeRoute(),
+                priority);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateFunction(UpdateFunctionRequest req) throws DodException {
+        Integer priority = priorityService.getCurrentUserPriority();
+        if (priority == null) throw new DodException(MessageCode.ROLE_PRIORITY_NOT_FOUND);
+        priorityService.checkFunctionPriority(priority, req.getId());
+
         if (!functionRepository.existsById(req.getId())) {
             throw new DodException(MessageCode.FUNCTION_NOT_FOUND);
         }
@@ -65,6 +73,10 @@ class FunctionServiceImpl implements FunctionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteFunction(Long id) throws DodException {
+        Integer priority = priorityService.getCurrentUserPriority();
+        if (priority == null) throw new DodException(MessageCode.ROLE_PRIORITY_NOT_FOUND);
+        priorityService.checkFunctionPriority(priority, id);
+
         if (!functionRepository.existsById(id)) {
             throw new DodException(MessageCode.FUNCTION_NOT_FOUND);
         }
@@ -80,6 +92,10 @@ class FunctionServiceImpl implements FunctionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addPermission(AddPermissionRequest request) throws DodException {
+        Integer priority = priorityService.getCurrentUserPriority();
+        if (priority == null) throw new DodException(MessageCode.ROLE_PRIORITY_NOT_FOUND);
+        priorityService.checkFunctionPriority(priority, request.getFunctionId());
+
         if (!functionRepository.existsById(request.getFunctionId())) {
             throw new DodException(MessageCode.FUNCTION_NOT_FOUND);
         }
@@ -111,6 +127,11 @@ class FunctionServiceImpl implements FunctionService {
     @Transactional(rollbackFor = Exception.class)
     public void updatePermission(UpdatePermissionRequest request) throws DodException {
         Permission permission = permissionRepository.findById(request.getId()).orElseThrow(() -> new DodException(MessageCode.PERMISSION_NOT_FOUND));
+
+        Integer priority = priorityService.getCurrentUserPriority();
+        if (priority == null) throw new DodException(MessageCode.ROLE_PRIORITY_NOT_FOUND);
+        priorityService.checkFunctionPriority(priority, permission.getFunctionId());
+
         if (permissionRepository.existsByNameAndFunctionIdAndIdNot(request.getName(), permission.getFunctionId(), request.getId())) {
             throw new DodException(MessageCode.PERMISSION_NAME_EXISTS, request.getName());
         }
@@ -138,7 +159,13 @@ class FunctionServiceImpl implements FunctionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public DeletePermissionRes deletePermission(Long permissionId) throws DodException {
+
+
         Permission permission = permissionRepository.findById(permissionId).orElseThrow(() -> new DodException(MessageCode.PERMISSION_NOT_FOUND));
+        Integer priority = priorityService.getCurrentUserPriority();
+        if (priority == null) throw new DodException(MessageCode.ROLE_PRIORITY_NOT_FOUND);
+        priorityService.checkFunctionPriority(priority, permission.getFunctionId());
+
         DeletePermissionRes res = new DeletePermissionRes();
         if (permission.getDefaultPermission() == 1 && !permissionRepository
                 .existsByIdNotAndFunctionIdAndDefaultPermission(permissionId, permission.getFunctionId(),
@@ -156,8 +183,11 @@ class FunctionServiceImpl implements FunctionService {
     }
 
     @Override
-    public List<FunctionDto> viewAll() {
-        List<Function> functions = functionRepository.findAll((root, query, criteriaBuilder) -> null);
+    public List<FunctionDto> viewAll() throws DodException {
+        Integer priority = priorityService.getCurrentUserPriority();
+        if (priority == null) throw new DodException(MessageCode.ROLE_PRIORITY_NOT_FOUND);
+        List<Function> functions = functionRepository.findAll((root, query, criteriaBuilder) ->
+                criteriaBuilder.greaterThanOrEqualTo(root.get("priority"), priority));
         return FunctionDto.mapByFunction(functions);
     }
 
@@ -165,6 +195,11 @@ class FunctionServiceImpl implements FunctionService {
     public String checkDeletePermission(Long permissionId) throws DodException {
         Permission permission = permissionRepository.findById(permissionId)
                 .orElseThrow(() -> new DodException(MessageCode.PERMISSION_NOT_FOUND));
+
+        Integer priority = priorityService.getCurrentUserPriority();
+        if (priority == null) throw new DodException(MessageCode.ROLE_PRIORITY_NOT_FOUND);
+        priorityService.checkFunctionPriority(priority, permission.getFunctionId());
+
         String message = "";
         if (permission.getDefaultPermission() == 1) {
             if (permissionRepository.existsByIdNotAndFunctionIdAndDefaultPermission(permissionId, permission.getFunctionId(), 1)) {

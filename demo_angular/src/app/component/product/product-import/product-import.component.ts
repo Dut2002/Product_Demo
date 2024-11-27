@@ -183,7 +183,7 @@ export class ProductImportComponent implements OnInit {
 
           const excelParse = new ExcelParse(headerMaps, this.validationConfig, this.options);
 
-
+          this.viewError = false;
           this.parseResult = await excelParse.parseExcel(arrayBuffer);
           // Xử lý kết quả
           this.listProduct = this.parseResult.listData as ProductImport[]
@@ -317,6 +317,7 @@ export class ProductImportComponent implements OnInit {
   onClose() {
     this.showModal = false;
     this.disableButton = true;
+    this.parseResult = null;
   }
 
   isValid() {

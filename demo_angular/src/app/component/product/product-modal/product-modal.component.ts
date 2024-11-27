@@ -128,6 +128,8 @@ export class ProductModalComponent implements OnChanges {
     return this.productForm.valid && this.categoryNgModel.valid && this.supplierNgModel.valid;
   }
 
+
+
   onReset() {
     this.product = { ...this.defaultProduct }
     this.productForm.control.markAsUntouched();

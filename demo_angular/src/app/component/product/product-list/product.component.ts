@@ -1,8 +1,8 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { ApiStatus, PermissionName } from '../../../constant/api.const.urls';
 import { RouterUrl } from '../../../constant/app.const.router';
 import { ProductDto } from '../../../model/dto/product-dto';
-import { ProductFilter } from '../../../model/dto/product-filter';
+import { ProductFilter } from '../../../model/filter/search-filter';
 import { Product } from '../../../model/product';
 
 import { HttpParams } from '@angular/common/http';
@@ -37,7 +37,7 @@ export class ProductComponent implements OnInit {
 
   constructor(public common: CommonService,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.common.setFunctionName(this.route)
@@ -168,5 +168,14 @@ export class ProductComponent implements OnInit {
       this.productFilter.sortDesc = false;
     }
     this.loadProducts();
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyDown(event: KeyboardEvent) {
+    if (event.key === 'ArrowRight') {
+      if (this.productFilter.pageNum < this.totalPages) this.onPageChange(this.productFilter.pageNum + 1);
+    } else if (event.key === 'ArrowLeft') {
+      if (this.productFilter.pageNum > 1) this.onPageChange(this.productFilter.pageNum - 1);
+    }
   }
 }

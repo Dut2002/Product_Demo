@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Role } from '../../../model/role';
 
@@ -7,9 +7,9 @@ import { Role } from '../../../model/role';
   templateUrl: './role-modal.component.html',
   styleUrl: './role-modal.component.scss'
 })
-export class RoleModalComponent implements OnInit {
+export class RoleModalComponent implements OnChanges {
 
-  save!: Role
+  save: Role = {} as Role
   @Input() title = '';
   showModal = false;
   isLoading = false;
@@ -20,9 +20,15 @@ export class RoleModalComponent implements OnInit {
   constructor(){
   }
 
-  ngOnInit(): void {
-    this.save = {...this.role}
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['role']?.currentValue !== changes['role']?.previousValue) {
+      this.save = { ...this.role }; // Sao chép giá trị từ role để tránh thay đổi trực tiếp
+    }
   }
+
+
+
+
 
   saveRole(form: NgForm){
     if(form.valid){

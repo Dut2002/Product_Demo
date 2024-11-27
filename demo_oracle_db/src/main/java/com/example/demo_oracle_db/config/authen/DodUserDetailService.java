@@ -7,6 +7,7 @@ import com.example.demo_oracle_db.entity.Account;
 import com.example.demo_oracle_db.entity.Permission;
 import com.example.demo_oracle_db.entity.Role;
 import com.example.demo_oracle_db.repository.AccountRepository;
+import com.example.demo_oracle_db.repository.AccountRoleRepository;
 import com.example.demo_oracle_db.repository.PermissionRepository;
 import com.example.demo_oracle_db.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,8 @@ public class DodUserDetailService implements UserDetailsService {
     private AccountRepository accountRepository;
     @Autowired
     private PermissionRepository permissionRepository;
+    @Autowired
+    private AccountRoleRepository accountRoleRepository;
 
 //    public static final ThreadLocal<Account> ACCOUNT = new ThreadLocal<>();
 
@@ -38,7 +41,7 @@ public class DodUserDetailService implements UserDetailsService {
     public UserPrincipal loadUserByUsername(String username) throws UsernameNotFoundException {
         Account account = accountRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
-//        ACCOUNT.set(account);
+        Integer priority = accountRoleRepository.getAccountPriority(account.getId()).orElseThrow(() -> new UsernameNotFoundException("Priority not found!"));
         List<Role> roles = roleRepository.findByAccount(account.getId());
         if (roles.isEmpty()) throw new UsernameNotFoundException("Role not found");
 
@@ -52,6 +55,6 @@ public class DodUserDetailService implements UserDetailsService {
                     grantedAuthorities.add(new GrantedAuthorityCustom(functionInfo))
             );
         }
-        return new UserPrincipal(account.getUsername(), account.getPassword(), roles.stream().map(Role::getName).toList(), grantedAuthorities);
+        return new UserPrincipal(account.getUsername(), account.getPassword(), priority,roles.stream().map(Role::getName).toList(), grantedAuthorities);
     }
 }

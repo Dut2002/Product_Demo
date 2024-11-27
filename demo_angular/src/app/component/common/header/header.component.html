@@ -17,11 +17,12 @@
         <nav class="navigation" [ngClass]="{'is-open': isOpen}" (click)="clickNav()">
           <ul>
             <li><a [routerLink]="route.HOME">Home</a></li>
-            <li *ngIf="authService.hasFunction(route.USER_ROLE)"><a [routerLink]="route.USER_ROLE">Permissons For Role</a></li>
-            <li *ngIf="authService.hasFunction(route.FUNCTION_MANAGEMENT)"><a [routerLink]="route.FUNCTION_MANAGEMENT">Functions And Permissions</a></li>
-            <li *ngIf="authService.hasFunction(route.PRODUCT_MANAGEMENT)"><a [routerLink]="route.PRODUCT_MANAGEMENT">Product Management</a></li>
-            <li *ngIf="authService.hasFunction(route.SUPPLIER_MANAGER)"><a [routerLink]="route.SUPPLIER_MANAGER">Supplier Manager</a></li>
-            <li *ngIf="authService.hasFunction(route.MY_SUPPLIER)"><a [routerLink]="route.MY_SUPPLIER">My Supplier</a></li>
+            <li *ngIf="authService.hasFunction(route.USER_MANAGEMENT)"><a [href]="route.USER_MANAGEMENT">Account Management</a></li>
+            <li *ngIf="authService.hasFunction(route.USER_ROLE)"><a [href]="route.USER_ROLE">Permissons For Role</a></li>
+            <li *ngIf="authService.hasFunction(route.FUNCTION_MANAGEMENT)"><a [href]="route.FUNCTION_MANAGEMENT">Functions And Permissions</a></li>
+            <li *ngIf="authService.hasFunction(route.PRODUCT_MANAGEMENT)"><a [href]="route.PRODUCT_MANAGEMENT">Product Management</a></li>
+            <li *ngIf="authService.hasFunction(route.SUPPLIER_MANAGER)"><a [href]="route.SUPPLIER_MANAGER">Supplier Manager</a></li>
+            <li *ngIf="authService.hasFunction(route.MY_SUPPLIER)"><a [href]="route.MY_SUPPLIER">My Supplier</a></li>
             <li><a (click)="logOut()" >Logout</a></li>
           </ul>
         </nav>

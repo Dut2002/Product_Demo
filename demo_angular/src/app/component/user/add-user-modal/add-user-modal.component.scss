@@ -1,0 +1,41 @@
+::ng-deep .roles-selected .ng-select-container {
+  border: 0.25px solid black;
+  border-radius: 5px;
+  padding: 5px;
+  height: 3.2rem;
+  overflow: auto;
+}
+
+.roles-selected ng-select {
+  width: 100%;
+}
+
+.roles-selected{
+  min-height: 95px;
+}
+
+::ng-deep .roles-selected .ng-dropdown-panel {
+  background-color: white;
+  border: 0.25px solid black;
+  top: calc(100% - 3px);
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+
+}
+
+::ng-deep .roles-selected .ng-option {
+
+  padding: 10px;
+  border-radius: 5px;
+  transition: background-color 0.5s ease;
+  /* Thêm hiệu ứng chuyển màu nền */
+
+  &:hover {
+    background-color: #ccc;
+  }
+}
+
+::ng-deep  .ng-value {
+  margin-right: 5px;
+  font-size: 12px;
+}

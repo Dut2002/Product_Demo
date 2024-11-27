@@ -8,13 +8,4 @@ export interface SupplierInfor{
   website: string
 }
 
-export interface SupplierFilter{
-  name: string|null
-  contact: string|null
-  address: string|null
-  phone: string|null
-  email: string|null
-  website: string|null
-  pageNum: number;
-  pageSize: number;
-}
+

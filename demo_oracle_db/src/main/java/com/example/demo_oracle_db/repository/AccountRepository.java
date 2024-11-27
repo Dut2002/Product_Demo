@@ -69,5 +69,11 @@ public interface AccountRepository extends CrudRepository<Account, Long>, JpaSpe
     @Query(value = "select FULL_NAME from cmd_account " +
             " WHERE ID = ?1",nativeQuery = true)
     Optional<String> getFullNameById(Long accountId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "Update Account " +
+            " set password = ?2, status = ?3 where id = ?1 ")
+    void setPassword(Long id, String encode, String status);
 }
 

@@ -4,13 +4,11 @@ import com.example.demo_oracle_db.entity.Account;
 import com.example.demo_oracle_db.entity.Category;
 import com.example.demo_oracle_db.entity.Role;
 import com.example.demo_oracle_db.entity.Supplier;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
 public class SearchBox {
     private Long id;
     private String name;
@@ -32,11 +30,16 @@ public class SearchBox {
 
     public SearchBox(Role role){
         this.id = role.getId();
-        this.name = role.getName();
+        this.name = role.getName().replace("ROLE_","").replace("_", " ");
     }
 
     public SearchBox(Object[] o) {
         this.id = ((Long) o[0]);
         this.name = o[1].toString();
+    }
+
+    public SearchBox(Long id, String name) {
+        this.id = id;
+        this.name = name.replace("ROLE_","").replace("_", " ");
     }
 }

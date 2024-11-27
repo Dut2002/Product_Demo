@@ -54,6 +54,12 @@ import { SupplierRequestListComponent } from './component/supplier/supplier-requ
 import { SupplierRequestDetailsComponent } from './component/supplier/supplier-request-details/supplier-request-details.component';
 import { HomeComponent } from './component/common/home/home.component';
 import { UserManagementComponent } from './component/user/user-management/user-management.component';
+import { UserFilterComponent } from './component/user/user-filter/user-filter.component';
+import { UserRoleComponent } from './component/user/user-role/user-role.component';
+import { AddUserModalComponent } from './component/user/add-user-modal/add-user-modal.component';
+import { FixSystemComponent } from './component/fix-system/fix-system.component';
+import { FixSystemDetailsComponent } from './component/fix-system/fix-system-details/fix-system-details.component';
+import { PermissionModalComponent } from './component/function/permission-modal/permission-modal.component';
 
 @NgModule({
   declarations: [
@@ -98,6 +104,12 @@ import { UserManagementComponent } from './component/user/user-management/user-m
     SupplierRequestDetailsComponent,
     HomeComponent,
     UserManagementComponent,
+    UserFilterComponent,
+    UserRoleComponent,
+    AddUserModalComponent,
+    FixSystemComponent,
+    FixSystemDetailsComponent,
+    PermissionModalComponent,
   ],
   imports: [
     BrowserModule,

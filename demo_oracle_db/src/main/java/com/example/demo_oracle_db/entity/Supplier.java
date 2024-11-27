@@ -1,5 +1,6 @@
 package com.example.demo_oracle_db.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,6 +40,7 @@ public class Supplier {
     @Column(name = "ACCOUNT_ID")
     private Long accountId;
 
+    @JsonIgnore
     @OneToOne(optional = false)
     @JoinColumn(name = "ACCOUNT_ID", updatable = false, insertable = false)
     private Account account;

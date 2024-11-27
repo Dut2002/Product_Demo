@@ -4,10 +4,12 @@ import com.example.demo_oracle_db.config.JwtConfig;
 import com.example.demo_oracle_db.config.authen.dto.FunctionInfo;
 import com.example.demo_oracle_db.config.authen.dto.GrantedAuthorityCustom;
 import com.example.demo_oracle_db.config.authen.dto.PermissionInfo;
+import com.example.demo_oracle_db.config.authen.dto.UserPrincipal;
 import com.example.demo_oracle_db.entity.Account;
 import com.example.demo_oracle_db.entity.Role;
 import com.example.demo_oracle_db.exception.DodException;
 import com.example.demo_oracle_db.repository.AccountRepository;
+import com.example.demo_oracle_db.repository.AccountRoleRepository;
 import com.example.demo_oracle_db.repository.PermissionRepository;
 import com.example.demo_oracle_db.repository.RoleRepository;
 import com.example.demo_oracle_db.util.MessageCode;
@@ -43,6 +45,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Autowired
     AccountRepository accountRepository;
     @Autowired
+    AccountRoleRepository accountRoleRepository;
+    @Autowired
     PermissionRepository permissionRepository;
     @Autowired
     RoleRepository roleRepository;
@@ -72,6 +76,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 if (account.getAccessToken() == null) {
                     throw new DodException(MessageCode.TOKEN_NOT_EXISTS, username);
                 }
+                Integer priority = accountRoleRepository.getAccountPriority(account.getId()).orElseThrow(() -> new DodException(MessageCode.ROLE_PRIORITY_NOT_FOUND));
                 List<FunctionInfo> functionInfos = extractFucntionInfoFromClaims(claims);
                 List<String> endPoints = new ArrayList<>();
                 for (FunctionInfo functionInfo : functionInfos) {
@@ -88,12 +93,16 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 ) {
                     throw new DodException(MessageCode.USER_UNAUTHORIZED);
                 }
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+
+                UserPrincipal userPrincipal = new UserPrincipal(
                         username,
-                        roles.stream().map(Role::getName),
-                        functionInfos.stream().map(GrantedAuthorityCustom::new).collect(Collectors.toList())
+                        null, // không cần password
+                        priority,
+                        roles.stream().map(Role::getName).toList(),
+                        functionInfos.stream().map(GrantedAuthorityCustom::new).collect(Collectors.toSet())
                 );
-                SecurityContextHolder.getContext().setAuthentication(auth);
+
+                SecurityContextHolder.getContext().setAuthentication(userPrincipal);
             }
         } catch (Exception e) {
             SecurityContextHolder.clearContext();

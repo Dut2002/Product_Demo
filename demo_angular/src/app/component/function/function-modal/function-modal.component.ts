@@ -12,13 +12,14 @@ export class FunctionModalComponent implements OnInit{
   showModal = false
   isLoading = false;
   @Input() title = '';
-  @Input() function!: Function;
+  @Input() function: Function = {} as Function;
   private save!: Function;
 
   @Output() addEvent = new EventEmitter<Function>();
   @Output() updateEvent = new EventEmitter<Function>();
 
   ngOnInit(): void {
+
       this.save = {...this.function};
   }
 
@@ -38,6 +39,11 @@ export class FunctionModalComponent implements OnInit{
   resetModal(form: NgForm){
     this.function = {...this.save}
     form.control.markAsUntouched();
+  }
+
+  close(){
+    this.showModal = false;
+    this.function = {} as Function;
   }
 
 }

@@ -17,10 +17,6 @@ public class AddUserReq {
     @Column(name = "USERNAME", nullable = false)
     private String username;
 
-    @NotBlank(message = "Password is required")
-    @Size(max = 255)
-    private String password;
-
     @NotBlank(message = "Full name is required")
     @Size(max = 255)
     private String fullName;
@@ -31,5 +27,6 @@ public class AddUserReq {
     private String email;
 
     @NotNull(message = "Role is required")
-    private List<Long> roles;
+    @Size(min = 1)
+    private Long[] roles;
 }

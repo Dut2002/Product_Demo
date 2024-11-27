@@ -63,7 +63,15 @@ public enum MessageCode {
     PROCESS_REQUEST_ERROR("Process request error!"),
     REQUEST_NOT_FOUND("Request not found!"),
     REQUEST_COMPLETED("This request has already been processed."),
-    UNABLE_REQUEST("Unable to submit additional requests"), REQUESTER_NOT_MATCH("Requester not match with account"), SUPPLIER_ALREADY_REGISTER("Supplier already register!");
+    UNABLE_REQUEST("Unable to submit additional requests"),
+    REQUESTER_NOT_MATCH("Requester not match with account"),
+    SUPPLIER_ALREADY_REGISTER("Supplier already register!"),
+    ROLE_ALREADY_IN_USE("Role already add for any account!"),
+    ACCOUNT_ONLY_1_ROLE("Role is required for each account, this account only has one"),
+    ROLE_PRIORITY_NOT_FOUND("Role priority not found"),
+    ACCOUNT_PRIORITY_NOT_FOUND("Account priority not found"),
+    FUNCTION_PRIORITY_NOT_FOUND("Function priority not found"),
+    ACCOUNT_NOT_PERMISSION("Account does not have sufficient permissions");
 
     private final String code;
 

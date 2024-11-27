@@ -40,7 +40,6 @@ public class MySupplierServiceImpl implements MySupplierService {
     SupplierRepository supplierRepository;
     @Autowired
     EntityManager entityManager;
-    private String note;
 
     @Override
     public void supplierRegister(OpenSupplierRequest request) throws DodException {

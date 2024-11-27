@@ -1,10 +1,12 @@
 import { HttpParams } from '@angular/common/http';
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { PermissionName } from '../../../constant/api.const.urls';
+import { ApiStatus, PermissionName } from '../../../constant/api.const.urls';
 import { FunctionDto } from '../../../model/dto/function-dto';
 import { Permission } from '../../../model/permission';
 import { CommonService } from '../../../service/common/common.service';
 import { PermissionAddComponent } from '../permission-add/permission-add.component';
+import { AddPermissionDto } from '../../../model/dto/add-permission-dto';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-function-detail',
@@ -12,6 +14,7 @@ import { PermissionAddComponent } from '../permission-add/permission-add.compone
   styleUrl: './function-detail.component.scss'
 })
 export class FunctionDetailComponent {
+  @ViewChild('permissionAdd') permissionAdd!: PermissionAddComponent;
 
   @Input() common!: CommonService;
   @Input() func!: FunctionDto
@@ -35,6 +38,29 @@ export class FunctionDetailComponent {
           this.common.errorHandle.handle(err);
         }
       });
+  }
+
+  addPermission(permissionDto :AddPermissionDto){
+    const endpoint = this.common.getPermission(PermissionName.FunctionManagement.ADD_PERMISSION)
+      if (!endpoint) {
+        this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
+        this.permissionAdd.isLoading = false;
+        return;
+      }
+      this.common.base.post(endpoint, permissionDto)
+        .pipe(finalize(() => {
+          this.permissionAdd.isLoading = false;
+        }))
+        .subscribe({
+          next: (res) => {
+            this.common.snackBar.show(null, res.content, ApiStatus.SUCCESS, 5000)
+            this.loadData();
+            this.permissionAdd.onClose();
+          },
+          error: (err) => {
+            this.common.errorHandle.handle(err);
+          }
+        });
   }
 
   updatePermission(permissionId: number, newPermission: Permission) {
