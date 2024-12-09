@@ -20,9 +20,9 @@
           </ng-template>
         </h1>
         <div class="accordion-action">
-          <button class="btn btn-icon btn-orange"
+          <!-- <button class="btn btn-icon btn-orange"
             *ngIf="common.hasPermission(common.permissionName.UserRole.CHANGE_ROLE_NAME)"
-            (click)="openUpdateModal(role)"><i class="fa-solid fa-pen-to-square"></i></button>
+            (click)="openUpdateModal(role)"><i class="fa-solid fa-pen-to-square"></i></button> -->
           <button class="btn btn-icon btn-red" *ngIf="common.hasPermission(common.permissionName.UserRole.DELETE_ROLE)"
             (click)="confirmDelete(role)"><i class="fa-solid fa-trash"></i></button>
         </div>
