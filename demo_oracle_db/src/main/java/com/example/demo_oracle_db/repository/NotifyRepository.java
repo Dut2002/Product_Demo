@@ -1,9 +1,7 @@
 package com.example.demo_oracle_db.repository;
 
 import com.example.demo_oracle_db.entity.Notify;
-import com.example.demo_oracle_db.entity.OrderDetail;
 import com.example.demo_oracle_db.util.Constants;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

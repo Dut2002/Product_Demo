@@ -1,6 +1,5 @@
 package com.example.demo_oracle_db.service.supplier.mySupplier.impl;
 
-import com.example.demo_oracle_db.entity.Account;
 import com.example.demo_oracle_db.entity.Approval;
 import com.example.demo_oracle_db.entity.Supplier;
 import com.example.demo_oracle_db.exception.DodException;
@@ -24,7 +23,6 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

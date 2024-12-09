@@ -26,7 +26,7 @@ public class UserRes {
         this.email = user.getEmail();
         this.fullName = user.getFullName();
         this.status = user.getStatus();
-        this.roles = user.getAccountRoles().stream().map(
+        this.roles = user.getAccountRoles().stream().filter(role -> !role.getRole().getName().equals(Constants.Role.USER)).map(
                 accountRole -> new SearchBox(accountRole.getRole()))
                 .toList();
     }

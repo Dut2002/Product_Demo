@@ -12,7 +12,6 @@ import com.example.demo_oracle_db.util.Constants;
 import com.example.demo_oracle_db.util.MessageCode;
 import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

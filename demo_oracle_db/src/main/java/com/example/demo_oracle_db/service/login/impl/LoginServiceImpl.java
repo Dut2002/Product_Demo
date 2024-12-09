@@ -66,7 +66,7 @@ public class LoginServiceImpl implements LoginService {
         String refreshToken = tokenProvider.createRefreshToken(userPrincipal);
         if (StringUtils.hasText(accessToken) && StringUtils.hasText(refreshToken)) {
 
-            LogRes res = longinResponse(account, accessToken, refreshToken);;
+            LogRes res = longinResponse(account, accessToken, refreshToken);
             try {
                 accountRepository.updateToken(accessToken, refreshToken, account.getId());
                 SecurityContextHolder.getContext().setAuthentication(userPrincipal);

@@ -83,7 +83,7 @@ public class AccountServiceImpl implements AccountService {
                 predicates.add(criteriaBuilder.equal(accountAccountRoleJoin.get("roleId"), request.getRoleId()));
             }
 
-            predicates.add(criteriaBuilder.notEqual(accountRoleRoleJoin.get("name"), Constants.Role.USER));
+//            predicates.add(criteriaBuilder.notEqual(accountRoleRoleJoin.get("name"), Constants.Role.USER));
 
             assert query != null;
             Subquery<Integer> subquery = query.subquery(Integer.class);

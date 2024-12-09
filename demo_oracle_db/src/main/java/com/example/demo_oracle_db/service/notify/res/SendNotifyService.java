@@ -1,6 +1,5 @@
 package com.example.demo_oracle_db.service.notify.res;
 
-import com.example.demo_oracle_db.exception.DodException;
 import com.example.demo_oracle_db.service.notify.req.AddNotifyReq;
 
 public interface SendNotifyService {

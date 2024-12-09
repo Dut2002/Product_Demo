@@ -1,7 +1,6 @@
 package com.example.demo_oracle_db.repository;
 
 import com.example.demo_oracle_db.entity.Account;
-import com.example.demo_oracle_db.util.Constants;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

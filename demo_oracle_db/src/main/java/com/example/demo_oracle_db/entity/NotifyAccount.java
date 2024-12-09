@@ -2,10 +2,13 @@ package com.example.demo_oracle_db.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "CMD_NOTIFY_ACCOUNT", schema = "DEMO")
-
+@Getter
+@Setter
 public class NotifyAccount {
 
     @Id

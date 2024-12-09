@@ -14,8 +14,6 @@ import org.springframework.stereotype.Service;
 public class SendNotifyServiceImpl implements SendNotifyService {
 
     private final SimpMessagingTemplate messagingTemplate;
-    private final RoleRepository roleRepository;
-
     @Override
     public void sendNotification(String username, String message){
         log.info("send notification to {}", username);

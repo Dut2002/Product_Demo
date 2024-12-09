@@ -1,7 +1,6 @@
 package com.example.demo_oracle_db.service.notify.res;
 
 import com.example.demo_oracle_db.util.Constants;
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
