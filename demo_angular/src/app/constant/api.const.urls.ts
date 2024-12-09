@@ -73,6 +73,7 @@ export class PermissionName {
     GET_ROLE_SEARCH: 'Get Role Search',
     ADD_ROLE_USER: 'Add Role User',
     DELETE_ROLE_USER: 'Delete Role User',
+    CHANGE_PASSWORD: 'Change Password'
   }
   public static readonly UserRole = {
     VIEW_ROLES: 'View Roles',
@@ -132,6 +133,13 @@ export class PermissionName {
     MY_SUPPLIER_REQUEST: 'My Supplier Request',
     CANCEL_REQUEST: 'Cancel Request',
     SUPPLIER_REGISTER: 'Supplier Register',
+  }
+
+  public static readonly ViewNotification = {
+    GET_NOTIFIES: 'Get Notifies',
+    HAS_UNREAD_NOTIFY: 'Has Unread Notify',
+    CHECK_READ: 'Check Read',
+    CHECK_READ_ALL: 'Check Read All'
   }
 }
 

@@ -1,6 +1,7 @@
 package com.example.demo_oracle_db.entity;
 
 import com.example.demo_oracle_db.util.Constants;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
@@ -59,4 +60,8 @@ public class Account {
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<AccountRole> accountRoles;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<NotifyAccount> notifyAccountList;
 }

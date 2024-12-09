@@ -1,20 +1,25 @@
 <div class="container">
   <h1 class="title center">Function Management</h1>
   <div class="table-actions">
-    <button class="btn add-btn btn-medium" (click)="openAddModal()" *ngIf="common.hasPermission(common.permissionName.FunctionManagement.ADD_FUNCTION)">Add Function</button>
+    <button class="btn add-btn btn-medium" (click)="openAddModal()"
+      *ngIf="common.hasPermission(common.permissionName.FunctionManagement.ADD_FUNCTION)">Add Function</button>
     <button class="btn add-btn btn-medium" (click)="loadList()">Refresh</button>
   </div>
   <div class="accordion-container">
-    <section class="accordion" [ngClass]="{'accordion-selected':openSectionId == func.id}" *ngFor="let func of listFunction">
+    <section class="accordion" [ngClass]="{'accordion-selected':openSectionId == func.id}"
+      *ngFor="let func of listFunction">
       <div class="accordion-header">
         <h1 class="title"><a [routerLink]="[]" fragment="{{func.id}}" (click)="toggle(func)">{{func.name}}</a></h1>
         <div class="accordion-action">
-          <button class="btn btn-icon btn-orange" *ngIf="common.hasPermission(common.permissionName.FunctionManagement.UPDATE_FUNCTION)" (click)="openUpdateModal(func)"><i
-              class="fa-solid fa-pen-to-square"></i></button>
-          <button class="btn btn-icon btn-red" *ngIf="common.hasPermission(common.permissionName.FunctionManagement.DELETE_FUNCTION)" (click)="confirmDelete(func)"><i class="fa-solid fa-trash"></i></button>
+          <button class="btn btn-icon btn-orange"
+            *ngIf="common.hasPermission(common.permissionName.FunctionManagement.UPDATE_FUNCTION)"
+            (click)="openUpdateModal(func)"><i class="fa-solid fa-pen-to-square"></i></button>
+          <button class="btn btn-icon btn-red"
+            *ngIf="common.hasPermission(common.permissionName.FunctionManagement.DELETE_FUNCTION)"
+            (click)="confirmDelete(func)"><i class="fa-solid fa-trash"></i></button>
         </div>
       </div>
-      <div class="content hidden" [ngClass]="{'hidden': openSectionId !== func.id}">
+      <div class="content" #content *ngIf="openSectionId === func.id" [@permissionView]>
         <div class="wrapper">
           <app-function-detail [common]="common" [func]="func" (deleteEvent)="removeFunction($event)">
           </app-function-detail>
@@ -22,8 +27,8 @@
       </div>
     </section>
   </div>
-  <app-function-modal #actionModal [function]="currentFunction" [title]="modalTitle" (updateEvent)="updateFunction($event)"
-    (addEvent)="addFunction($event)">
+  <app-function-modal #actionModal [function]="currentFunction" [title]="modalTitle"
+    (updateEvent)="updateFunction($event)" (addEvent)="addFunction($event)">
   </app-function-modal>
   <app-confirm-modal #confirmModal [title]="'Do you want to delete this function?'" (confirmEvent)="deleteFunction()">
   </app-confirm-modal>

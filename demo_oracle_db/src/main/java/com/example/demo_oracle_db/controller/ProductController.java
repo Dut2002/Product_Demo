@@ -9,6 +9,7 @@ import com.example.demo_oracle_db.service.excelParse.response.UploadProductReque
 import com.example.demo_oracle_db.service.login.response.Res;
 import com.example.demo_oracle_db.service.product.ProductService;
 import com.example.demo_oracle_db.service.product.request.AddVoucherRequest;
+import com.example.demo_oracle_db.service.product.request.ExportProductRequest;
 import com.example.demo_oracle_db.service.product.request.ProductFilter;
 import com.example.demo_oracle_db.service.product.request.ProductRequest;
 import com.example.demo_oracle_db.util.FileType;
@@ -100,14 +101,14 @@ public class ProductController {
         return ResponseEntity.ok(new Res().resOk("Delete voucher from product success"));
     }
 
-    @GetMapping("export-products")
-    private ResponseEntity<InputStreamResource> exportProduct(@RequestParam String option) throws DodException, IOException {
+    @PostMapping("export-products")
+    private ResponseEntity<InputStreamResource> exportProduct(@RequestBody ExportProductRequest request) throws DodException, IOException {
         FileType fileType;
         try {
-            fileType = FileType.fromOption(option);
+            fileType = FileType.fromOption(request.getOption());
         } catch (IllegalArgumentException e) {
             // Xử lý khi options không hợp lệ
-            throw new DodException(MessageCode.ILLEGAL_EXTENSION, option);
+            throw new DodException(MessageCode.ILLEGAL_EXTENSION, request.getOption());
         }
         MediaType mediaType = switch (fileType) {
             case XLSX -> MediaType.valueOf("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -122,7 +123,7 @@ public class ProductController {
 
         String contentDisposition = "attachment; filename=\"" + fileName + "\"";
 
-        ByteArrayInputStream data = productService.productListReport();
+        ByteArrayInputStream data = productService.productListReport(request.getFilter());
         HttpHeaders headers = new HttpHeaders();
         headers.add("File-Name", fileName);
         headers.add("Content-Disposition", contentDisposition);

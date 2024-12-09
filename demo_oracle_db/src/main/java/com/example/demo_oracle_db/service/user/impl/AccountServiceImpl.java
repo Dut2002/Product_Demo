@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -61,6 +62,8 @@ public class AccountServiceImpl implements AccountService {
 
         Page<Account> users = accountRepository.findAll((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
+            Join<Account,AccountRole> accountAccountRoleJoin = root.join("accountRoles", JoinType.INNER);
+            Join<AccountRole, Role> accountRoleRoleJoin = accountAccountRoleJoin.join("role", JoinType.INNER);
             if (request.getUsername() != null && !request.getUsername().isBlank()) {
                 String searchKey = request.getUsername().trim().toLowerCase();
                 predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("username")), "%" + searchKey + "%"));
@@ -77,11 +80,27 @@ public class AccountServiceImpl implements AccountService {
                 predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));
             }
             if (request.getRoleId() != null) {
-                predicates.add(criteriaBuilder.equal(root.join("accountRoles", JoinType.INNER).get("roleId"), request.getRoleId()));
+                predicates.add(criteriaBuilder.equal(accountAccountRoleJoin.get("roleId"), request.getRoleId()));
             }
-            predicates.add(criteriaBuilder.greaterThan(
-                    root.join("accountRoles", JoinType.INNER).join("role", JoinType.INNER).get("priority")
-                    , priority));
+
+            predicates.add(criteriaBuilder.notEqual(accountRoleRoleJoin.get("name"), Constants.Role.USER));
+
+            assert query != null;
+            Subquery<Integer> subquery = query.subquery(Integer.class);
+            Root<AccountRole> subRoot = subquery.from(AccountRole.class);
+
+
+
+            predicates.add(criteriaBuilder.not(criteriaBuilder.exists(
+                    subquery.select(criteriaBuilder.literal(1))
+                            .where(criteriaBuilder.and(
+                                    criteriaBuilder.equal(subRoot.get("accountId"), root.get("id")),
+                                    criteriaBuilder.lessThanOrEqualTo(
+                                            subRoot.join("role").get("priority"), priority
+                                    )
+                            ))
+                    )
+            ));
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         }, PageRequest.of(request.getPageNum() - 1, request.getPageSize()));
         return UserRes.MapPageUser(users);
@@ -100,9 +119,12 @@ public class AccountServiceImpl implements AccountService {
             throw new DodException(MessageCode.EMAIL_ALREADY_EXISTS);
         }
         String password = PasswordUtil.generateRandomPassword(8);
-        accountRepository.addAccount(req.getUsername(), bCryptPasswordEncoder.encode(password), req.getEmail(), req.getFullName());
+        accountRepository.addAccount(req.getUsername(), bCryptPasswordEncoder.encode(password), req.getEmail(), req.getFullName(), Constants.Status.Pending.name());
         Long accountId = accountRepository.getLastInsertedId();
-        for (Long roleId : req.getRoles()
+        List<Long> roleIds = new ArrayList<>(Arrays.stream(req.getRoles()).toList());
+        Long roleUserId = roleRepository.findIdByName(Constants.Role.USER).orElseThrow(()->new DodException(MessageCode.ROLE_NOT_FOUND));
+        if(!roleIds.contains(roleUserId))  roleIds.add(roleUserId);
+        for (Long roleId : roleIds
         ) {
             priorityService.checkRolePriority(priority, roleId);
             if (!roleRepository.existsById(roleId)) {
@@ -187,9 +209,9 @@ public class AccountServiceImpl implements AccountService {
                         "Tài khoản của bạn đã được cấp mật khẩu mới",
                         account.getFullName(),
                         "Cập nhật mật khẩu mới",
-                        "Mật khẩu mới của bạn là" + password,
+                        "Mật khẩu mới của bạn là " + password,
                         null,
-                        1
+                        0
                 );
             } catch (MessagingException e) {
                 throw new RuntimeException(e);
@@ -205,10 +227,14 @@ public class AccountServiceImpl implements AccountService {
         if (priority == null) throw new DodException(MessageCode.ROLE_PRIORITY_NOT_FOUND);
         priorityService.checkAccountPriority(priority, id);
 
+
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new DodException(MessageCode.USER_NOT_FOUND));
-        accountRoleRepository.deleteAll(account.getAccountRoles());
-        accountRepository.deleteById(id);
+//        accountRoleRepository.deleteAll(account.getAccountRoles());
+        if(account.getStatus() == Constants.Status.Blocked){
+            throw new DodException(MessageCode.USER_ALREADY_BLOCKED);
+        }
+        accountRepository.setStatus(id, Constants.Status.Blocked.name());
     }
 
     @Override
@@ -221,8 +247,10 @@ public class AccountServiceImpl implements AccountService {
         if (!accountRepository.existsById(req.getAccountId())) throw new DodException(MessageCode.USER_NOT_FOUND);
         for (Long roleId : req.getRoleId()
         ) {
+            Role role = roleRepository.findById(roleId).orElseThrow(()->new DodException(MessageCode.ROLE_NOT_FOUND));
             priorityService.checkRolePriority(priority, roleId);
-            if (!roleRepository.existsById(roleId)) throw new DodException(MessageCode.ROLE_NOT_FOUND);
+            if(accountRoleRepository.existsByAccountIdAndRoleId(req.getAccountId(),roleId))
+                throw new DodException(MessageCode.USER_ROLE_ALREADY_EXIST, role.getName());
             accountRoleRepository.addAccountRole(req.getAccountId(), roleId);
         }
     }
@@ -237,11 +265,11 @@ public class AccountServiceImpl implements AccountService {
 
         if (!accountRepository.existsById(req.getAccountId())) throw new DodException(MessageCode.USER_NOT_FOUND);
         if (!roleRepository.existsById(req.getRoleId())) throw new DodException(MessageCode.ROLE_NOT_FOUND);
-        if (accountRoleRepository.countUserRole(req.getAccountId()) == 1) {
-            throw new DodException(MessageCode.ACCOUNT_ONLY_1_ROLE);
-        }
         if (!accountRoleRepository.existsByAccountIdAndRoleId(req.getAccountId(), req.getRoleId()))
             throw new DodException(MessageCode.ACCOUNT_WITH_ROLE_NOT_FOUND);
+        if (accountRoleRepository.existsByRoleIdAndRoleName(req.getRoleId(), Constants.Role.USER)) {
+            throw new DodException(MessageCode.ROLE_USER_DEFAULT);
+        }
         accountRoleRepository.deleteByAccountIdAndRoleId(req.getAccountId(), req.getRoleId());
     }
 
@@ -271,6 +299,7 @@ public class AccountServiceImpl implements AccountService {
             // Thêm NOT EXISTS vào điều kiện chính
             predicates.add(criteriaBuilder.not(criteriaBuilder.exists(subquery)));
         }
+        predicates.add(criteriaBuilder.notEqual(root.get("name"),Constants.Role.USER));
         predicates.add(criteriaBuilder.greaterThan(root.get("priority"), priority));
 
         query.multiselect(root.get("id"), root.get("name"));

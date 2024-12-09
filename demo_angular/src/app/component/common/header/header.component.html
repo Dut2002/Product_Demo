@@ -1,35 +1,61 @@
 <header class="top-bar">
   <div class="grid-container full">
     <div class="grid-x align-middle">
-      <div class="cell small-11">
+      <div>
         <a class="logo" href="#">
           <i class="fas fa-weight-hanging"></i>
           <span>ACME Inc.</span>
         </a>
       </div>
-      <div class="cell small-1 nav-menu">
-        <button class="hamburger" (click)="clickNav()" [ngClass]="{'is-open': isOpen}">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-
-        <nav class="navigation" [ngClass]="{'is-open': isOpen}" (click)="clickNav()">
+      <div class="nav-menu" style="display: contents;">
+        <div class="flex-box nav-button">
+          <span class="noselect">{{auth.getName()}}</span>
+          <div class="notify-bell" [ngClass]="{'notify-bell_dot': hasUnread}" (click)="openNotify()"><i class="fa-regular fa-bell"></i></div>
+          <button class="hamburger" (click)="clickNav()" [ngClass]="{'is-open': isOpen}">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+        <nav class="navigation" [ngClass]="{'is-open': isOpen}">
           <ul>
-            <li><a [routerLink]="route.HOME">Home</a></li>
-            <li *ngIf="authService.hasFunction(route.USER_MANAGEMENT)"><a [href]="route.USER_MANAGEMENT">Account Management</a></li>
-            <li *ngIf="authService.hasFunction(route.USER_ROLE)"><a [href]="route.USER_ROLE">Permissons For Role</a></li>
-            <li *ngIf="authService.hasFunction(route.FUNCTION_MANAGEMENT)"><a [href]="route.FUNCTION_MANAGEMENT">Functions And Permissions</a></li>
-            <li *ngIf="authService.hasFunction(route.PRODUCT_MANAGEMENT)"><a [href]="route.PRODUCT_MANAGEMENT">Product Management</a></li>
-            <li *ngIf="authService.hasFunction(route.SUPPLIER_MANAGER)"><a [href]="route.SUPPLIER_MANAGER">Supplier Manager</a></li>
-            <li *ngIf="authService.hasFunction(route.MY_SUPPLIER)"><a [href]="route.MY_SUPPLIER">My Supplier</a></li>
+            <li><a [routerLink]="routerLinks.HOME">Home</a></li>
+            <li *ngIf="auth.hasFunction(routerLinks.USER_MANAGEMENT)"><a [href]="routerLinks.USER_MANAGEMENT">Account Management</a></li>
+            <li *ngIf="auth.hasFunction(routerLinks.USER_ROLE)"><a [href]="routerLinks.USER_ROLE">Permissons For Role</a></li>
+            <li *ngIf="auth.hasFunction(routerLinks.FUNCTION_MANAGEMENT)"><a [href]="routerLinks.FUNCTION_MANAGEMENT">Functions And Permissions</a></li>
+            <li *ngIf="auth.hasFunction(routerLinks.PRODUCT_MANAGEMENT)"><a [href]="routerLinks.PRODUCT_MANAGEMENT">Product Management</a></li>
+            <li *ngIf="auth.hasFunction(routerLinks.SUPPLIER_MANAGER)"><a [href]="routerLinks.SUPPLIER_MANAGER">Supplier Manager</a></li>
+            <li *ngIf="auth.hasFunction(routerLinks.MY_SUPPLIER)"><a [href]="routerLinks.MY_SUPPLIER">My Supplier</a></li>
             <li><a (click)="logOut()" >Logout</a></li>
           </ul>
+        </nav>
+
+        <nav class="navigation" [ngClass]="{'is-open': isNotifyOpen}">
+          <div class="notify-header">
+            <div class="title notify-header-title">Notifications</div>
+            <button class="btn btn-small btn-blue" (click)="markReadAll()">Read All</button>
+          </div>
+          <div class="notify-list-item" *ngIf="notifies.length>0; else nodata">
+            <div *ngFor="let notify of notifies" (click)="clickNotify(notify)" class="notify-item" [ngClass]="{'unread': !notify.read}">
+              <div class="notify-content">
+                <div class="notify-content-header">{{notify.header}}</div>
+                <div class="notify-content-message">{{notify.message}}</div>
+              </div>
+              <div class="notify-time"> {{ notify.timestamp | date: 'dd/MM/yyyy' }} <br>
+                {{ notify.timestamp | date: 'HH:mm:ss' }}</div>
+            </div>
+            <div class="load-notify" (click)="loadNotifies(true)" *ngIf="!last">Load more</div>
+          </div>
+          <ng-template #nodata>
+            <div class="no-notify">No Notify</div>
+          </ng-template>
         </nav>
       </div>
     </div>
   </div>
   <div class="hidden-modal" [ngClass]="{'is-open': isOpen}" (click)="clickNav()">
+  </div>
+  <div class="hidden-modal" [ngClass]="{'is-open': isNotifyOpen}" (click)="clickNot()">
   </div>
 </header>
 

@@ -42,6 +42,20 @@ export class AuthService {
       })
   }
 
+
+  getUsername(){
+    const token = this.getToken();
+    if(!token) return ''
+    const name = this.decodeToken(token).sub || '';
+    return name;
+  }
+
+  getName(){
+    const token = this.getToken();
+    const fullName = token ? this.decodeToken(token).fullName || '' : '';
+    return fullName;
+  }
+
   endRefreshTimer() {
     if (this.refreshTokenTimer) {
       this.refreshTokenTimer.unsubscribe();
@@ -111,10 +125,6 @@ export class AuthService {
     const token = this.getToken();
     if (!token) return false;
     const decodedToken = this.decodeToken(token);
-    console.log('Decoded Token:', decodedToken); // Kiểm tra dữ liệu
-    console.log('Roles:', decodedToken.roles);
-    console.log('Role:', roleName);
-
     return decodedToken.roles?.some((r: string) => r === roleName) || false;
   }
 

@@ -18,7 +18,7 @@ security:
     header: "Authorization"
     prefix: "Bearer "
     secret: "demo_oracle_db"
-    expiration: "#{2*60*60}"
+    expiration: "#{60*60}"
     refresh-expiration: "#{7*24*60*60}"
 
 spring:
@@ -46,8 +46,8 @@ spring:
     password: 12345678
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
-    hibernate:
-      ddl-auto: update
+#    hibernate:
+#      ddl-auto: update
     show-sql: true
 
   servlet:

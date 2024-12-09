@@ -19,7 +19,7 @@ public class SupplierApprovalController {
     SupplierService supplierService;
 
     @PostMapping("view-request")
-    ResponseEntity<?> viewRequest(RequestFilter filter) {
+    ResponseEntity<?> viewRequest(@RequestBody RequestFilter filter) {
         return ResponseEntity.ok(supplierService.viewRequest(filter));
     }
 

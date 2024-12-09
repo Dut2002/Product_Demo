@@ -13,6 +13,9 @@ import com.example.demo_oracle_db.service.mySupplier.request.SaveNoteRequest;
 import com.example.demo_oracle_db.service.mySupplier.request.SupplierFilter;
 import com.example.demo_oracle_db.service.mySupplier.response.RequestDto;
 import com.example.demo_oracle_db.service.mySupplier.response.SupplierInfo;
+import com.example.demo_oracle_db.service.notify.AddNotifyService;
+import com.example.demo_oracle_db.service.notify.req.AddNotifyReq;
+import com.example.demo_oracle_db.service.notify.res.SendNotifyService;
 import com.example.demo_oracle_db.service.supplier.mySupplier.request.OpenSupplierRequest;
 import com.example.demo_oracle_db.util.Constants;
 import com.example.demo_oracle_db.util.MessageCode;
@@ -50,6 +53,10 @@ public class SupplierServiceImpl implements SupplierService {
     AccountRoleRepository accountRoleRepository;
     @Autowired
     RoleRepository roleRepository;
+    @Autowired
+    AddNotifyService addNotifyService;
+    @Autowired
+    SendNotifyService sendNotifyService;
 
     @Override
     public Page<RequestDto> viewRequest(RequestFilter filter) {
@@ -144,10 +151,12 @@ public class SupplierServiceImpl implements SupplierService {
         } catch (Exception e) {
             throw new DodException(MessageCode.JSON_PARSE_ERROR);
         }
-        if (request.getStatus().equals(Constants.ApprovalStatus.APPROVED)) {
+        String header = "Supplier Register Request";
+        String content;
 
-            Long supplier = roleRepository.findIdByName(Constants.Role.SUPPLIER).orElseThrow(()->new DodException(MessageCode.ROLE_NOT_FOUND));
-            if(!accountRoleRepository.existsByAccountIdAndRoleId(approval.getRequesterId(), supplier)){
+        if (request.getStatus().equals(Constants.ApprovalStatus.APPROVED)) {
+            Long supplier = roleRepository.findIdByName(Constants.Role.SUPPLIER).orElseThrow(() -> new DodException(MessageCode.ROLE_NOT_FOUND));
+            if (!accountRoleRepository.existsByAccountIdAndRoleId(approval.getRequesterId(), supplier)) {
                 accountRoleRepository.addAccountRole(approval.getRequesterId(), supplier);
             }
             supplierRepository.addSupplier(
@@ -160,49 +169,59 @@ public class SupplierServiceImpl implements SupplierService {
                     approval.getRequesterId()
             );
             approvalRepository.processRequest(request.getId(), request.getStatus().name(), account.getId(), LocalDateTime.now());
-            CompletableFuture.supplyAsync(() -> {
-                try {
-                    Account requester = accountRepository.findById(approval.getRequesterId()).orElseThrow(()-> new DodException(MessageCode.USER_NOT_FOUND));
-
-                    emailService.sendSimpleMail(
-                            requester.getEmail(),
-                            "Yêu cầu đăng ký làm Supplier",
-                            requester.getFullName(),
-                            "Yêu cầu của bạn đã được duyệt",
-                            "Yêu cầu đăng ký cho supplier " + data.getName() + " đã được chấp thuận. Bạn từ giờ đã là Supplier của chúng tôi",
-                            null, 0);
-                    System.out.println("Email đã được gửi thành công.");
-
-                } catch (Exception e) {
-                    System.err.println("Send Mail Failed");
-                }
-                return null;
-            });
+            content = "Yêu cầu đăng ký cho supplier " + data.getName() + " đã được chấp thuận. Bạn từ giờ đã là Supplier của chúng tôi";
         } else if (request.getStatus().equals(Constants.ApprovalStatus.REJECTED)) {
             approvalRepository.processRequest(request.getId(), request.getStatus().name(), account.getId(), LocalDateTime.now());
-
-            CompletableFuture.supplyAsync(() -> {
-                try {
-                    Account requester = accountRepository.findById(approval.getRequesterId()).orElseThrow(()-> new DodException(MessageCode.USER_NOT_FOUND));
-
-                    emailService.sendSimpleMail(
-                            requester.getEmail(),
-                            "Yêu cầu đăng ký làm Supplier",
-                            requester.getFullName(),
-                            "Yêu cầu của bạn đã bị từ chối",
-                            "Yêu cầu đăng ký cho supplier " + data.getName() + "đã được chấp thuận. Bạn từ giờ đã là Supplier của chúng tôi",
-                            null, 0);
-                    System.out.println("Email đã được gửi thành công.");
-                } catch (Exception e) {
-                    System.err.println("Send Mail Failed");
-                }
-                return null;
-            });
+            content = "Yêu cầu đăng ký cho supplier " + data.getName() + " đã không được chấp thuận. Bạn vui lòng kiểm tra lại thông tin đăng ký!";
         } else {
             throw new DodException(MessageCode.PROCESS_REQUEST_ERROR);
         }
+        CompletableFuture.supplyAsync(() -> {
+            try {
+                Account requester = accountRepository.findById(approval.getRequesterId()).orElseThrow(() -> new DodException(MessageCode.USER_NOT_FOUND));
+                sendNotification(requester.getId(), requester.getUsername(), header, content);
+                sendNotificationForManager();
+                sendEmail(requester.getEmail(), header, requester.getFullName(),
+                        request.getStatus().equals(Constants.ApprovalStatus.APPROVED) ? "Yêu cầu của bạn đã được duyệt" : "Yêu cầu của bạn đã bị từ chối",
+                        content);
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
+            return null;
+        });
     }
 
+    private void sendNotificationForManager() {
+        try {
+            addNotifyService.addSupplierRequest();
+            sendNotifyService.sendGroupNotification(Constants.Role.SUPPLIER_MANAGER, "new Notify");
+        } catch (Exception e) {
+            System.err.println(MessageCode.ADD_NOTIFY_FAILED);
+        }
+    }
+
+    private void sendNotification(Long accountId, String username, String header, String content) {
+        try {
+            AddNotifyReq addNotifyReq = new AddNotifyReq();
+            addNotifyReq.setHeader(header);
+            addNotifyReq.setMessage(content);
+            addNotifyReq.setTimestamp(LocalDateTime.now());
+            addNotifyReq.setPageRedirect(Constants.PageRedirect.SupplierRequest);
+            addNotifyReq.setData(null);
+            addNotifyService.addNotify(addNotifyReq, List.of(accountId));
+            sendNotifyService.sendNotification(username, addNotifyReq);
+        } catch (Exception e) {
+            System.err.println(MessageCode.ADD_NOTIFY_FAILED);
+        }
+    }
+
+    private void sendEmail(String email, String header, String fullName, String subject, String content) {
+        try {
+            emailService.sendSimpleMail(email, header, fullName, subject, content, null, 0);
+        } catch (Exception e) {
+            System.err.println("Send Mail Failed");
+        }
+    }
     @Override
     public Page<SupplierInfo> viewSupplier(SupplierFilter filter) {
         int pageNum = filter.getPageNum() != null ? filter.getPageNum() : 1;
@@ -264,7 +283,7 @@ public class SupplierServiceImpl implements SupplierService {
         Long totalRecords = entityManager.createQuery(countQuery).getSingleResult();
 
 
-        return new PageImpl<SupplierInfo>(list, PageRequest.of(pageNum - 1, pageSize), totalRecords);
+        return new PageImpl<>(list, PageRequest.of(pageNum - 1, pageSize), totalRecords);
     }
 
     @Override

@@ -41,4 +41,6 @@ public interface FunctionRepository extends CrudRepository<Function, Long>, JpaS
 
     @Query(value = "select priority from cmd_function WHERE ID = ?1", nativeQuery = true)
     Optional<Integer> findPriorityById(Long functionId);
+
+    boolean existsByFeRoute(String name);
 }

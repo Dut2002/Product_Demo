@@ -1,4 +1,8 @@
+@import "ngx-toastr/toastr";
+
 $mono: 'Source Code Pro', monospace;
+
+
 
 
 * {
@@ -157,6 +161,14 @@ $mono: 'Source Code Pro', monospace;
   border: 1px solid black;
   top: 100%;
   left: 0;
+}
+
+.form-select .ng-option-marked {
+  border-radius: 4px;
+  background-color: lightblue;
+  color: black;
+  transition: background-color 0.25s ease, transform 0.25s ease;
+  transform: scale(1.02); /* Phóng to nhẹ */
 }
 
 .form-input .select-label {
@@ -748,10 +760,20 @@ section h1.title {
 
 .list-request {
   margin-top: 20px;
+  height: 70vh;
+  overflow: auto;
 }
 
 .modal-action {
   display: flex;
   justify-content: center;
   gap: 12px;
+}
+
+
+
+.noselect {
+  user-select: none; /* Ngăn chặn bôi đen */
+  pointer-events: none; /* Ngăn chặn các tương tác chuột */
+  -webkit-user-drag: none; /* Ngăn chặn kéo trong trình duyệt WebKit */
 }

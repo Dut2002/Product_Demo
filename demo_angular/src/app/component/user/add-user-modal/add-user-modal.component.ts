@@ -32,8 +32,6 @@ export class AddUserModalComponent {
     }
     this.common.base.get(endpoint).subscribe({
       next: (response) => {
-        console.log(response);
-
         this.roleSearchBox = response;
       },
       error: (err) => {

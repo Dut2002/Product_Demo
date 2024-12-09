@@ -21,14 +21,9 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.ParameterMode;
 import jakarta.persistence.StoredProcedureQuery;
 import jakarta.persistence.criteria.*;
-import org.apache.poi.ss.util.AreaReference;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.*;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTable;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableColumn;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableColumns;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableStyleInfo;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -404,10 +399,21 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ByteArrayInputStream productListReport() throws IOException {
+    public ByteArrayInputStream productListReport(@NotNull ProductFilter filter) throws IOException {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ProductDto> query = criteriaBuilder.createQuery(ProductDto.class);
         Root<Product> root = query.from(Product.class);
+
+        List<Predicate> predicates = createPredicates(criteriaBuilder, root, filter);
+        if (filter.getOrderCol() != null && !filter.getOrderCol().isBlank()) {
+            if (filter.getSortDesc() != null ? filter.getSortDesc() : false) {
+                query.orderBy(criteriaBuilder.desc(root.get(filter.getOrderCol())));
+            } else {
+                query.orderBy(criteriaBuilder.asc(root.get(filter.getOrderCol())));
+            }
+        }
+        query.where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
+
         query.multiselect(
                 root.get("id"),
                 root.get("name"),
@@ -421,7 +427,9 @@ public class ProductServiceImpl implements ProductService {
                 root.join("supplier", JoinType.INNER).get("name")
         );
 
-        List<ProductDto> products = entityManager.createQuery(query).getResultList();
+
+        List<ProductDto> list = entityManager.createQuery(query)
+                .getResultList();
 
         String[] columns = {"No", "Id","Name", "Year Making", "Price", "Quantity", "Expire Date", "Category", "Supplier"};
         try (XSSFWorkbook workbook = new XSSFWorkbook();
@@ -440,36 +448,36 @@ public class ProductServiceImpl implements ProductService {
             sheet.setColumnWidth(8, 25 * 256);
 
             sheet.createFreezePane(0, 1);
-            sheet.setAutoFilter(new CellRangeAddress(0, products.size(), 1, columns.length - 1));
+            sheet.setAutoFilter(new CellRangeAddress(0, list.size(), 1, columns.length - 1));
 
-            AreaReference areaReference = new AreaReference(
-                    new CellReference(0, 0), // Bắt đầu từ ô đầu tiên (0,0)
-                    new CellReference(products.size(), columns.length-1), // Kết thúc tại hàng cuối và cột cuối
-                    workbook.getSpreadsheetVersion()
-            );
+//            AreaReference areaReference = new AreaReference(
+//                    new CellReference(0, 0), // Vùng bắt đầu từ ô đầu tiên
+//                    new CellReference(products.size(), columns.length - 1), // Vùng kết thúc khớp với dữ liệu
+//                    SpreadsheetVersion.EXCEL2007 // Đảm bảo đúng phiên bản Excel
+//            );
 
-            XSSFTable table = sheet.createTable(areaReference);
-            table.setName("ProductTable"); // Tên bảng
-            table.setDisplayName("ProductTable"); // Tên hiển thị của bảng
-
-            CTTable ctTable = table.getCTTable();
-            ctTable.setRef(areaReference.formatAsString()); // Đảm bảo vùng tham chiếu đúng
-            ctTable.setId(1); // ID bảng phải là duy nhất
-            ctTable.setName("ProductTable");
-            ctTable.setDisplayName("ProductTable");
-
-            CTTableStyleInfo tableStyleInfo = ctTable.addNewTableStyleInfo();
-            tableStyleInfo.setName("TableStyleMedium9"); // Chọn style (chẳng hạn "TableStyleMedium9")
-            tableStyleInfo.setShowRowStripes(true);
-            tableStyleInfo.setShowColumnStripes(false);
-
-            CTTableColumns tableColumns = ctTable.addNewTableColumns();
-            tableColumns.setCount(columns.length);
-            for (int i = 0; i < columns.length; i++) {
-                CTTableColumn column = tableColumns.addNewTableColumn();
-                column.setId(i + 1); // ID của mỗi cột (bắt đầu từ 1)
-                column.setName(columns[i]); // Tên cột
-            }
+//            XSSFTable table = sheet.createTable(areaReference);
+//            table.setName("ProductTable"); // Tên bảng
+//            table.setDisplayName("ProductTable"); // Tên hiển thị của bảng
+//
+//            CTTable ctTable = table.getCTTable();
+//            ctTable.setRef(areaReference.formatAsString()); // Đảm bảo vùng tham chiếu đúng
+//            ctTable.setId(1); // ID bảng phải là duy nhất
+//            ctTable.setName("ProductTable");
+//            ctTable.setDisplayName("ProductTable");
+//
+//            CTTableStyleInfo tableStyleInfo = ctTable.addNewTableStyleInfo();
+//            tableStyleInfo.setName("TableStyleMedium9"); // Chọn style (chẳng hạn "TableStyleMedium9")
+//            tableStyleInfo.setShowRowStripes(true);
+//            tableStyleInfo.setShowColumnStripes(false);
+//
+//            CTTableColumns tableColumns = ctTable.addNewTableColumns();
+//            tableColumns.setCount(columns.length);
+//            for (int i = 0; i < columns.length; i++) {
+//                CTTableColumn column = tableColumns.addNewTableColumn();
+//                column.setId(i + 1); // ID của mỗi cột (bắt đầu từ 1)
+//                column.setName(columns[i]); // Tên cột
+//            }
 
 
             XSSFRow header = sheet.createRow(0);
@@ -488,7 +496,7 @@ public class ProductServiceImpl implements ProductService {
             priceStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat("$#,##0.00"));
 
             int rowIndex = 1;
-            for (ProductDto productDto : products) {
+            for (ProductDto productDto : list) {
                 XSSFRow row = sheet.createRow(rowIndex);
 
                 XSSFCell noCell = row.createCell(0);

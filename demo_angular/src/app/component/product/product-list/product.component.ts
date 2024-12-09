@@ -134,10 +134,12 @@ export class ProductComponent implements OnInit {
       this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
       return;
     }
-    let params = new HttpParams()
-    params = params.set('option', 'xlsx');
+    let data = {
+      filter: this.productFilter,
+      option: 'xlsx'
+    }
     // Implement export functionality
-    this.common.base.export(endpoint, params).subscribe({
+    this.common.base.export(endpoint, data).subscribe({
       next: (response) => {
 
         const blob = new Blob([response.body!], { type: response.body?.type || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })

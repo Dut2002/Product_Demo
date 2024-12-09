@@ -52,7 +52,7 @@ public class SecurityAuthConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Collections.singletonList("*")); // Chấp nhận tất cả các nguồn
+        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:4200")); // Chấp nhận tất cả các nguồn
         configuration.setAllowedMethods(Arrays.asList(
                 HttpMethod.GET.name(),
                 HttpMethod.POST.name(),
@@ -62,11 +62,11 @@ public class SecurityAuthConfig {
         ); // Chấp nhận các phương thức
 //        configuration.setAllowedHeaders(Arrays.asList("X-Requested-With", "Origin", "Content-Type","Content-Length", "Accept", "Authorization"));
         configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true); // Quan trọng: cho phép credentials
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -81,15 +81,17 @@ public class SecurityAuthConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint()))
 
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Cấu hình quản lý phiên
-                .authorizeHttpRequests(auth -> auth // Cấu hình phân quyền truy cập
-                        .requestMatchers(HttpMethod.POST, "/api/login/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/login/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/v3/api-docs/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/user/send-otp-reset-password").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/user/reset-password").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/search/**").permitAll()
-//                        .requestMatchers(HttpMethod.POST, "/api/product/upload-product").permitAll()
+                .authorizeHttpRequests(req -> req
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/api/login/**",
+                                "/api/user/send-otp-reset-password",
+                                "/api/user/reset-password",
+                                "/api/search/**",
+                                "/api/web-socket/**",
+                                "/ws/**"
+                        ).permitAll()
                         .anyRequest().authenticated()); // Tất cả yêu cầu còn lại phải được xác thực
         return http.build();
     }

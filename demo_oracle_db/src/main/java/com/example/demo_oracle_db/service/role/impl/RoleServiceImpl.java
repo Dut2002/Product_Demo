@@ -7,6 +7,7 @@ import com.example.demo_oracle_db.service.priority.PriorityService;
 import com.example.demo_oracle_db.service.role.RoleService;
 import com.example.demo_oracle_db.service.role.request.RoleReq;
 import com.example.demo_oracle_db.service.role.response.RoleRes;
+import com.example.demo_oracle_db.util.Constants;
 import com.example.demo_oracle_db.util.MessageCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,11 +54,11 @@ public class RoleServiceImpl implements RoleService {
     public void addRole(RoleReq req) throws DodException {
         Integer priority = priorityService.getCurrentUserPriority();
         if (priority == null) throw new DodException(MessageCode.ROLE_PRIORITY_NOT_FOUND);
-
-        if (roleRepository.existsByName(req.getName())) {
+        String roleName = "ROLE_" + req.getName().toUpperCase().replace(" ", "_");
+        if (roleRepository.existsByName(roleName)) {
             throw new DodException(MessageCode.ROLE_NAME_EXIST, req.getName());
         }
-        roleRepository.addRole("ROLE_" + req.getName().toUpperCase().replace(" ", "_"), priority);
+        roleRepository.addRole(roleName, priority + 1);
     }
 
     @Override
@@ -81,12 +82,13 @@ public class RoleServiceImpl implements RoleService {
     public void deleteRole(Long id) throws DodException {
         Integer priority = priorityService.getCurrentUserPriority();
         if (priority == null) throw new DodException(MessageCode.ROLE_PRIORITY_NOT_FOUND);
+        Role role = roleRepository.findById(id).orElseThrow(()-> new DodException(MessageCode.ROLE_NOT_FOUND));
         priorityService.checkRolePriority(priority, id);
-
-
-        if (!roleRepository.existsById(id)) {
-            throw new DodException(MessageCode.ROLE_NOT_EXIST);
-        }
+//        if (!roleRepository.existsById(id)) {
+//            throw new DodException(MessageCode.ROLE_NOT_EXIST);
+//        }
+        if(role.getName().equals(Constants.Role.USER))
+            throw new DodException(MessageCode.ROLE_USER_DEFAULT);
         if (accountRoleRepository.existsByRoleId(id)) {
             throw new DodException(MessageCode.ROLE_ALREADY_IN_USE);
         }

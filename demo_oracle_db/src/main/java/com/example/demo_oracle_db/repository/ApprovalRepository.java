@@ -36,5 +36,9 @@ public interface ApprovalRepository extends CrudRepository<Approval, Long>, JpaS
             " set note = ?2, update_by = ?3, update_at = ?4 " +
             " where id = ?1 ")
     void saveNote(Long id, String note, Long accountId, LocalDate now);
+
+    @Query(nativeQuery = true, value = "select count(1) from cmd_approval" +
+            " where status = ?2 and approval_type = ?1")
+    Integer countRequest(String approvalType, String approvalStatus);
 }
 

@@ -6,6 +6,7 @@ import { AuthService } from '../auth/auth.service';
 import { BaseService } from '../base/base.service';
 import { ErrorHandleService } from '../error-handle/error-handle.service';
 import { SnackBarService } from '../snack-bar/snack-bar.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +27,7 @@ export class CommonService {
     public errorHandle: ErrorHandleService,
     public snackBar: SnackBarService,
     public auth: AuthService,
+    public toastService: ToastrService,
     public router: Router
   ) {
   }
@@ -34,7 +36,7 @@ export class CommonService {
     const path = route?.routeConfig?.path;
     this.functionName = this.auth.getFunction(path);
     if (!this.functionName) {
-      this.router.navigate([RouterUrl.NOT_FOUND]);
+      // this.router.navigate([RouterUrl.NOT_FOUND]);
     }
   }
 

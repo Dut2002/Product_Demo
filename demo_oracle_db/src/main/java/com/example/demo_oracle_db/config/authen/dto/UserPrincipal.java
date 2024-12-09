@@ -17,14 +17,16 @@ public class UserPrincipal implements UserDetails, Authentication  {
     List<String> roles;
     String password;
     String username;
+    String fullName;
     Integer priority;
     Set<GrantedAuthorityCustom> authorities;
     private boolean authenticated = true;
 
-    public UserPrincipal(String username, @Size(max = 255) String password, Integer priority, List<String> roles, Set<GrantedAuthorityCustom> authorities) {
+    public UserPrincipal(String username, String fullName, @Size(max = 255) String password, Integer priority, List<String> roles, Set<GrantedAuthorityCustom> authorities) {
         this.username = username;
         this.password = password;
         this.priority = priority;
+        this.fullName = fullName;
         this.roles = roles;
         this.authorities = authorities;
     }

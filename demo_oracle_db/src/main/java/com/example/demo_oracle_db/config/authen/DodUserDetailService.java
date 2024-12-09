@@ -41,6 +41,7 @@ public class DodUserDetailService implements UserDetailsService {
     public UserPrincipal loadUserByUsername(String username) throws UsernameNotFoundException {
         Account account = accountRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
+
         Integer priority = accountRoleRepository.getAccountPriority(account.getId()).orElseThrow(() -> new UsernameNotFoundException("Priority not found!"));
         List<Role> roles = roleRepository.findByAccount(account.getId());
         if (roles.isEmpty()) throw new UsernameNotFoundException("Role not found");
@@ -55,6 +56,6 @@ public class DodUserDetailService implements UserDetailsService {
                     grantedAuthorities.add(new GrantedAuthorityCustom(functionInfo))
             );
         }
-        return new UserPrincipal(account.getUsername(), account.getPassword(), priority,roles.stream().map(Role::getName).toList(), grantedAuthorities);
+        return new UserPrincipal(account.getUsername(), account.getFullName() ,account.getPassword(), priority,roles.stream().map(Role::getName).toList(), grantedAuthorities);
     }
 }

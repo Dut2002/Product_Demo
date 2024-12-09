@@ -60,6 +60,7 @@ import { AddUserModalComponent } from './component/user/add-user-modal/add-user-
 import { FixSystemComponent } from './component/fix-system/fix-system.component';
 import { FixSystemDetailsComponent } from './component/fix-system/fix-system-details/fix-system-details.component';
 import { PermissionModalComponent } from './component/function/permission-modal/permission-modal.component';
+import {ToastrModule} from 'ngx-toastr'
 
 @NgModule({
   declarations: [
@@ -122,7 +123,14 @@ import { PermissionModalComponent } from './component/function/permission-modal/
     MatFormFieldModule,
     MatInputModule,
     MatPseudoCheckboxModule,
-    MatButtonModule,
+    ToastrModule.forRoot({
+      progressBar: true,
+      newestOnTop: true,
+      closeButton: true,
+      tapToDismiss: true,
+      positionClass: 'toast-bottom-right',
+      timeOut: 5000
+    }),
   ],
   providers: [
     provideHttpClient(withInterceptors([authenInterceptor,])),

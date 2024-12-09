@@ -18,11 +18,11 @@
         </div>
         <div><strong>Email:</strong>
           <div>
-            <a href="mailto:{{request.data.email }}">{{request.data.email }}</a>
+            <a target="_blank" href="mailto:{{request.data.email }}">{{request.data.email }}</a>
           </div>
         </div>
         <div><strong>Website:</strong>
-          <div> <a [href]="request.data.website">{{ request.data.website }}</a></div>
+          <div> <a target="_blank" [href]="request.data.website">{{ request.data.website }}</a></div>
         </div>
         <div><strong>Requester:</strong>
           <div> {{request.fullName}}</div>

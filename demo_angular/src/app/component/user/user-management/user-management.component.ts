@@ -3,8 +3,9 @@ import { AccountDto } from '../../../model/account-management/account-dto';
 import { AccountFilter } from '../../../model/filter/search-filter';
 import { CommonService } from '../../../service/common/common.service';
 import { ActivatedRoute } from '@angular/router';
-import { PermissionName } from '../../../constant/api.const.urls';
+import { ApiStatus, PermissionName } from '../../../constant/api.const.urls';
 import { AddUserModalComponent } from '../add-user-modal/add-user-modal.component';
+import { HttpParams } from '@angular/common/http';
 
 @Component({
   selector: 'app-user-management',
@@ -64,5 +65,41 @@ export class UserManagementComponent {
     this.loadAccounts();
   }
 
+  changePassword(id: number){
+    const endpoint = this.common.getPermission(PermissionName.UserManagement.CHANGE_PASSWORD)
+    if (!endpoint) {
+      this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
+      return;
+    }
+    const body = {
+      id: id
+    }
+    this.common.base.put(endpoint, body).subscribe({
+      next: (response) => {
+        this.common.snackBar.show(null, response.content, ApiStatus.SUCCESS, 5000)
+        this.loadAccounts();
+      },
+      error: (error) => {
+        this.common.errorHandle.handle(error)
+      }
+    });
+  }
 
+  deleteAccount(id: number){
+    const endpoint = this.common.getPermission(PermissionName.UserManagement.DELETE_USER)
+    if (!endpoint) {
+      this.common.errorHandle.show('Unauthorized access.', 'You do not have permission to access this resource!');
+      return;
+    }
+    const params = new HttpParams().set("id", id)
+    this.common.base.delete(endpoint, params).subscribe({
+      next: (response) => {
+        this.common.snackBar.show(null, response.content, ApiStatus.SUCCESS, 5000)
+        this.loadAccounts();
+      },
+      error: (error) => {
+        this.common.errorHandle.handle(error)
+      }
+    });
+  }
 }

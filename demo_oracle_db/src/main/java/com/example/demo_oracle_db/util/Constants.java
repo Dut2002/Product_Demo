@@ -17,6 +17,8 @@ public class Constants {
         String CUSTOMER = "ROLE_CUSTOMER";
         String SUPPLIER = "ROLE_SUPPLIER";
         String SUPER_ADMIN = "ROLE_SUPER_ADMIN";
+        String USER = "ROLE_USER";
+        String SUPPLIER_MANAGER = "ROLE_SUPPLIER_MANAGER";
     }
 
     public interface TypeImport {
@@ -64,5 +66,10 @@ public class Constants {
         Blocked,
         Deleted,
         Banned
+    }
+
+    public enum PageRedirect {
+        SupplierRequest,
+        SupplierRequestManagement
     }
 }

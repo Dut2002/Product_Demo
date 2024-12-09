@@ -42,7 +42,7 @@ class FunctionServiceImpl implements FunctionService {
         if (functionRepository.existsByName(request.getName())) {
             throw new DodException(MessageCode.FUNCTION_NAME_EXISTS, request.getName());
         }
-        if (functionRepository.existsByName(request.getName())) {
+        if (functionRepository.existsByFeRoute(request.getFeRoute())) {
             throw new DodException(MessageCode.FUNCTION_FE_ROUTE_EXISTS, request.getFeRoute());
         }
         functionRepository.addFunction(

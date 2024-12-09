@@ -1,5 +1,6 @@
 package com.example.demo_oracle_db.service.supplier.mySupplier.impl;
 
+import com.example.demo_oracle_db.entity.Account;
 import com.example.demo_oracle_db.entity.Approval;
 import com.example.demo_oracle_db.entity.Supplier;
 import com.example.demo_oracle_db.exception.DodException;
@@ -9,6 +10,8 @@ import com.example.demo_oracle_db.repository.SupplierRepository;
 import com.example.demo_oracle_db.service.mySupplier.request.CancelRequest;
 import com.example.demo_oracle_db.service.mySupplier.response.MyRequestDto;
 import com.example.demo_oracle_db.service.mySupplier.response.SupplierInfo;
+import com.example.demo_oracle_db.service.notify.AddNotifyService;
+import com.example.demo_oracle_db.service.notify.res.SendNotifyService;
 import com.example.demo_oracle_db.service.supplier.mySupplier.MySupplierService;
 import com.example.demo_oracle_db.service.supplier.mySupplier.request.OpenSupplierRequest;
 import com.example.demo_oracle_db.util.Constants;
@@ -20,6 +23,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -28,18 +32,18 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
+@RequiredArgsConstructor
 public class MySupplierServiceImpl implements MySupplierService {
 
-    @Autowired
-    AccountRepository accountRepository;
-    @Autowired
-    ApprovalRepository approvalRepository;
-    @Autowired
-    SupplierRepository supplierRepository;
-    @Autowired
-    EntityManager entityManager;
+    private final AccountRepository accountRepository;
+    private final ApprovalRepository approvalRepository;
+    private final SupplierRepository supplierRepository;
+    private final EntityManager entityManager;
+    private final AddNotifyService addNotifyService;
+    private final SendNotifyService sendNotifyService;
 
     @Override
     public void supplierRegister(OpenSupplierRequest request) throws DodException {
@@ -70,12 +74,25 @@ public class MySupplierServiceImpl implements MySupplierService {
                     jsonRequest,//json
                     LocalDateTime.now()
             );
+            CompletableFuture.supplyAsync(()->{
+                try {
+                    sendNotification();
+                } catch (Exception e) {
+                    System.err.println(e.getMessage());
+                }
+                return null;
+            });
         } catch (JsonProcessingException e) {
             throw new DodException(MessageCode.JSON_PARSE_ERROR);
         } catch (Exception e) {
             // Xử lý các lỗi khác (lỗi không xác định)
             throw new DodException(MessageCode.ADD_REQUEST_FAILED);
         }
+    }
+
+    private void sendNotification() {
+        addNotifyService.addSupplierRequest();
+        sendNotifyService.sendGroupNotification(Constants.Role.SUPPLIER_MANAGER, "New Notify");
     }
 
     @Override
@@ -147,5 +164,13 @@ public class MySupplierServiceImpl implements MySupplierService {
             throw new DodException(MessageCode.REQUEST_COMPLETED);
         }
         approvalRepository.processRequest(approval.getId(), Constants.ApprovalStatus.CANCELED.name(), accountId, LocalDateTime.now());
+        CompletableFuture.supplyAsync(()->{
+            try {
+                sendNotification();
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
+            return null;
+        });
     }
 }

@@ -16,6 +16,6 @@ export class RouterUrl {
   static readonly SUPPLIER_APPROVAL = 'supplier-approval/view-request'
   static readonly MY_SUPPLIER = 'supplier-info/view-supplier-info';
   static readonly FIX_SYSTEM = 'fix-system/view-function';
-
+  static readonly VIEW_NOTIFICATION = 'notification/view-notify'
 }
 

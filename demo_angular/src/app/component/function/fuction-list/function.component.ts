@@ -1,13 +1,11 @@
+import { animate, style, transition, trigger } from '@angular/animations';
 import { HttpParams } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { finalize } from 'rxjs';
 import { ApiStatus, PermissionName } from '../../../constant/api.const.urls';
-import { AddPermissionDto } from '../../../model/dto/add-permission-dto';
 import { FunctionDto } from '../../../model/dto/function-dto';
-import { FunctionResponse } from '../../../model/dto/function-response';
 import { Function } from '../../../model/function';
-import { Permission } from '../../../model/permission';
 import { Role } from '../../../model/role';
 import { CommonService } from '../../../service/common/common.service';
 import { ConfirmModalComponent } from '../../common/confirm-modal/confirm-modal.component';
@@ -16,9 +14,21 @@ import { FunctionModalComponent } from '../function-modal/function-modal.compone
 @Component({
   selector: 'app-function',
   templateUrl: './function.component.html',
-  styleUrl: './function.component.scss'
+  styleUrl: './function.component.scss',
+  animations: [
+    trigger('permissionView', [
+      transition(':enter', [
+        style({ height: '0px', opacity: 0, overflow: 'hidden'}), // Bắt đầu từ chiều cao 0 và mờ
+        animate('{{timing}} cubic-bezier(0.4, 0.0, 0.2, 1)', style({ height: '*', opacity: 1 })) // Mở rộng chiều cao và hiển thị
+      ], { params: { timing: '1s' } }),
+      transition(':leave', [
+        animate('{{timing}} cubic-bezier(0.4, 0.0, 0.2, 1)', style({ height: '0px', opacity: 0 })) // Thu nhỏ và ẩn
+      ], { params: { timing: '0.5s' } }),
+    ])
+  ]
 })
 export class FunctionComponent implements OnInit {
+[x: string]: any;
 
   modalTitle = ''
   openSectionId: number | null = null;
@@ -33,6 +43,13 @@ export class FunctionComponent implements OnInit {
   constructor(public common: CommonService,
     private route: ActivatedRoute) {
 
+  }
+
+  getAnimationTiming(element: HTMLElement): string {
+    const height = element.scrollHeight; // Lấy chiều cao thật của nội dung
+    const baseDuration = 500; // Thời gian gốc (ms) cho chiều cao chuẩn
+    const duration = Math.min(1000, Math.max(300, (height / 100) * baseDuration)); // Giới hạn thời gian
+    return `${duration}ms`;
   }
 
   ngOnInit(): void {

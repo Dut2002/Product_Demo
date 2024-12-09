@@ -10,6 +10,4 @@ import lombok.Setter;
 public class ChangePassReq {
     @NotNull
     Long id;
-    @NotBlank
-    String password;
 }

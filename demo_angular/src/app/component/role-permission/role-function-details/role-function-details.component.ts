@@ -115,8 +115,6 @@ export class RoleFunctionDetailsComponent {
 
   ConfirmDelete(permissionId: number) {
     this.permissionDeleteId = permissionId;
-    console.log(permissionId);
-
     this.confirmModal.showConfirmation = true;
   }
 }

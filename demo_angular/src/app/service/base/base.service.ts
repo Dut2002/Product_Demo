@@ -29,7 +29,7 @@ export class BaseService {
   }
 
   // Gọi API PUT
-  put(endpoint: string, data: any): Observable<any> {
+  put(endpoint: string, data?: any): Observable<any> {
     return this.http.put(`${env+endpoint}`, data, {
       headers: new HttpHeaders(ApiHeaders.HEADER_DEFAULT)
     });
@@ -62,10 +62,10 @@ export class BaseService {
     })
   }
 
-  export(endpoint: string, params?: HttpParams) {
-    return this.http.get<Blob>(`${env + endpoint}`,
+  export(endpoint: string, data?: any) {
+    return this.http.post<Blob>(`${env + endpoint}`,
+      data,
       {
-        params: params,
         reportProgress: true,
         observe: 'response',
         responseType: 'blob' as 'json' //      }

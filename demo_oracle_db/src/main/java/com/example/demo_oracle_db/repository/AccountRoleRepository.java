@@ -33,4 +33,6 @@ public interface AccountRoleRepository extends CrudRepository<AccountRole,Long>,
     @Query(value = "select min(priority) from cmd_account_role " +
             " inner join demo.cmd_role cr on ACCOUNT_ID = ?1 AND cmd_account_role.ROLE_ID = cr.ID ", nativeQuery = true)
     Optional<Integer> getAccountPriority(Long accountId);
+
+    boolean existsByRoleIdAndRoleName(Long roleId, String user);
 }

@@ -71,7 +71,14 @@ public enum MessageCode {
     ROLE_PRIORITY_NOT_FOUND("Role priority not found"),
     ACCOUNT_PRIORITY_NOT_FOUND("Account priority not found"),
     FUNCTION_PRIORITY_NOT_FOUND("Function priority not found"),
-    ACCOUNT_NOT_PERMISSION("Account does not have sufficient permissions");
+    ACCOUNT_NOT_PERMISSION("Account does not have sufficient permissions"),
+    USER_ALREADY_BLOCKED("User account already blocked"),
+    USER_DELETED("User already deleted"),
+    USER_ALREADY_BANNED("User already banned"),
+    USER_INACTIVE("User can not active now"),
+    NOTIFY_NOT_FOUND("Notify not found"),
+    NOTIFY_ALREADY_READ("Notify already check read"), NOTIFY_RECEIVER_EMPTY("Notify receiver list is empty"),
+    ADD_NOTIFY_FAILED("Send notify failed!"), USER_ROLE_ALREADY_EXIST("User already has role [%]!"), ROLE_USER_DEFAULT("Role USER is default");
 
     private final String code;
 

@@ -9,6 +9,7 @@ import com.example.demo_oracle_db.service.product.request.AddVoucherRequest;
 import com.example.demo_oracle_db.service.product.request.ProductFilter;
 import com.example.demo_oracle_db.service.product.request.ProductRequest;
 import com.example.demo_oracle_db.service.product.response.ProductDto;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,7 +34,7 @@ public interface ProductService {
 
     void deleteVoucherFromProduct(Long productId, Long voucherId) throws DodException;
 
-    ByteArrayInputStream productListReport() throws IOException;
+    ByteArrayInputStream productListReport(@NotNull ProductFilter filter) throws IOException;
 
     ParseResult<ProductImportData> parseProduct(MultipartFile file, ParseOptions options);
 }

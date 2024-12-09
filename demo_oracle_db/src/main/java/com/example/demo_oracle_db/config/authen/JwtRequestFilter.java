@@ -95,6 +95,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
                 UserPrincipal userPrincipal = new UserPrincipal(
                         username,
+                        account.getFullName(),
                         null, // không cần password
                         priority,
                         roles.stream().map(Role::getName).toList(),

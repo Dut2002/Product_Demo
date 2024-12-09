@@ -8,7 +8,6 @@ import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -31,20 +30,17 @@ public class TokenProvider {
         return headers.get(jwtConfig.getHeader().toLowerCase()).replace(jwtConfig.getPrefix(), "");
     }
 
-    public String createToken(Authentication authentication) {
+    public String createToken(UserPrincipal userPrincipal) {
         try {
             Date date = new Date();
             long now = date.getTime();
-            UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-            List<String> roles = userPrincipal.getRoles();
-            // Lấy danh sách quyền (authorities) và endpoint
-            List<GrantedAuthorityCustom> authorities = authentication.getAuthorities().stream()
-                    .map(auth -> (GrantedAuthorityCustom) auth)
+            List<GrantedAuthorityCustom> authorities = userPrincipal.getAuthorities().stream()
                     .toList();
             List<FunctionInfo> functionInfos = authorities.stream().map(GrantedAuthorityCustom::getFunctionInfo)
                     .toList();
-            return Jwts.builder().setSubject(authentication.getName())
-                    .claim("roles", roles)
+            return Jwts.builder().setSubject(userPrincipal.getName())
+                    .claim("fullName", userPrincipal.getFullName())
+                    .claim("roles", userPrincipal.getRoles())
                     .claim("functions", functionInfos)
                     .setIssuedAt(date)
                     .setExpiration(new Date(now + jwtConfig.getExpiration() * 1000L))//milliseconds
@@ -56,11 +52,11 @@ public class TokenProvider {
         }
     }
 
-    public String createRefreshToken(Authentication authentication) {
+    public String createRefreshToken(UserPrincipal userPrincipal) {
         try {
             Date date = new Date();
             long now = date.getTime();
-            return Jwts.builder().setSubject(authentication.getName())
+            return Jwts.builder().setSubject(userPrincipal.getName())
                     .setIssuedAt(date)
                     .setExpiration(new Date(now + jwtConfig.getRefreshExpiration() * 1000L))//milliseconds
                     .signWith(SignatureAlgorithm.HS512, jwtConfig.getSecret().getBytes())
@@ -71,9 +67,8 @@ public class TokenProvider {
         }
     }
 
-    public Authentication getAuthentication(String token) {
-        UserPrincipal userPrincipal = dodUserDetailService.loadUserByUsername(getUsername(token));
-        return new UsernamePasswordAuthenticationToken(userPrincipal, userPrincipal.getRoles(), userPrincipal.getAuthorities());
+    public UserPrincipal getUserPrincipal(String username) {
+        return dodUserDetailService.loadUserByUsername(username);
     }
 
     public String getUsername(String token) {

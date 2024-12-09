@@ -1,12 +1,12 @@
 <div class="modal" *ngIf="showModal">
   <div class="modal-content">
     <h2 class="modal-title">{{ modalTitle }}</h2>
-    <form class="flex" #productForm="ngForm" (ngSubmit)="saveProduct()">
+    <form class="flex" #productForm="ngForm">
       <input type="hidden" [(ngModel)]="product.id" name="id">
       <div class="form-input flex-half">
         <label class="form-label" for="category">Product Name</label>
         <div class="form-input-enter">
-          <input type="text" [(ngModel)]="product.name" #name="ngModel" name="name" placeholder="Product Name"
+          <input type="text" [(ngModel)]="product.name" #name="ngModel" name="name" placeholder="Product Name" tabindex="1"
             [minlength]="2" [maxlength]="100" [required]="true">
         </div>
         <div *ngIf="name.touched && !name.valid" class="validate-input">
@@ -17,7 +17,7 @@
       <div class="form-input flex-half">
         <label class="form-label" for="category">Year Making</label>
         <div class="form-input-enter">
-          <input type="number" [(ngModel)]="product.yearMaking" #yearMaking="ngModel" name="yearMaking"
+          <input type="number" [(ngModel)]="product.yearMaking" #yearMaking="ngModel" name="yearMaking" tabindex="2"
             placeholder="Year Making" [min]="1900" [required]="true">
         </div>
         <div *ngIf="yearMaking.touched && !yearMaking.valid" class="validate-input">
@@ -28,7 +28,7 @@
       <div class="form-input flex-half">
         <label class="form-label" for="category">Price</label>
         <div class="form-input-enter">
-          <input type="number" [(ngModel)]="product.price" #price="ngModel" name="price" placeholder="Price" [min]="0"
+          <input type="number" [(ngModel)]="product.price" #price="ngModel" name="price" placeholder="Price" [min]="0" tabindex="3"
             [required]="true">
         </div>
         <div *ngIf="price.touched && !price.valid" class="validate-input">
@@ -39,7 +39,7 @@
       <div class="form-input flex-half">
         <label class="form-label" for="category">Quantity</label>
         <div class="form-input-enter">
-          <input type="number" [(ngModel)]="product.quantity" #quantity="ngModel" name="quantity" placeholder="Quality"
+          <input type="number" [(ngModel)]="product.quantity" #quantity="ngModel" name="quantity" placeholder="Quality" tabindex="4"
             [min]="0" [required]="true">
         </div>
         <div *ngIf="quantity.touched && !quantity.valid" class="validate-input">
@@ -50,7 +50,7 @@
       <div class="form-input flex-half">
         <label class="form-label" for="category">Expire Date</label>
         <div class="form-input-enter">
-          <input type="date" [(ngModel)]="product.expireDate" #expireDate="ngModel" name="expridate"
+          <input type="date" [(ngModel)]="product.expireDate" #expireDate="ngModel" name="expridate" tabindex="5"
             placeholder="Expired Date" [required]="true">
         </div>
         <div *ngIf="expireDate.touched && !expireDate.valid" class="validate-input">
@@ -60,7 +60,7 @@
       <div class="form-input flex-half">
         <label class="form-label" for="category">Category</label>
         <div class="form-input-enter">
-          <ng-select class="form-select" [items]="categoryBox" bindLabel="name" bindValue="id"
+          <ng-select class="form-select" [items]="categoryBox" bindLabel="name" bindValue="id" tabindex="6"
             [placeholder]="'Category: '" [(ngModel)]="product.categoryId" name="categoryId"
             [ngModelOptions]="{ standalone: true }" [searchable]="true" [required]="true" #category="ngModel">
           </ng-select>
@@ -72,8 +72,8 @@
       <div class="form-input flex-half">
         <label class="form-label" for="category">Supplier</label>
         <div class="form-input-enter">
-          <ng-select class="form-select" [items]="supplierBox" bindLabel="name" bindValue="id"
-            [placeholder]="'Supplier: '" [(ngModel)]="product.supplierId" name="supplierId"
+          <ng-select class="form-select" [items]="supplierBox" bindLabel="name" bindValue="id" tabindex="7"
+            [placeholder]="'Supplier: '" [(ngModel)]="product.supplierId" name="supplierId" markFirst="true"
             [ngModelOptions]="{ standalone: true }" [searchable]="true" [required]="true" #supplier="ngModel">
           </ng-select>
         </div>
@@ -83,9 +83,9 @@
       </div>
 
       <div class="center">
-        <button [ngClass]="{'btn-disable': isLoading}" type="submit" class="btn btn-small btn-green">Save</button>
-        <button [ngClass]="{'btn-disable': isLoading}" type="button" class="btn btn-small btn-orange" (click)="onReset()">Refresh</button>
-        <button [ngClass]="{'btn-disable': isLoading}" type="button" class="btn btn-small btn-gray" (click)="openModal(false)">Cancel</button>
+        <button [ngClass]="{'btn-disable': isLoading}" type="button" class="btn btn-small btn-green" (click)="saveProduct()" tabindex="8">Save</button>
+        <button [ngClass]="{'btn-disable': isLoading}" type="button" class="btn btn-small btn-orange" (click)="onReset()" tabindex="9">Refresh</button>
+        <button [ngClass]="{'btn-disable': isLoading}" type="button" class="btn btn-small btn-gray" (click)="openModal(false)" tabindex="10">Cancel</button>
       </div>
     </form>
   </div>

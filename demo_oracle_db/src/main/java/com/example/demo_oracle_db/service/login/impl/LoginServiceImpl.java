@@ -1,6 +1,7 @@
 package com.example.demo_oracle_db.service.login.impl;
 
 import com.example.demo_oracle_db.config.authen.TokenProvider;
+import com.example.demo_oracle_db.config.authen.dto.UserPrincipal;
 import com.example.demo_oracle_db.entity.Account;
 import com.example.demo_oracle_db.entity.Role;
 import com.example.demo_oracle_db.exception.DodException;
@@ -16,8 +17,6 @@ import com.example.demo_oracle_db.util.MessageCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -51,24 +50,26 @@ public class LoginServiceImpl implements LoginService {
         if (!bCryptPasswordEncoder.matches(req.getPassword(), account.getPassword())) {
             throw new DodException(MessageCode.PASSWORD_INCORRECT);
         }
+
+        switch (account.getStatus()){
+            case Pending -> accountRepository.setStatus(account.getId(), Constants.Status.Active.name());
+            case Deleted -> throw new DodException(MessageCode.USER_DELETED);
+            case Blocked -> throw new DodException(MessageCode.USER_ALREADY_BLOCKED);
+            case Banned -> throw new DodException(MessageCode.USER_ALREADY_BANNED);
+            case Inactive -> throw new DodException(MessageCode.USER_INACTIVE);
+        }
         SecurityContextHolder.clearContext();
-        Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(account.getUsername(), req.getPassword()));
-        String accessToken = tokenProvider.createToken(auth);
-        String refreshToken = tokenProvider.createRefreshToken(auth);
+
+        UserPrincipal userPrincipal = tokenProvider.getUserPrincipal(account.getUsername());
+
+        String accessToken = tokenProvider.createToken(userPrincipal);
+        String refreshToken = tokenProvider.createRefreshToken(userPrincipal);
         if (StringUtils.hasText(accessToken) && StringUtils.hasText(refreshToken)) {
-            LogRes res = new LogRes();
-            res.setUsername(account.getUsername());
-            res.setEmail(account.getEmail());
-            res.setFullName(account.getFullName());
-            List<Role> roles = roleRepository.findByAccount(account.getId());
-            if (roles.isEmpty()) throw new DodException(MessageCode.ROLE_NOT_FOUND);
-            res.setRoles(roles.stream().map(Role::getName).toList());
-            res.setStatus(account.getStatus());
-            res.setToken(accessToken);
-            res.setRefreshToken(refreshToken);
+
+            LogRes res = longinResponse(account, accessToken, refreshToken);;
             try {
                 accountRepository.updateToken(accessToken, refreshToken, account.getId());
-                SecurityContextHolder.getContext().setAuthentication(auth);
+                SecurityContextHolder.getContext().setAuthentication(userPrincipal);
                 return res;
             } catch (Exception e) {
                 throw new DodException(MessageCode.LOGIN_FAILED);
@@ -78,27 +79,32 @@ public class LoginServiceImpl implements LoginService {
         }
     }
 
+    private LogRes longinResponse(Account account, String accessToken, String refreshToken) throws DodException {
+        LogRes res = new LogRes();
+        res.setUsername(account.getUsername());
+        res.setEmail(account.getEmail());
+        res.setFullName(account.getFullName());
+        List<Role> roles = roleRepository.findByAccount(account.getId());
+        if (roles.isEmpty()) throw new DodException(MessageCode.ROLE_NOT_FOUND);
+        res.setRoles(roles.stream().map(Role::getName).toList());
+        res.setStatus(account.getStatus());
+        res.setToken(accessToken);
+        res.setRefreshToken(refreshToken);
+        return res;
+    }
+
     @Override
     public LogRes checkRefreshToken(String refreshToken) throws DodException {
         if (tokenProvider.validateJwtToken(refreshToken)) {
             String username = tokenProvider.getUsername(refreshToken);
             Account account = accountRepository.findByUsername(username).orElseThrow(() -> new DodException(MessageCode.USER_NAME_NOT_EXIST, username));
-            Authentication auth = tokenProvider.getAuthentication(refreshToken);
+            UserPrincipal auth = tokenProvider.getUserPrincipal(username);
             if (refreshToken.equals(account.getRefreshToken())) {
                 String accessToken = tokenProvider.createToken(auth);
+                if(accessToken.isBlank()) throw new DodException(MessageCode.TOKEN_INVALID);
                 try {
                     // Tạo LogRes và thiết lập thông tin
-                    LogRes res = new LogRes();
-                    res.setUsername(account.getUsername());
-                    res.setEmail(account.getEmail());
-                    res.setFullName(account.getFullName());
-                    List<Role> role = roleRepository.findByAccount(account.getId());
-                    if (role.isEmpty()) throw new DodException(MessageCode.ROLE_NOT_FOUND);
-                    res.setRoles(role.stream().map(Role::getName).toList());
-                    res.setStatus(account.getStatus());
-                    res.setToken(accessToken);
-                    res.setRefreshToken(refreshToken);
-
+                    LogRes res = longinResponse(account, accessToken, refreshToken);
                     // Lưu thông tin tài khoản với access token mới
                     accountRepository.updateToken(accessToken, refreshToken, account.getId());
                     return res;
@@ -126,8 +132,8 @@ public class LoginServiceImpl implements LoginService {
                     req.getUsername(),
                     bCryptPasswordEncoder.encode(req.getPassword()),
                     req.getEmail(),
-                    req.getFullName()
-            );
+                    req.getFullName(),
+                    Constants.Status.Pending.name());
             Long accountId = accountRepository.getLastInsertedId();
             if(req.getRoles()!=null){
                 for (Long roleId: req.getRoles()
