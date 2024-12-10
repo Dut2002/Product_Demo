@@ -62,8 +62,6 @@ public class AccountServiceImpl implements AccountService {
 
         Page<Account> users = accountRepository.findAll((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            Join<Account,AccountRole> accountAccountRoleJoin = root.join("accountRoles", JoinType.INNER);
-            Join<AccountRole, Role> accountRoleRoleJoin = accountAccountRoleJoin.join("role", JoinType.INNER);
             if (request.getUsername() != null && !request.getUsername().isBlank()) {
                 String searchKey = request.getUsername().trim().toLowerCase();
                 predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("username")), "%" + searchKey + "%"));
@@ -80,10 +78,8 @@ public class AccountServiceImpl implements AccountService {
                 predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));
             }
             if (request.getRoleId() != null) {
-                predicates.add(criteriaBuilder.equal(accountAccountRoleJoin.get("roleId"), request.getRoleId()));
+                predicates.add(criteriaBuilder.equal(root.join("accountRoles", JoinType.INNER).get("roleId"), request.getRoleId()));
             }
-
-//            predicates.add(criteriaBuilder.notEqual(accountRoleRoleJoin.get("name"), Constants.Role.USER));
 
             assert query != null;
             Subquery<Integer> subquery = query.subquery(Integer.class);
